@@ -51,7 +51,6 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
                 String key = (String) e.nextElement();
                 if (alreadyAddedTables.add(key)) {
                     manager.addCollapsibleLabeledComponent(table.getValue(key), new TableOutputPanel(DotNetTables.subscribe(key)));
-                    // TODO: Add table to manager
                 }
             }
         }
