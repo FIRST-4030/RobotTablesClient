@@ -46,7 +46,7 @@ public class ClientFrameManager {
         constraints.fill = GridBagConstraints.VERTICAL;
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setLayout(new GridBagLayout());
-        addCollapsibleLabledComponent("Log", loggingText);
+        addCollapsibleLabeledComponent("Log", loggingText);
         frame.setTitle("Robot Output");
     }
 
@@ -54,7 +54,7 @@ public class ClientFrameManager {
         frame.setVisible(true);
     }
 
-    private void addCollapsibleLabledComponent(final String label, JComponent internalComponent) {
+    public void addCollapsibleLabeledComponent(final String label, JComponent internalComponent) {
         final JButton collapse = new JButton("Hide");
         final JXCollapsiblePane collapsiblePane = new JXCollapsiblePane();
         collapsiblePane.add(new JScrollPane(internalComponent));
@@ -86,6 +86,7 @@ public class ClientFrameManager {
     }
 
     public void addComponent(Component component) {
+        constraints.gridx++;
         frame.add(component, constraints);
     }
 
