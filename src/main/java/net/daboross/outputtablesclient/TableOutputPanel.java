@@ -30,15 +30,21 @@ import org.ingrahamrobotics.dotnettables.DotNetTable;
 public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableEvents {
 
     private final Map<String, JLabel> labels = new HashMap<>();
+    private final ClientFrameManager log;
 
-    public TableOutputPanel(final DotNetTable table) {
+    public TableOutputPanel(ClientFrameManager manager) {
+        this.log = manager;
+    }
+
+    public void init(DotNetTable table) {
         changed(table);
         table.onChange(this);
     }
 
     private void set(String key, String value) {
-        JLabel label = labels.get(key.toLowerCase());
+        JLabel label = labels.get(key);
         if (label == null) {
+            log.log("New key '%s', value = '%s'.", key, value);
             label = new JLabel(value);
             JPanel panel = new JPanel(new GridBagLayout());
             GridBagConstraints constraints = new GridBagConstraints();
@@ -47,14 +53,16 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             panel.add(label, constraints);
             panel.setBorder(new LineBorder(Color.BLACK));
             add(panel);
-        } else {
+            labels.put(key, label);
+        } else if (!label.getText().equals(value)) {
+            log.log("Key updated '%s', value = '%s'.", key, value);
             label.setText(value);
         }
     }
 
     @Override
     public void changed(final DotNetTable table) {
-        for (Enumeration e = table.keys(); e.hasMoreElements(); ) {
+        for (Enumeration e = table.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             String value = table.getValue(key);
             set(key, value);

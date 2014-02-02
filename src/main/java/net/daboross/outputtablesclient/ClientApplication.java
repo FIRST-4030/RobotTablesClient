@@ -32,25 +32,30 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
         manager = new ClientFrameManager();
         names = DotNetTables.subscribe("output-tables");
         alreadyAddedTables = new HashSet<>();
-        names.onChange(this);
     }
 
-    public void show() {
+    public void start() {
+        names.onChange(this);
         manager.show();
+        manager.log("Started");
+        this.changed(names);
     }
 
     public static void main(String[] args) throws IOException {
         DotNetTables.startClient("4030");
-        new ClientApplication().show();
+        new ClientApplication().start();
     }
 
     @Override
     public void changed(final DotNetTable table) {
         if (table.name().equals("output-tables")) {
-            for (Enumeration e = table.keys(); e.hasMoreElements(); ) {
+            for (Enumeration e = table.keys(); e.hasMoreElements();) {
                 String key = (String) e.nextElement();
                 if (alreadyAddedTables.add(key)) {
-                    manager.addCollapsibleLabeledComponent(table.getValue(key), new TableOutputPanel(DotNetTables.subscribe(key)));
+                    manager.log("New table '%s'.", key);
+                    TableOutputPanel panel = new TableOutputPanel(manager);
+                    panel.init(DotNetTables.subscribe(key));
+                    manager.addCollapsibleLabeledComponent(table.getValue(key), panel);
                 }
             }
         }
