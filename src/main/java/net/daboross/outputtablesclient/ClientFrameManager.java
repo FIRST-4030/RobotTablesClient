@@ -20,8 +20,11 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -54,35 +57,50 @@ public class ClientFrameManager {
         frame.setVisible(true);
     }
 
-    public void addCollapsibleLabeledComponent(final String label, JComponent internalComponent) {
+    public final JLabel addCollapsibleLabeledComponent(final String labelText, JComponent internalComponent) {
         final JButton collapse = new JButton("Hide");
         final JXCollapsiblePane collapsiblePane = new JXCollapsiblePane();
-        collapsiblePane.add(new JScrollPane(internalComponent));
+        JLabel label = new JLabel(labelText);
+        final JComponent scrollPane = new JScrollPane(internalComponent);
+        collapsiblePane.add(scrollPane);
         collapse.addActionListener(new AbstractAction() {
+            @Override
             public void actionPerformed(final ActionEvent e) {
                 if (collapsiblePane.isCollapsed()) {
+                    collapsiblePane.add(scrollPane);
                     collapsiblePane.setCollapsed(false);
                     collapse.setText("Hide");
                 } else {
                     collapsiblePane.setCollapsed(true);
                     collapse.setText("Show");
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                sleep(1000);
+                                collapsiblePane.remove(scrollPane);
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+                    }.start();
                 }
             }
         });
 
-        GridBagConstraints constraints = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints();
         JPanel panel = new JPanel(new GridBagLayout());
-        constraints.anchor = GridBagConstraints.ABOVE_BASELINE;
-        constraints.gridy = 1;
-        panel.add(new JLabel(label), constraints);
-        constraints.anchor = GridBagConstraints.BELOW_BASELINE;
-        constraints.gridy = 2;
-        panel.add(collapsiblePane, constraints);
-        constraints.anchor = GridBagConstraints.BELOW_BASELINE;
-        constraints.gridy = 3;
-        panel.add(collapse, constraints);
+        c.anchor = GridBagConstraints.ABOVE_BASELINE;
+        c.gridy = 1;
+        panel.add(label, c);
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.gridy = 2;
+        panel.add(collapsiblePane, c);
+        c.anchor = GridBagConstraints.BELOW_BASELINE;
+        c.gridy = 3;
+        panel.add(collapse, c);
 
         addComponent(panel);
+        return label;
     }
 
     public void addComponent(Component component) {

@@ -52,7 +52,8 @@ dependency-reduced-pom.xml
 .settings
 build
 dist
-nbproject
+/nbproject
+/nbactions.xml
 atlassian-ide-plugin.xml
 build.xml
 nb-configuration.xml

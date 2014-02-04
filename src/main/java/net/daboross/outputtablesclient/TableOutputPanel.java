@@ -24,48 +24,62 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 
 public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableEvents {
 
+    private static final Border border = new LineBorder(Color.BLACK);
     private final Map<String, JLabel> labels = new HashMap<>();
     private final ClientFrameManager log;
+    private JLabel label;
+    private final String name;
 
-    public TableOutputPanel(ClientFrameManager manager) {
+    public TableOutputPanel(ClientFrameManager manager, String name) {
         this.log = manager;
+        this.name = name;
+    }
+
+    public void setLabel(JLabel label) {
+        this.label = label;
     }
 
     public void init(DotNetTable table) {
-        changed(table);
         table.onChange(this);
     }
 
     private void set(String key, String value) {
-        JLabel label = labels.get(key);
-        if (label == null) {
-            log.log("New key '%s', value = '%s'.", key, value);
-            label = new JLabel(value);
+        JLabel valueLabel = labels.get(key);
+        if (valueLabel == null) {
+            log.log("[%s][%s*] %s", name, key, value);
+            valueLabel = new JLabel(value);
+            valueLabel.setBorder(border);
             JPanel panel = new JPanel(new GridBagLayout());
             GridBagConstraints constraints = new GridBagConstraints();
-            panel.add(new JLabel(key), constraints);
+            JLabel keyLabel = new JLabel(key);
+            keyLabel.setBorder(border);
+            panel.add(keyLabel, constraints);
             constraints.gridy++;
-            panel.add(label, constraints);
-            panel.setBorder(new LineBorder(Color.BLACK));
+            panel.add(valueLabel, constraints);
+            panel.setBorder(border);
             add(panel);
-            labels.put(key, label);
-        } else if (!label.getText().equals(value)) {
-            log.log("Key updated '%s', value = '%s'.", key, value);
-            label.setText(value);
+            labels.put(key, valueLabel);
+        } else if (!valueLabel.getText().equals(value)) {
+            log.log("[%s][%s] %s", name, key, value);
+            valueLabel.setText(value);
         }
     }
 
     @Override
     public void changed(final DotNetTable table) {
+        label.setText(name);
         for (Enumeration e = table.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
-            String value = table.getValue(key);
-            set(key, value);
+            if (!key.equals("_UPDATE_INTERVAL")) {
+                String value = table.getValue(key);
+                set(key, value);
+            }
         }
     }
 
