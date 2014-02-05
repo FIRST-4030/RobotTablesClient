@@ -23,8 +23,6 @@ import java.awt.event.ActionEvent;
 import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -106,6 +104,9 @@ public class ClientFrameManager {
     public void addComponent(Component component) {
         constraints.gridx++;
         frame.add(component, constraints);
+        frame.getContentPane().invalidate();
+        frame.getContentPane().validate();
+        frame.getContentPane().repaint();
     }
 
     public void log(String msg, Object... args) {

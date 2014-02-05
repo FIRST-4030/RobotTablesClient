@@ -49,7 +49,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
         table.onChange(this);
     }
 
-    private void set(String key, String value) {
+    private boolean set(String key, String value) {
         JLabel valueLabel = labels.get(key);
         if (valueLabel == null) {
             log.log("[%s][%s*] %s", name, key, value);
@@ -65,21 +65,30 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             panel.setBorder(border);
             add(panel);
             labels.put(key, valueLabel);
+            return true;
         } else if (!valueLabel.getText().equals(value)) {
             log.log("[%s][%s] %s", name, key, value);
             valueLabel.setText(value);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
     public void changed(final DotNetTable table) {
         label.setText(name);
+        boolean changed = false;
         for (Enumeration e = table.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             if (!key.equals("_UPDATE_INTERVAL")) {
                 String value = table.getValue(key);
-                set(key, value);
+                changed = changed || set(key, value);
             }
+        }
+        if (changed) {
+            validate();
+            repaint();
         }
     }
 
