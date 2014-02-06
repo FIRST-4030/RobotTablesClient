@@ -17,6 +17,7 @@
 package net.daboross.outputtablesclient;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.Enumeration;
@@ -81,13 +82,22 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             }
         }
         if (changed) {
-            invalidate();
-            validate();
-            repaint();
+            updateGraphics();
         }
     }
 
     @Override
     public void stale(final DotNetTable table) {
+    }
+
+    private void updateGraphics() {
+        Container p = getParent();
+        if (p != null) {
+            p.revalidate();
+            Container p2 = p.getParent();
+            if (p2 != null) {
+                p2.revalidate();
+            }
+        }
     }
 }

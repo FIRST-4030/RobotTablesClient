@@ -19,43 +19,37 @@ package net.daboross.outputtablesclient;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 public class ToggleAreaPanel extends JPanel {
 
-    private Container toggleOn;
-    private final HashMap<String, ToggleThing> thingsToToggle = new HashMap<>();
     private GridBagConstraints constraints = new GridBagConstraints();
 
     public ToggleAreaPanel() {
+        setLayout(new GridBagLayout());
+        constraints.ipadx = 2;
+        constraints.ipady = 2;
     }
 
-    public void setToggleOn(Container toggleOn) {
-        this.toggleOn = toggleOn;
-    }
-
-    public void addToToggle(final String name, Component toToggle, Object toggleConstraints) {
-        final ToggleThing thing = new ToggleThing(toToggle, toggleConstraints);
+    public void addToToggle(final String name, Component toToggle, Container container, Object toggleConstraints) {
+        final ToggleThing thing = new ToggleThing(toToggle, container, toggleConstraints);
         final JToggleButton button = new JToggleButton();
         button.setText(name);
-        thingsToToggle.put(name, thing);
-        button.addActionListener(new ActionListener() {
+        button.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (button.isEnabled()) {
-                    StaticLog.log("EsnureOn " + name);
+            public void itemStateChanged(ItemEvent e) {
+                if (button.isSelected()) {
                     thing.ensureOn();
                 } else {
-                    StaticLog.log("EsnureOff " + name);
                     thing.ensureOff();
                 }
             }
         });
-
+        button.setSelected(true);
         constraints.gridy++;
         add(button, constraints);
     }
@@ -63,11 +57,13 @@ public class ToggleAreaPanel extends JPanel {
     public class ToggleThing {
 
         private final Component toToggle;
+        private final Container toggleOn;
         private final Object toggleConstraints;
         private boolean toggled;
 
-        public ToggleThing(Component toToggle, Object toggleConstraints) {
+        public ToggleThing(Component toToggle, Container toggleOn, Object toggleConstraints) {
             this.toToggle = toToggle;
+            this.toggleOn = toggleOn;
             this.toggleConstraints = toggleConstraints;
         }
 
@@ -77,21 +73,32 @@ public class ToggleAreaPanel extends JPanel {
             } else {
                 toggleOn.add(toToggle, toggleConstraints);
             }
+            update();
             toggled = !toggled;
         }
 
         public void ensureOn() {
             if (!toggled) {
-                toggled = !toggled;
                 toggleOn.add(toToggle, toggleConstraints);
+                update();
+                toggled = !toggled;
             }
         }
 
         public void ensureOff() {
             if (toggled) {
                 toggleOn.remove(toToggle);
+                update();
                 toggled = !toggled;
             }
+        }
+
+        private void update() {
+            Container parent = getParent();
+            parent.revalidate();
+            parent.repaint();
+            toggleOn.revalidate();
+            toggleOn.repaint();
         }
     }
 }

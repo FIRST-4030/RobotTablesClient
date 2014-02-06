@@ -16,12 +16,14 @@
  */
 package net.daboross.outputtablesclient;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
@@ -29,45 +31,61 @@ import javax.swing.text.DefaultCaret;
 
 public class ClientFrameManager implements StaticLog.StaticLogger {
 
-    private final GridBagConstraints constraints = new GridBagConstraints();
+    private final GridBagConstraints sConstraints = new GridBagConstraints();
     private final JTextArea loggingText = new JTextArea(30, 40);
     private final ToggleAreaPanel toggleArea = new ToggleAreaPanel();
     private final JFrame frame = new JFrame();
+    private final JPanel subComponentPanel = new JPanel();
 
     public ClientFrameManager() {
-        toggleArea.setToggleOn(frame.getContentPane());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         ((DefaultCaret) loggingText.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setLayout(new GridBagLayout());
         frame.setTitle("Robot Output");
-        constraints.fill = GridBagConstraints.NONE;
-        constraints.weightx = 1;
-        constraints.weighty = 1;
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        frame.add(toggleArea, constraints);
-        constraints.anchor = GridBagConstraints.EAST;
-        constraints.gridx++;
-        addCollapsibleComponent("Log", new JScrollPane(loggingText));
-        constraints.gridx++;
+        frame.setMinimumSize(new Dimension(320, 240));
+        subComponentPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints fConstraints = new GridBagConstraints();
+        fConstraints.fill = GridBagConstraints.NONE;
+        fConstraints.weightx = 1;
+        fConstraints.weighty = 1;
+        fConstraints.anchor = GridBagConstraints.NORTHWEST;
+        fConstraints.gridx = 0;
+        fConstraints.gridy = 0;
+        frame.add(toggleArea, fConstraints);
+        fConstraints.anchor = GridBagConstraints.EAST;
+        fConstraints.gridx = 1;
+        toggleArea.addToToggle("Log", new JScrollPane(loggingText), frame, fConstraints.clone());
+        fConstraints.gridx = 2;
+        frame.add(subComponentPanel, fConstraints);
+
+        sConstraints.anchor = GridBagConstraints.EAST;
+        sConstraints.fill = GridBagConstraints.HORIZONTAL;
+        sConstraints.weightx = 1;
+        sConstraints.weighty = 1;
     }
 
     public void show() {
         frame.setVisible(true);
     }
 
-    public final void addCollapsibleComponent(final String labelText, JComponent component) {
-        constraints.gridy++;
-        toggleArea.addToToggle(labelText, component, constraints.clone());
-        frame.add(component, constraints);
-        frame.getContentPane().invalidate();
-        frame.getContentPane().validate();
-        frame.getContentPane().repaint();
+    public final void addSubComponent(final String labelText, JComponent component) {
+        sConstraints.gridy++;
+        toggleArea.addToToggle(labelText, component, subComponentPanel, sConstraints.clone());
+        update();
     }
 
+    @Override
     public void log(String msg, Object... args) {
         String message = String.format("[%s] %s\n", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(msg, args));
         loggingText.append(message);
         System.out.print(message);
+    }
+
+    private void update() {
+        frame.getContentPane().invalidate();
+        frame.getContentPane().validate();
+        frame.getContentPane().repaint();
     }
 }

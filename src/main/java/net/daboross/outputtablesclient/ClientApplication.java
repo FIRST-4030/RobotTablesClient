@@ -19,32 +19,35 @@ package net.daboross.outputtablesclient;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
-import javax.swing.JLabel;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class ClientApplication implements DotNetTable.DotNetTableEvents {
 
     private final ClientFrameManager manager;
-    private final DotNetTable names;
     private final HashSet<String> alreadyAddedTables;
 
     public ClientApplication() {
         manager = new ClientFrameManager();
-        names = DotNetTables.subscribe("output-tables");
         alreadyAddedTables = new HashSet<>();
     }
 
     public void start() {
-        names.onChange(this);
+        manager.log("Starting");
+        DotNetTables.subscribe("output-tables").onChange(this);
         manager.show();
         manager.log("Started");
-        this.changed(names);
+    }
+
+    public StaticLog.StaticLogger getLog() {
+        return manager;
     }
 
     public static void main(String[] args) throws IOException {
         DotNetTables.startClient("127.0.0.1");
-        new ClientApplication().start();
+        ClientApplication app = new ClientApplication();
+        StaticLog.setLogger(app.getLog());
+        app.start();
     }
 
     @Override
@@ -52,12 +55,12 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
         if (table.name().equals("output-tables")) {
             for (Enumeration e = table.keys(); e.hasMoreElements();) {
                 String key = (String) e.nextElement();
-                if (alreadyAddedTables.add(key) && !key.equals("_UPDATE_INTERVAL") && !key.equals("bump")) {
+                if (alreadyAddedTables.add(key) && !key.startsWith("_")) {
                     manager.log("[%s] *", key);
                     String value = table.getValue(key);
                     TableOutputPanel panel = new TableOutputPanel(manager, value);
                     panel.init(DotNetTables.subscribe(key));
-                    manager.addCollapsibleComponent(value, panel);
+                    manager.addSubComponent(value, panel);
                 }
             }
         }
