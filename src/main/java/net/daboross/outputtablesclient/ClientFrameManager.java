@@ -16,93 +16,49 @@
  */
 package net.daboross.outputtablesclient;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import static java.lang.Thread.sleep;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
-import org.jdesktop.swingx.JXCollapsiblePane;
 
-public class ClientFrameManager {
+public class ClientFrameManager implements StaticLog.StaticLogger {
 
     private final GridBagConstraints constraints = new GridBagConstraints();
     private final JTextArea loggingText = new JTextArea(30, 40);
+    private final ToggleAreaPanel toggleArea = new ToggleAreaPanel();
     private final JFrame frame = new JFrame();
 
     public ClientFrameManager() {
+        toggleArea.setToggleOn(frame.getContentPane());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         ((DefaultCaret) loggingText.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        constraints.fill = GridBagConstraints.VERTICAL;
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setLayout(new GridBagLayout());
-        addCollapsibleLabeledComponent("Log", loggingText);
         frame.setTitle("Robot Output");
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        frame.add(toggleArea, constraints);
+        constraints.anchor = GridBagConstraints.EAST;
+        constraints.gridx++;
+        addCollapsibleComponent("Log", new JScrollPane(loggingText));
+        constraints.gridx++;
     }
 
     public void show() {
         frame.setVisible(true);
     }
 
-    public final JLabel addCollapsibleLabeledComponent(final String labelText, JComponent internalComponent) {
-        final JButton collapse = new JButton("Hide");
-        final JXCollapsiblePane collapsiblePane = new JXCollapsiblePane();
-        JLabel label = new JLabel(labelText);
-        final JComponent scrollPane = new JScrollPane(internalComponent);
-        collapsiblePane.add(scrollPane);
-        collapse.addActionListener(new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (collapsiblePane.isCollapsed()) {
-                    collapsiblePane.add(scrollPane);
-                    collapsiblePane.setCollapsed(false);
-                    collapse.setText("Hide");
-                } else {
-                    collapsiblePane.setCollapsed(true);
-                    collapse.setText("Show");
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                sleep(1000);
-                                collapsiblePane.remove(scrollPane);
-                            } catch (InterruptedException ex) {
-                            }
-                        }
-                    }.start();
-                }
-            }
-        });
-
-        GridBagConstraints c = new GridBagConstraints();
-        JPanel panel = new JPanel(new GridBagLayout());
-        c.anchor = GridBagConstraints.ABOVE_BASELINE;
-        c.gridy = 1;
-        panel.add(label, c);
-        c.anchor = GridBagConstraints.BELOW_BASELINE;
-        c.gridy = 2;
-        panel.add(collapsiblePane, c);
-        c.anchor = GridBagConstraints.BELOW_BASELINE;
-        c.gridy = 3;
-        panel.add(collapse, c);
-
-        addComponent(panel);
-        return label;
-    }
-
-    public void addComponent(Component component) {
-        constraints.gridx++;
+    public final void addCollapsibleComponent(final String labelText, JComponent component) {
+        constraints.gridy++;
+        toggleArea.addToToggle(labelText, component, constraints.clone());
         frame.add(component, constraints);
         frame.getContentPane().invalidate();
         frame.getContentPane().validate();

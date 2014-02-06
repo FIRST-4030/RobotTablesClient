@@ -33,16 +33,11 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
     private static final Border border = new LineBorder(Color.BLACK);
     private final Map<String, JLabel> labels = new HashMap<>();
     private final ClientFrameManager log;
-    private JLabel label;
     private final String name;
 
     public TableOutputPanel(ClientFrameManager manager, String name) {
         this.log = manager;
         this.name = name;
-    }
-
-    public void setLabel(JLabel label) {
-        this.label = label;
     }
 
     public void init(DotNetTable table) {
@@ -77,16 +72,16 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
 
     @Override
     public void changed(final DotNetTable table) {
-        label.setText(name);
         boolean changed = false;
         for (Enumeration e = table.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
-            if (!key.equals("_UPDATE_INTERVAL")) {
+            if (!key.equals("_UPDATE_INTERVAL") && !key.equals("bump")) {
                 String value = table.getValue(key);
                 changed = changed || set(key, value);
             }
         }
         if (changed) {
+            invalidate();
             validate();
             repaint();
         }

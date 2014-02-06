@@ -43,7 +43,7 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
     }
 
     public static void main(String[] args) throws IOException {
-        DotNetTables.startClient("4030");
+        DotNetTables.startClient("127.0.0.1");
         new ClientApplication().start();
     }
 
@@ -52,13 +52,12 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
         if (table.name().equals("output-tables")) {
             for (Enumeration e = table.keys(); e.hasMoreElements();) {
                 String key = (String) e.nextElement();
-                if (alreadyAddedTables.add(key) && !key.equals("_UPDATE_INTERVAL")) {
+                if (alreadyAddedTables.add(key) && !key.equals("_UPDATE_INTERVAL") && !key.equals("bump")) {
                     manager.log("[%s] *", key);
                     String value = table.getValue(key);
                     TableOutputPanel panel = new TableOutputPanel(manager, value);
                     panel.init(DotNetTables.subscribe(key));
-                    JLabel label = manager.addCollapsibleLabeledComponent(value, panel);
-                    panel.setLabel(label);
+                    manager.addCollapsibleComponent(value, panel);
                 }
             }
         }
@@ -66,6 +65,5 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
 
     @Override
     public void stale(final DotNetTable table) {
-
     }
 }
