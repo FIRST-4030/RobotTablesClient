@@ -19,12 +19,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.daboross</groupId>
-    <artifactId>java-outputtables-client</artifactId>
+    <artifactId>java-outputtables-desktop-server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>JavaOutputTablesClient</name>
-    <description>Client for testing robot output class, using DotNetTables</description>
+    <name>JavaOutputTablesServer</name>
+    <description>Basic test server for the OutputTables using DotNetTables. Used to test the client.</description>
     <inceptionYear>2014</inceptionYear>
     <licenses>
         <license>
@@ -66,12 +66,6 @@
             <version>1.0.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swingx</artifactId>
-            <version>1.6.1</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -99,10 +93,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <outputPrefix>v${project.version} (git-</outputPrefix>
-                    <outputPostfix>)</outputPostfix>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -112,7 +102,7 @@
                     <archive>
                         <manifestEntries>
                             <Implementation-Version>${describe}</Implementation-Version>
-                            <Main-Class>net.daboross.outputtablesclient.ClientApplication</Main-Class>
+                            <Main-Class>org.ingrahamrobotics.dotnettables.Server</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>

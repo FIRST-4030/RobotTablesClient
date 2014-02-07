@@ -42,7 +42,7 @@ public class ClientFrameManager implements StaticLog.StaticLogger {
         ((DefaultCaret) loggingText.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         frame.setLayout(new GridBagLayout());
-        frame.setTitle("Robot Output");
+        frame.setTitle("Robot Output - " + ClientFrameManager.class.getPackage().getImplementationVersion());
         frame.setMinimumSize(new Dimension(320, 240));
         subComponentPanel.setLayout(new GridBagLayout());
 
