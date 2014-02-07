@@ -76,7 +76,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
         boolean changed = false;
         for (Enumeration e = table.keys(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
-            if (!key.equals("_UPDATE_INTERVAL") && !key.equals("bump")) {
+            if (!key.startsWith("_")) {
                 String value = table.getValue(key);
                 changed = changed || set(key, value);
             }
