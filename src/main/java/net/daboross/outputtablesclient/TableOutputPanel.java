@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Dabo Ross <http://www.daboross.net/>
+ * Copyright (C) 2014 Dabo Ross <http://www.daboross.net/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,39 +34,37 @@ import javax.swing.border.LineBorder;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 
 public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableEvents {
-    
+
     private final Border border = new LineBorder(Color.BLACK);
     private final GridBagConstraints templateConstraints = new GridBagConstraints();
     private final Map<String, JLabel> labels = new HashMap<>();
     private final JLabel nameLabel;
-    private final ClientFrameManager log;
     private final String name;
-    
-    public TableOutputPanel(ClientFrameManager manager, String name) {
+
+    public TableOutputPanel(String name) {
         super(new GridBagLayout());
-        this.log = manager;
         this.name = name;
         setBorder(border);
-        
+
         templateConstraints.insets = new Insets(5, 5, 5, 5);
         templateConstraints.gridx = 0;
         templateConstraints.gridy = 0;
-        
+
         this.nameLabel = new JLabel(name);
         GridBagConstraints nameConstraints = (GridBagConstraints) templateConstraints.clone();
         nameConstraints.anchor = GridBagConstraints.WEST;
         nameLabel.setFont(nameLabel.getFont().deriveFont(Font.ITALIC | Font.BOLD, 15.0f));
         add(nameLabel, nameConstraints);
     }
-    
+
     public void init(DotNetTable table) {
         table.onChange(this);
     }
-    
+
     private boolean set(String key, String value) {
         JLabel valueLabel = labels.get(key);
         if (valueLabel == null) {
-            log.log("[%s][%s*] %s", name, key, value);
+            StaticLog.log("[%s][%s*] %s", name, key, value);
             valueLabel = new JLabel(value);
             JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(border);
@@ -87,14 +85,14 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             labels.put(key, valueLabel);
             return true;
         } else if (!valueLabel.getText().equals(value)) {
-            log.log("[%s][%s] %s", name, key, value);
+            StaticLog.log("[%s][%s] %s", name, key, value);
             valueLabel.setText(value);
             return true;
         } else {
             return false;
         }
     }
-    
+
     @Override
     public void changed(final DotNetTable table) {
         boolean changed = false;
@@ -109,11 +107,11 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             updateGraphics();
         }
     }
-    
+
     @Override
     public void stale(final DotNetTable table) {
     }
-    
+
     private void updateGraphics() {
         Container p = getParent();
         if (p != null) {

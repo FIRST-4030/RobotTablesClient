@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Dabo Ross <http://www.daboross.net/>
+ * Copyright (C) 2014 Dabo Ross <http://www.daboross.net/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,15 +66,17 @@ public class ClientFrameManager implements StaticLog.StaticLogger {
         sConstraints.fill = GridBagConstraints.HORIZONTAL;
         sConstraints.weightx = 1;
         sConstraints.weighty = 0;
+        sConstraints.gridx = 0;
+        sConstraints.gridy = 0;
     }
 
     public void show() {
         frame.setVisible(true);
     }
 
-    public final void addSubComponent(final String labelText, JComponent component) {
-        sConstraints.gridy++;
+    public void addSubComponent(final String labelText, JComponent component) {
         toggleArea.addToToggle(labelText, component, subComponentPanel, sConstraints.clone());
+        sConstraints.gridy++;
         update();
     }
 

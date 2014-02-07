@@ -19,10 +19,6 @@ package net.daboross.outputtablesclient;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -48,11 +44,6 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
     }
 
     public static void main(String[] args) throws IOException {
-//        try {
-//            UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
-//        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-//            ex.printStackTrace();
-//        }
         DotNetTables.startClient("127.0.0.1");
         ClientApplication app = new ClientApplication();
         StaticLog.setLogger(app.getLog());
@@ -66,10 +57,10 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
                 String key = (String) e.nextElement();
                 if (alreadyAddedTables.add(key) && !key.startsWith("_")) {
                     manager.log("[%s] *", key);
-                    String value = table.getValue(key);
-                    TableOutputPanel panel = new TableOutputPanel(manager, value);
+                    String name = table.getValue(key);
+                    TableOutputPanel panel = new TableOutputPanel(name);
                     panel.init(DotNetTables.subscribe(key));
-                    manager.addSubComponent(value, panel);
+                    manager.addSubComponent(name, panel);
                 }
             }
         }
