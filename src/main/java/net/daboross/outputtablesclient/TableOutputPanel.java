@@ -18,45 +18,69 @@ package net.daboross.outputtablesclient;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 
 public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableEvents {
-
-    private static final Border border = new LineBorder(Color.BLACK);
+    
+    private final Border border = new LineBorder(Color.BLACK);
+    private final GridBagConstraints templateConstraints = new GridBagConstraints();
     private final Map<String, JLabel> labels = new HashMap<>();
+    private final JLabel nameLabel;
     private final ClientFrameManager log;
     private final String name;
-
+    
     public TableOutputPanel(ClientFrameManager manager, String name) {
+        super(new GridBagLayout());
         this.log = manager;
         this.name = name;
+        setBorder(border);
+        
+        templateConstraints.insets = new Insets(5, 5, 5, 5);
+        templateConstraints.gridx = 0;
+        templateConstraints.gridy = 0;
+        
+        this.nameLabel = new JLabel(name);
+        GridBagConstraints nameConstraints = (GridBagConstraints) templateConstraints.clone();
+        nameConstraints.anchor = GridBagConstraints.WEST;
+        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.ITALIC | Font.BOLD, 15.0f));
+        add(nameLabel, nameConstraints);
     }
-
+    
     public void init(DotNetTable table) {
         table.onChange(this);
     }
-
+    
     private boolean set(String key, String value) {
         JLabel valueLabel = labels.get(key);
         if (valueLabel == null) {
             log.log("[%s][%s*] %s", name, key, value);
             valueLabel = new JLabel(value);
-            valueLabel.setBorder(border);
             JPanel panel = new JPanel(new GridBagLayout());
-            GridBagConstraints constraints = new GridBagConstraints();
-            JLabel keyLabel = new JLabel(key);
-            keyLabel.setBorder(border);
-            panel.add(keyLabel, constraints);
-            constraints.gridy++;
+            panel.setBorder(border);
+            GridBagConstraints constraints = (GridBagConstraints) templateConstraints.clone();
+            GridBagConstraints separatorConstraints = (GridBagConstraints) templateConstraints.clone();
+            separatorConstraints.weighty = 1;
+            separatorConstraints.insets = new Insets(0, 0, 0, 0);
+            separatorConstraints.fill = GridBagConstraints.VERTICAL;
+            JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+            separator.setPreferredSize(new Dimension(2, 20));
+            panel.add(new JLabel(key), constraints);
+            separatorConstraints.gridx = 1;
+            panel.add(separator, separatorConstraints);
+            constraints.gridx = 2;
             panel.add(valueLabel, constraints);
             panel.setBorder(border);
             add(panel);
@@ -70,7 +94,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             return false;
         }
     }
-
+    
     @Override
     public void changed(final DotNetTable table) {
         boolean changed = false;
@@ -85,11 +109,11 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             updateGraphics();
         }
     }
-
+    
     @Override
     public void stale(final DotNetTable table) {
     }
-
+    
     private void updateGraphics() {
         Container p = getParent();
         if (p != null) {

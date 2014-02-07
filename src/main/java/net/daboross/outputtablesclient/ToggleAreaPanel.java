@@ -33,6 +33,7 @@ public class ToggleAreaPanel extends JPanel {
         setLayout(new GridBagLayout());
         constraints.ipadx = 2;
         constraints.ipady = 2;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
     }
 
     public void addToToggle(final String name, Component toToggle, Container container, Object toggleConstraints) {

@@ -58,12 +58,14 @@ public class ClientFrameManager implements StaticLog.StaticLogger {
         fConstraints.gridx = 1;
         toggleArea.addToToggle("Log", new JScrollPane(loggingText), frame, fConstraints.clone());
         fConstraints.gridx = 2;
+        fConstraints.weightx = 2;
+        fConstraints.fill = GridBagConstraints.BOTH;
         frame.add(subComponentPanel, fConstraints);
 
         sConstraints.anchor = GridBagConstraints.EAST;
         sConstraints.fill = GridBagConstraints.HORIZONTAL;
         sConstraints.weightx = 1;
-        sConstraints.weighty = 1;
+        sConstraints.weighty = 0;
     }
 
     public void show() {
