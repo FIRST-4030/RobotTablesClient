@@ -44,7 +44,7 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
     }
 
     public static void main(String[] args) throws IOException {
-        DotNetTables.startClient("127.0.0.1");
+        DotNetTables.startClient("4030");
         ClientApplication app = new ClientApplication();
         StaticLog.setLogger(app.getLog());
         app.start();
