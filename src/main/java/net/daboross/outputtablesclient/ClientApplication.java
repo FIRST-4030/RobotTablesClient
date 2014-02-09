@@ -19,6 +19,7 @@ package net.daboross.outputtablesclient;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
+import javax.swing.SwingUtilities;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -39,15 +40,21 @@ public class ClientApplication implements DotNetTable.DotNetTableEvents {
         manager.log("Started");
     }
 
-    public StaticLog.StaticLogger getLog() {
+    public Output.StaticLogger getLog() {
         return manager;
     }
 
     public static void main(String[] args) throws IOException {
-        DotNetTables.startClient("4030");
-        ClientApplication app = new ClientApplication();
-        StaticLog.setLogger(app.getLog());
-        app.start();
+//        DotNetTables.startClient("4030");
+        DotNetTables.startClient("127.0.0.1");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ClientApplication app = new ClientApplication();
+                Output.setLogger(app.getLog());
+                app.start();
+            }
+        });
     }
 
     @Override

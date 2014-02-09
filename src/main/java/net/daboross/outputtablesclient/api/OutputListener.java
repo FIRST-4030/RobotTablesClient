@@ -14,24 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient;
+package net.daboross.outputtablesclient.api;
 
-public class StaticLog {
+public interface OutputListener {
 
-    private static StaticLogger logger;
+    public void onTableCreate(String tableKey, String tableName);
 
-    public static void log(String message, Object... args) {
-        if (logger != null) {
-            logger.log(message, args);
-        }
-    }
+    public void onTableStale(String tableKey);
 
-    public static void setLogger(StaticLogger logger) {
-        StaticLog.logger = logger;
-    }
+    public void onKeyCreate(String tableKey, String keyName, String keyValue);
 
-    public static interface StaticLogger {
+    public void onKeyUpdate(String tableKey, String keyName, String keyValue);
 
-        public void log(String message, Object... args);
-    }
+    public void onKeyDelete(String tableKey, String keyName);
 }

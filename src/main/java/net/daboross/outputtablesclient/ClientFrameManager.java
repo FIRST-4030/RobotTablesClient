@@ -29,10 +29,10 @@ import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
-public class ClientFrameManager implements StaticLog.StaticLogger {
+public class ClientFrameManager implements Output.StaticLogger {
 
     private final GridBagConstraints sConstraints = new GridBagConstraints();
-    private final JTextArea loggingText = new JTextArea(30, 40);
+    private final JTextArea loggingText = new JTextArea(16, 20);
     private final ToggleAreaPanel toggleArea = new ToggleAreaPanel();
     private final JFrame frame = new JFrame();
     private final JPanel subComponentPanel = new JPanel();

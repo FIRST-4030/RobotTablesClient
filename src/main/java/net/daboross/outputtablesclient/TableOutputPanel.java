@@ -53,7 +53,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
         this.nameLabel = new JLabel(name);
         GridBagConstraints nameConstraints = (GridBagConstraints) templateConstraints.clone();
         nameConstraints.anchor = GridBagConstraints.WEST;
-        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.ITALIC | Font.BOLD, 15.0f));
+        nameLabel.setFont(Font.getFont("DejuVu Sans", nameLabel.getFont()).deriveFont(Font.ITALIC | Font.BOLD, 15.0f));
         add(nameLabel, nameConstraints);
     }
 
@@ -64,7 +64,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
     private boolean set(String key, String value) {
         JLabel valueLabel = labels.get(key);
         if (valueLabel == null) {
-            StaticLog.log("[%s][%s*] %s", name, key, value);
+            Output.log("[%s][%s*] %s", name, key, value);
             valueLabel = new JLabel(value);
             JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(border);
@@ -85,7 +85,7 @@ public class TableOutputPanel extends JPanel implements DotNetTable.DotNetTableE
             labels.put(key, valueLabel);
             return true;
         } else if (!valueLabel.getText().equals(value)) {
-            StaticLog.log("[%s][%s] %s", name, key, value);
+            Output.log("[%s][%s] %s", name, key, value);
             valueLabel.setText(value);
             return true;
         } else {
