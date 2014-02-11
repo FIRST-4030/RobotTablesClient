@@ -47,34 +47,13 @@ public class ToggleButtonResponder implements ItemListener {
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (button.isSelected()) {
-            ensureOn();
-        } else {
-            ensureOff();
-        }
-    }
-
-    public void ensureOn() {
-        if (!toggled) {
+        if (button.isSelected() && !toggled) {
             toggleOn.add(toToggle, toggleConstraints);
-            update();
-            toggled = !toggled;
-        }
-    }
-
-    public void ensureOff() {
-        if (toggled) {
+        } else if (!button.isSelected() && toggled) {
             toggleOn.remove(toToggle);
-            update();
-            toggled = !toggled;
         }
-    }
-
-    private void update() {
-//        Container root = rootFrame.getContentPane();
-//        root.revalidate();
-//        root.repaint();
         toggleOn.revalidate();
         toggleOn.repaint();
+        toggled = !toggled;
     }
 }
