@@ -16,6 +16,7 @@
  */
 package net.daboross.outputtablesclient.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -23,12 +24,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
@@ -38,13 +39,17 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.main.OutputTableMain;
 import net.daboross.outputtablesclient.util.DGBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
 
 public class OutputTablesGUI implements OutputListener {
 
+    private final OutputTableMain main;
     final GridBagConstraints toggleButtonConstraints;
     final JFrame rootFrame;
+    final JTabbedPane tabbedPane;
+    final JPanel mainTabPanel;
     final JPanel toggleButtonPanel;
     final JTextArea loggingTextArea;
     final JPanel tableRootPanel;
@@ -52,7 +57,9 @@ public class OutputTablesGUI implements OutputListener {
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
 
-    public OutputTablesGUI() {
+    public OutputTablesGUI(OutputTableMain main) {
+        this.main = main;
+
         // toggleButtonConstraints
         toggleButtonConstraints = new DGBC()
                 .ipadx(2).ipady(2).gridx(0).gridy(-1)
@@ -63,34 +70,36 @@ public class OutputTablesGUI implements OutputListener {
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));
         rootFrame.setPreferredSize(new Dimension(640, 480));
-        rootFrame.setLayout(new GridBagLayout());
+        rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
         rootFrame.setTitle("Robot Output " + OutputTablesGUI.class.getPackage().getImplementationVersion());
 
+        // tabbedPane
+        tabbedPane = new JTabbedPane();
+        rootFrame.add(tabbedPane, BorderLayout.CENTER);
+
+        // loggingTextArea
+        loggingTextArea = new JTextArea(20, 25);
+        ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane loggingPane = new JScrollPane(loggingTextArea);
+        tabbedPane.addTab("Log", loggingPane);
+
+        // mainTabPanel
+        mainTabPanel = new JPanel();
+        mainTabPanel.setLayout(new GridBagLayout());
+        tabbedPane.addTab("Main", mainTabPanel);
+        tabbedPane.setSelectedIndex(1);
 
         // toggleButtonPanel
         toggleButtonPanel = new JPanel();
         toggleButtonPanel.setLayout(new GridBagLayout());
-        rootFrame.add(toggleButtonPanel, new DGBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
-
-
-        // loggingTextArea
-        Object loggingConstraints = new DGBC().weightx(1).weighty(1).gridx(1).gridy(0).anchor(GridBagConstraints.EAST);
-        Border loggingBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)), "Log");
-
-        loggingTextArea = new JTextArea(20, 25);
-        ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        JScrollPane loggingPane = new JScrollPane(loggingTextArea);
-        loggingPane.setBorder(loggingBorder);
-        loggingPane.setMinimumSize(loggingPane.getSize());
-        JToggleButton toggleLog = ToggleButtonResponder.createToggleButton("Log", loggingPane, rootFrame, loggingConstraints);
-        toggleButtonPanel.add(toggleLog, toggleButtonConstraints);
+        mainTabPanel.add(toggleButtonPanel, new DGBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
 
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
-        rootFrame.add(tableRootPanel, new DGBC().weightx(1).weighty(1).fill(GridBagConstraints.VERTICAL).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
+        mainTabPanel.add(tableRootPanel, new DGBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
 
 
         // maps
@@ -103,8 +112,13 @@ public class OutputTablesGUI implements OutputListener {
         rootFrame.setVisible(true);
     }
 
-    @Override
-    public void onTableCreate(final String tableKey, final String tableName) {
+    private void ensureTableExists(String tableKey) {
+        if (tableKeyToTablePanel.get(tableKey) == null) {
+            createTable(tableKey, main.getTableName(tableKey));
+        }
+    }
+
+    private void createTable(String tableKey, String tableName) {
         JPanel tablePanel = new JPanel(new WrapLayout());
         Border lineBorder = new LineBorder(new Color(0, 0, 0));
         Border titleBorder = new TitledBorder(lineBorder, tableName);
@@ -112,7 +126,7 @@ public class OutputTablesGUI implements OutputListener {
         Border compoundBorder = new CompoundBorder(titleBorder, spaceBorder);
         tablePanel.setBorder(compoundBorder);
 
-        DGBC constraints = new DGBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.VERTICAL);
+        DGBC constraints = new DGBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
         JToggleButton toggleButton = ToggleButtonResponder.createToggleButton(tableName, tablePanel, tableRootPanel, constraints);
         toggleButtonPanel.add(toggleButton, toggleButtonConstraints);
 
@@ -122,11 +136,16 @@ public class OutputTablesGUI implements OutputListener {
     }
 
     @Override
+    public void onTableCreate(final String tableKey, final String tableName) {
+    }
+
+    @Override
     public void onTableStale(final String tableKey) {
     }
 
     @Override
     public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
+        ensureTableExists(tableKey);
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new LineBorder(Color.BLACK));
         tableKeyAndKeyToValuePanel.get(tableKey).put(keyName, panel);
