@@ -18,7 +18,6 @@ package net.daboross.outputtablesclient.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -40,6 +39,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.api.OutputListener;
 import net.daboross.outputtablesclient.util.DGBC;
+import net.daboross.outputtablesclient.util.WrapLayout;
 
 public class OutputTablesGUI implements OutputListener {
 
@@ -83,12 +83,13 @@ public class OutputTablesGUI implements OutputListener {
         ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane loggingPane = new JScrollPane(loggingTextArea);
         loggingPane.setBorder(loggingBorder);
+        loggingPane.setMinimumSize(loggingPane.getSize());
         JToggleButton toggleLog = ToggleButtonResponder.createToggleButton("Log", loggingPane, rootFrame, loggingConstraints);
         toggleButtonPanel.add(toggleLog, toggleButtonConstraints);
 
 
         // tableRootPanel
-        tableRootPanel = new JPanel(new FlowLayout());
+        tableRootPanel = new JPanel(new GridBagLayout());
         rootFrame.add(tableRootPanel, new DGBC().weightx(1).weighty(1).fill(GridBagConstraints.VERTICAL).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
 
 
@@ -104,7 +105,7 @@ public class OutputTablesGUI implements OutputListener {
 
     @Override
     public void onTableCreate(final String tableKey, final String tableName) {
-        JPanel tablePanel = new JPanel();
+        JPanel tablePanel = new JPanel(new WrapLayout());
         Border lineBorder = new LineBorder(new Color(0, 0, 0));
         Border titleBorder = new TitledBorder(lineBorder, tableName);
         Border spaceBorder = new EmptyBorder(5, 5, 5, 5);

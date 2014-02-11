@@ -16,6 +16,7 @@
  */
 package net.daboross.outputtablesclient.main;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
                     l.onKeyUpdate(tableKey, key, value);
                 }
             }
-            for (String key : valueTable.keySet()) {
+            for (String key : new ArrayList<String>(valueTable.keySet())) {
                 if (!dnt.exists(key)) {
                     valueTable.remove(key);
                     l.onKeyDelete(tableKey, key);
