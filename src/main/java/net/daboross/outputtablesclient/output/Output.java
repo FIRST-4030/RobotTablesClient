@@ -18,7 +18,7 @@ package net.daboross.outputtablesclient.output;
 
 public class Output {
 
-    private static StaticLogger logger;
+    private static StaticLogger logger = new DefaultLogger();
 
     public static void log(String message, Object... args) {
         if (logger != null) {
@@ -27,11 +27,23 @@ public class Output {
     }
 
     public static void setLogger(StaticLogger logger) {
-        Output.logger = logger;
+        if (logger == null) {
+            Output.logger = new DefaultLogger();
+        } else {
+            Output.logger = logger;
+        }
     }
 
     public static interface StaticLogger {
 
         public void log(String message, Object... args);
+    }
+
+    public static class DefaultLogger implements StaticLogger {
+
+        @Override
+        public void log(String message, Object... args) {
+            System.out.println(String.format(message, args));
+        }
     }
 }
