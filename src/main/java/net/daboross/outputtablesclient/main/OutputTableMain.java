@@ -39,11 +39,11 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
         nameTable.onChange(this);
     }
 
-    public String getTableName(String tableKey) {
+    public synchronized String getTableName(String tableKey) {
         return nameTable.getValue(tableKey);
     }
 
-    public Map<String, String> getTable(String tableKey) {
+    public synchronized Map<String, String> getTable(String tableKey) {
         return Collections.unmodifiableMap(values.get(tableKey));
     }
 
