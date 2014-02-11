@@ -16,9 +16,9 @@
  */
 package net.daboross.outputtablesclient.main;
 
+import net.daboross.outputtablesclient.output.Output;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.daboross.outputtablesclient.Output;
 import net.daboross.outputtablesclient.api.OutputListener;
 
 public class ListenerForward implements OutputListener {

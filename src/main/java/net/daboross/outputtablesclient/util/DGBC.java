@@ -19,59 +19,59 @@ package net.daboross.outputtablesclient.util;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
-public class DynamicGridBagConstraints extends GridBagConstraints {
+public class DGBC extends GridBagConstraints {
 
-    public DynamicGridBagConstraints anchor(int anchor) {
+    public DGBC anchor(int anchor) {
         this.anchor = anchor;
         return this;
     }
 
-    public DynamicGridBagConstraints fill(int fill) {
+    public DGBC fill(int fill) {
         this.fill = fill;
         return this;
     }
 
-    public DynamicGridBagConstraints gridheight(int gridheight) {
+    public DGBC gridheight(int gridheight) {
         this.gridheight = gridheight;
         return this;
     }
 
-    public DynamicGridBagConstraints gridwidth(int gridwidth) {
+    public DGBC gridwidth(int gridwidth) {
         this.gridwidth = gridwidth;
         return this;
     }
 
-    public DynamicGridBagConstraints gridx(int gridx) {
+    public DGBC gridx(int gridx) {
         this.gridx = gridx;
         return this;
     }
 
-    public DynamicGridBagConstraints gridy(int gridy) {
+    public DGBC gridy(int gridy) {
         this.gridy = gridy;
         return this;
     }
 
-    public DynamicGridBagConstraints insets(Insets insets) {
+    public DGBC insets(Insets insets) {
         this.insets = insets;
         return this;
     }
 
-    public DynamicGridBagConstraints ipadx(int ipadx) {
+    public DGBC ipadx(int ipadx) {
         this.ipadx = ipadx;
         return this;
     }
 
-    public DynamicGridBagConstraints ipady(int ipady) {
+    public DGBC ipady(int ipady) {
         this.ipady = ipady;
         return this;
     }
 
-    public DynamicGridBagConstraints weightx(double weightx) {
+    public DGBC weightx(double weightx) {
         this.weightx = weightx;
         return this;
     }
 
-    public DynamicGridBagConstraints weighty(double weighty) {
+    public DGBC weighty(double weighty) {
         this.weighty = weighty;
         return this;
     }

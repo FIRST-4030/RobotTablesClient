@@ -102,7 +102,7 @@
                     <archive>
                         <manifestEntries>
                             <Implementation-Version>${describe}</Implementation-Version>
-                            <Main-Class>org.ingrahamrobotics.dotnettables.Server</Main-Class>
+                            <Main-Class>org.ingrahamrobotics.dotnettables.server.Server</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>

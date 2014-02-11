@@ -28,14 +28,22 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
 
     private final ListenerForward l = new ListenerForward();
     private final Map<String, Map<String, String>> values = new HashMap<>();
+    private final DotNetTable nameTable;
 
-    public Map<String, String> getTable(String tableKey) {
-        return Collections.unmodifiableMap(values.get(tableKey));
+    public OutputTableMain() {
+        nameTable = DotNetTables.subscribe("output-tables");
     }
 
     public void subscribe() {
-        DotNetTable table = DotNetTables.subscribe("output-tables");
-        table.onChange(this);
+        nameTable.onChange(this);
+    }
+
+    public String getTableName(String tableKey) {
+        return nameTable.getValue(tableKey);
+    }
+
+    public Map<String, String> getTable(String tableKey) {
+        return Collections.unmodifiableMap(values.get(tableKey));
     }
 
     public void addListener(OutputListener listener) {
@@ -47,10 +55,13 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
     }
 
     @Override
-    public void changed(DotNetTable dnt) {
+    public synchronized void changed(DotNetTable dnt) {
         if (dnt.name().equals("output-tables")) {
             for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
                 String tableKey = e.nextElement();
+                if (tableKey.startsWith("_")) {
+                    continue;
+                }
                 Map<String, String> valueTable = values.get(tableKey);
                 if (valueTable == null) {
                     valueTable = new HashMap<>();
@@ -65,6 +76,9 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
             Map<String, String> valueTable = values.get(tableKey);
             for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
                 String key = e.nextElement();
+                if (key.startsWith("_")) {
+                    continue;
+                }
                 String value = dnt.getValue(key);
                 if (!valueTable.containsKey(key)) {
                     valueTable.put(key, value);
@@ -84,7 +98,7 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
     }
 
     @Override
-    public void stale(DotNetTable dnt) {
+    public synchronized void stale(DotNetTable dnt) {
         if (!dnt.name().equals("output-tables")) {
             l.onTableStale(dnt.name());
         }

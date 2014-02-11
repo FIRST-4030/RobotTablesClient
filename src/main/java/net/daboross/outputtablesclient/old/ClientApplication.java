@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient;
+package net.daboross.outputtablesclient.old;
 
+import net.daboross.outputtablesclient.output.Output;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashSet;
