@@ -28,8 +28,7 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 public class Application {
 
     public static void main(String[] args) throws IOException {
-//        DotNetTables.startClient("4030");
-        DotNetTables.startClient("127.0.0.1");
+        DotNetTables.startClient("4030");
 
         final OutputTableMain main = new OutputTableMain();
         main.subscribe();
