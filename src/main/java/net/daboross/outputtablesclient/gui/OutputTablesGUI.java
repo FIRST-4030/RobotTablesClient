@@ -22,8 +22,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,12 +50,14 @@ public class OutputTablesGUI implements OutputListener {
 
     private final OutputTableMain main;
     final GridBagConstraints toggleButtonConstraints;
+    final GridBagConstraints tablePanelConstraints;
     final JFrame rootFrame;
     final JTabbedPane tabbedPane;
     final JPanel mainTabPanel;
     final JPanel toggleButtonPanel;
     final JTextArea loggingTextArea;
     final JPanel tableRootPanel;
+    final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
@@ -60,10 +65,9 @@ public class OutputTablesGUI implements OutputListener {
     public OutputTablesGUI(OutputTableMain main) {
         this.main = main;
 
-        // toggleButtonConstraints
-        toggleButtonConstraints = new DGBC()
-                .ipadx(2).ipady(2).gridx(0).gridy(-1)
-                .fill(GridBagConstraints.HORIZONTAL);
+        // constraints
+        toggleButtonConstraints = new DGBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
+        tablePanelConstraints = new DGBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
 
 
         // rootFrame
@@ -79,17 +83,17 @@ public class OutputTablesGUI implements OutputListener {
         tabbedPane = new JTabbedPane();
         rootFrame.add(tabbedPane, BorderLayout.CENTER);
 
-        // loggingTextArea
-        loggingTextArea = new JTextArea(20, 25);
-        ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        JScrollPane loggingPane = new JScrollPane(loggingTextArea);
-        tabbedPane.addTab("Log", loggingPane);
 
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
         tabbedPane.addTab("Main", mainTabPanel);
-        tabbedPane.setSelectedIndex(1);
+
+        // loggingTextArea
+        loggingTextArea = new JTextArea(20, 25);
+        ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane loggingPane = new JScrollPane(loggingTextArea);
+        tabbedPane.addTab("Log", loggingPane);
 
         // toggleButtonPanel
         toggleButtonPanel = new JPanel();
@@ -103,6 +107,7 @@ public class OutputTablesGUI implements OutputListener {
 
 
         // maps
+        tableKeyToTableEnabled = new TreeMap<>();
         tableKeyToTablePanel = new HashMap<>();
         tableKeyAndKeyToValuePanel = new HashMap<>();
         tableKeyAndKeyToValueLabel = new HashMap<>();
@@ -114,7 +119,7 @@ public class OutputTablesGUI implements OutputListener {
 
     private void ensureTableExists(String tableKey) {
         if (tableKeyToTablePanel.get(tableKey) == null) {
-            createTable(tableKey, main.getTableName(tableKey));
+            createTable(tableKey, String.valueOf(main.getTableName(tableKey)));
         }
     }
 
@@ -125,12 +130,14 @@ public class OutputTablesGUI implements OutputListener {
         Border spaceBorder = new EmptyBorder(5, 5, 5, 5);
         Border compoundBorder = new CompoundBorder(titleBorder, spaceBorder);
         tablePanel.setBorder(compoundBorder);
+        tableKeyToTablePanel.put(tableKey, tablePanel);
 
-        DGBC constraints = new DGBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
-        JToggleButton toggleButton = ToggleButtonResponder.createToggleButton(tableName, tablePanel, tableRootPanel, constraints);
+        JToggleButton toggleButton = new JToggleButton(tableName);
+        TableToggleListener listener = new TableToggleListener(toggleButton, tableKey);
+        toggleButton.addItemListener(listener);
+        listener.initialAdd();
         toggleButtonPanel.add(toggleButton, toggleButtonConstraints);
 
-        tableKeyToTablePanel.put(tableKey, tablePanel);
         tableKeyAndKeyToValuePanel.put(tableKey, new HashMap<String, JPanel>());
         tableKeyAndKeyToValueLabel.put(tableKey, new HashMap<String, JLabel>());
     }
@@ -170,6 +177,7 @@ public class OutputTablesGUI implements OutputListener {
 
     @Override
     public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
+        ensureTableExists(tableKey);
         JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
         valueLabel.setText(keyValue);
     }
@@ -180,5 +188,42 @@ public class OutputTablesGUI implements OutputListener {
         JPanel valuePanel = tableKeyAndKeyToValuePanel.get(tableKey).get(keyName);
         parentPanel.remove(valuePanel);
         parentPanel.revalidate();
+    }
+
+    private class TableToggleListener implements ItemListener {
+
+        private final JToggleButton button;
+        private final String tableKey;
+
+        public TableToggleListener(JToggleButton button, String tableKey) {
+            this.button = button;
+            this.tableKey = tableKey;
+
+        }
+
+        private void initialAdd() {
+            tableKeyToTableEnabled.put(tableKey, Boolean.TRUE);
+            JPanel panel = tableKeyToTablePanel.get(tableKey);
+            tableRootPanel.add(panel, tablePanelConstraints);
+            button.setSelected(true);
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+            tableRootPanel.removeAll();
+            for (Map.Entry<String, Boolean> e : tableKeyToTableEnabled.entrySet()) {
+                if (e.getKey().equals(tableKey)) {
+                    if (button.isSelected() != e.getValue()) {
+                        e.setValue(button.isSelected());
+                    }
+                }
+                if (e.getValue()) {
+                    JPanel panel = tableKeyToTablePanel.get(e.getKey());
+                    tableRootPanel.add(panel, tablePanelConstraints);
+                }
+            }
+            tableRootPanel.revalidate();
+            tableRootPanel.repaint();
+        }
     }
 }
