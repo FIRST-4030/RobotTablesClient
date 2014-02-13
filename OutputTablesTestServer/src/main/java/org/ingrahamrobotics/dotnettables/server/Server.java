@@ -1,9 +1,6 @@
 package org.ingrahamrobotics.dotnettables.server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -67,17 +64,17 @@ public class Server {
 //                    break;
 //            }
 //        }
-        DotNetTable[] tables = new DotNetTable[3];
+        DotNetTable[] tables = new DotNetTable[10];
         for (int i = 0; true; i++) {
-            if (tables[i % 3] == null) {
-                tables[i % 3] = DotNetTables.publish("table-" + i % 3);
-                outputTables.setValue("table-" + (i % 3), "Level" + i % 3);
-                Thread.sleep(500);
+            if (tables[i % 10] == null) {
+                tables[i % 10] = DotNetTables.publish("table-" + i % 10);
+                outputTables.setValue("table-" + (i % 10), "Level" + i % 10);
+                Thread.sleep(200);
                 outputTables.send();
             }
-            tables[i % 3].setValue("Key" + (i % 4), "Value" + i);
-            Thread.sleep(500);
-            tables[i % 3].send();
+            tables[i % 10].setValue("Key" + (i % 7), "Value" + i);
+            Thread.sleep(200);
+            tables[i % 10].send();
             if (i % 2 == 0) {
                 outputTables.send();
             }
