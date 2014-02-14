@@ -198,7 +198,6 @@ public class OutputTablesGUI implements OutputListener {
         public TableToggleListener(JToggleButton button, String tableKey) {
             this.button = button;
             this.tableKey = tableKey;
-
         }
 
         private void initialAdd() {

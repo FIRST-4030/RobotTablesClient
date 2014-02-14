@@ -27,25 +27,26 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
+    private static final String CLIENT_ADDRESS = "4030";
+
     public static void main(String[] args) throws IOException {
-        DotNetTables.startClient("4030");
-
+        Output.log("Starting client on " + CLIENT_ADDRESS);
+        DotNetTables.startClient(CLIENT_ADDRESS);
         final OutputTableMain main = new OutputTableMain();
-        main.subscribe();
-
         LoggerListener loggerListener = new LoggerListener(main);
         main.addListener(loggerListener);
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                Output.log("Starting GUI");
                 OutputTablesGUI gui = new OutputTablesGUI(main);
                 main.addListener(new SwingListenerForward(gui));
                 Output.setLogger(new GUIOutput(gui));
+                Output.log("Subscribing");
+                main.subscribe();
+                Output.log("Showing GUI");
                 gui.show();
             }
         });
-
-
     }
 }

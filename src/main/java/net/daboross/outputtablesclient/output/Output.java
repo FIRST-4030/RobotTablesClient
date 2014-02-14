@@ -16,13 +16,16 @@
  */
 package net.daboross.outputtablesclient.output;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Output {
 
     private static StaticLogger logger = new DefaultLogger();
 
     public static void log(String message, Object... args) {
         if (logger != null) {
-            logger.log(message, args);
+            logger.log(String.format("[%s] %s\n", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
         }
     }
 
@@ -36,14 +39,14 @@ public class Output {
 
     public static interface StaticLogger {
 
-        public void log(String message, Object... args);
+        public void log(String message);
     }
 
     public static class DefaultLogger implements StaticLogger {
 
         @Override
-        public void log(String message, Object... args) {
-            System.out.println(String.format(message, args));
+        public void log(String message) {
+            System.out.println(message);
         }
     }
 }

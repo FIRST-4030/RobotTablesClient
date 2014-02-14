@@ -28,13 +28,12 @@ public class GUIOutput implements Output.StaticLogger {
     }
 
     @Override
-    public void log(String message, Object... args) {
-        final String msg = String.format(message, args);
-        System.out.println(msg);
+    public void log(final String message) {
+        System.out.println(message);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                main.loggingTextArea.append(msg + "\n");
+                main.loggingTextArea.append(message + "\n");
             }
         });
     }
