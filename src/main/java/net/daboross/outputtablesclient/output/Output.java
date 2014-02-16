@@ -18,8 +18,6 @@ package net.daboross.outputtablesclient.output;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -52,15 +50,14 @@ public class Output {
 
     public static class StaticOutputStream extends OutputStream {
 
-        private StringBuffer currentBuffer = new StringBuffer();
+        private StringBuffer buffer = new StringBuffer();
 
         @Override
         public void write(final int b) throws IOException {
-            String str = new String(new byte[b], Charset.forName("UTF-8"));
-            if (str.equals("\n") || (str.length() > 1 && str.contains("\n"))) {
-                currentBuffer.append(str);
-                log(currentBuffer.toString());
-                currentBuffer = new StringBuffer();
+            if (b == '\n') {
+                log(buffer.toString());
+            } else {
+                buffer.append((char) b);
             }
         }
     }

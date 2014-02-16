@@ -16,7 +16,6 @@
  */
 package net.daboross.outputtablesclient.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -27,83 +26,57 @@ import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.api.OutputListener;
-import net.daboross.outputtablesclient.main.OutputTableMain;
-import net.daboross.outputtablesclient.util.DGBC;
+import net.daboross.outputtablesclient.main.OutputTablesMain;
+import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
 
-public class OutputTablesGUI implements OutputListener {
+public class OutputTablesInterfaceMain implements OutputListener {
 
-    private final OutputTableMain main;
+    private final OutputTablesMain main;
     final GridBagConstraints toggleButtonConstraints;
     final GridBagConstraints tablePanelConstraints;
-    final JFrame rootFrame;
-    final JTabbedPane tabbedPane;
     final JPanel mainTabPanel;
     final JPanel toggleButtonPanel;
-    final JTextArea loggingTextArea;
     final JPanel tableRootPanel;
     final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
 
-    public OutputTablesGUI(OutputTableMain main) {
+    public OutputTablesInterfaceMain(OutputTablesMain main, OutputTablesInterfaceRoot root) {
         this.main = main;
 
         // constraints
-        toggleButtonConstraints = new DGBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
-        tablePanelConstraints = new DGBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
-
-
-        // rootFrame
-        rootFrame = new JFrame();
-        rootFrame.setMinimumSize(new Dimension(640, 480));
-        rootFrame.setPreferredSize(new Dimension(640, 480));
-        rootFrame.setLayout(new BorderLayout());
-        rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
-        rootFrame.setTitle("Robot Output " + OutputTablesGUI.class.getPackage().getImplementationVersion());
-
-        // tabbedPane
-        tabbedPane = new JTabbedPane();
-        rootFrame.add(tabbedPane, BorderLayout.CENTER);
+        toggleButtonConstraints = new GBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
+        tablePanelConstraints = new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
 
 
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-        tabbedPane.addTab("Main", mainTabPanel);
+        root.tabbedPane.addTab("Main", mainTabPanel);
+        root.tabbedPane.setSelectedComponent(mainTabPanel);
 
-        // loggingTextArea
-        loggingTextArea = new JTextArea(20, 25);
-        ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        JScrollPane loggingPane = new JScrollPane(loggingTextArea);
-        tabbedPane.addTab("Log", loggingPane);
 
         // toggleButtonPanel
         toggleButtonPanel = new JPanel();
         toggleButtonPanel.setLayout(new GridBagLayout());
-        mainTabPanel.add(toggleButtonPanel, new DGBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
+        mainTabPanel.add(toggleButtonPanel, new GBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
 
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
-        mainTabPanel.add(tableRootPanel, new DGBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
+        mainTabPanel.add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
 
 
         // maps
@@ -113,9 +86,6 @@ public class OutputTablesGUI implements OutputListener {
         tableKeyAndKeyToValueLabel = new HashMap<>();
     }
 
-    public void show() {
-        rootFrame.setVisible(true);
-    }
 
     private void ensureTableExists(String tableKey) {
         if (tableKeyToTablePanel.get(tableKey) == null) {
@@ -159,15 +129,15 @@ public class OutputTablesGUI implements OutputListener {
 
         JLabel keyLabel = new JLabel(keyName);
         keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        panel.add(keyLabel, new DGBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+        panel.add(keyLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
         JSeparator separator = new JSeparator(JSeparator.VERTICAL);
         separator.setPreferredSize(new Dimension(2, 20));
-        panel.add(separator, new DGBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+        panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
         JLabel valueLabel = new JLabel(keyValue);
         valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        panel.add(valueLabel, new DGBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+        panel.add(valueLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
         tableKeyAndKeyToValueLabel.get(tableKey).put(keyName, valueLabel);
 
         JPanel parentPanel = tableKeyToTablePanel.get(tableKey);

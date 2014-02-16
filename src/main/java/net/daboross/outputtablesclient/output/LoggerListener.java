@@ -17,13 +17,13 @@
 package net.daboross.outputtablesclient.output;
 
 import net.daboross.outputtablesclient.api.OutputListener;
-import net.daboross.outputtablesclient.main.OutputTableMain;
+import net.daboross.outputtablesclient.main.OutputTablesMain;
 
 public class LoggerListener implements OutputListener {
 
-    private final OutputTableMain main;
+    private final OutputTablesMain main;
 
-    public LoggerListener(OutputTableMain main) {
+    public LoggerListener(OutputTablesMain main) {
         this.main = main;
     }
 
@@ -48,6 +48,6 @@ public class LoggerListener implements OutputListener {
 
     @Override
     public void onKeyDelete(String tableKey, String keyName) {
-        Output.log("[%s] - %s", main.getTableName(tableKey), keyName);
+        Output.log("[%s] delete(%s)", main.getTableName(tableKey), keyName);
     }
 }

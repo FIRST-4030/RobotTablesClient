@@ -26,13 +26,13 @@ import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
-public class OutputTableMain implements DotNetTable.DotNetTableEvents {
+public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
 
     private final ListenerForward l = new ListenerForward();
     private final Map<String, Map<String, String>> values = new HashMap<>();
     private final DotNetTable nameTable;
 
-    public OutputTableMain() {
+    public OutputTablesMain() {
         nameTable = DotNetTables.subscribe("output-tables");
     }
 

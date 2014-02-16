@@ -18,9 +18,11 @@ package net.daboross.outputtablesclient.main;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
-import net.daboross.outputtablesclient.gui.OutputTablesGUI;
+import net.daboross.outputtablesclient.gui.OutputTablesInterfaceMain;
+import net.daboross.outputtablesclient.gui.OutputTablesInterfaceRoot;
 import net.daboross.outputtablesclient.gui.SwingListenerForward;
 import net.daboross.outputtablesclient.output.LoggerListener;
 import net.daboross.outputtablesclient.output.Output;
@@ -28,28 +30,44 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
-    private static final String CLIENT_ADDRESS = "4030";
+    private static final String CLIENT_ADDRESS = "127.0.0.1";
+    private OutputTablesInterfaceRoot root;
 
-    public static void main(String[] args) throws IOException {
-        System.setOut(new PrintStream(new Output.StaticOutputStream()));
-        System.setErr(new PrintStream(new Output.StaticOutputStream()));
-        Output.log("Starting client on " + CLIENT_ADDRESS);
-        DotNetTables.startClient(CLIENT_ADDRESS);
-        final OutputTableMain main = new OutputTableMain();
-        LoggerListener loggerListener = new LoggerListener(main);
-        main.addListener(loggerListener);
-        SwingUtilities.invokeLater(new Runnable() {
+    public void run() throws InvocationTargetException, InterruptedException, IOException {
+        Output.log("Initiating root interface");
+        SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Output.log("Starting GUI");
-                OutputTablesGUI gui = new OutputTablesGUI(main);
-                main.addListener(new SwingListenerForward(gui));
-                Output.setLogger(new GUIOutput(gui));
-                Output.log("Subscribing");
-                main.subscribe();
-                Output.log("Showing GUI");
-                gui.show();
+                root = new OutputTablesInterfaceRoot();
+                root.show();
+                Output.setLogger(new GUIOutput(root));
+                System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
+                System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
             }
         });
+        Output.log("Starting client on " + CLIENT_ADDRESS);
+        DotNetTables.startClient(CLIENT_ADDRESS);
+        Output.log("Initiating OutputTablesMain");
+        final OutputTablesMain main = new OutputTablesMain();
+        Output.log("Initiating LoggerListener");
+        LoggerListener loggerListener = new LoggerListener(main);
+        main.addListener(loggerListener);
+        Output.log("Starting main interface initiation");
+        SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                Output.log("Initiating main interface");
+                OutputTablesInterfaceMain gui = new OutputTablesInterfaceMain(main, root);
+                Output.log("Adding listener");
+                main.addListener(new SwingListenerForward(gui));
+            }
+        });
+        Output.log("Subscribing to output-tables");
+        main.subscribe();
+        Output.log("Finished startup sequence");
+    }
+
+    public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {
+        new Application().run();
     }
 }

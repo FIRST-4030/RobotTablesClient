@@ -21,20 +21,23 @@ import net.daboross.outputtablesclient.output.Output;
 
 public class GUIOutput implements Output.StaticLogger {
 
-    private final OutputTablesGUI main;
+    private final OutputTablesInterfaceRoot root;
 
-    public GUIOutput(OutputTablesGUI main) {
-        this.main = main;
+    public GUIOutput(OutputTablesInterfaceRoot root) {
+        this.root = root;
     }
 
     @Override
     public void log(final String message) {
-        System.out.println(message);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                main.loggingTextArea.append(message + "\n");
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread()) {
+            root.loggingTextArea.append(message + "\n");
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    root.loggingTextArea.append(message + "\n");
+                }
+            });
+        }
     }
 }
