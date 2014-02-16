@@ -30,7 +30,7 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
-    private static final String CLIENT_ADDRESS = "127.0.0.1";
+    private static final String CLIENT_ADDRESS = "4030";
     private OutputTablesInterfaceRoot root;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
