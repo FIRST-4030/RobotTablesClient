@@ -17,6 +17,7 @@
 package net.daboross.outputtablesclient.main;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
 import net.daboross.outputtablesclient.gui.OutputTablesGUI;
@@ -30,6 +31,8 @@ public class Application {
     private static final String CLIENT_ADDRESS = "4030";
 
     public static void main(String[] args) throws IOException {
+        System.setOut(new PrintStream(new Output.StaticOutputStream()));
+        System.setErr(new PrintStream(new Output.StaticOutputStream()));
         Output.log("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
         final OutputTableMain main = new OutputTableMain();

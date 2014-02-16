@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -57,8 +58,9 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
 
     @Override
     public synchronized void changed(DotNetTable dnt) {
+        Output.log("Table changed '%s'", dnt.name());
         if (dnt.name().equals("output-tables")) {
-            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
+            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
                 String tableKey = e.nextElement();
                 if (tableKey.startsWith("_")) {
                     continue;
@@ -75,7 +77,7 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
         } else {
             String tableKey = dnt.name();
             Map<String, String> valueTable = values.get(tableKey);
-            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
+            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
                 String key = e.nextElement();
                 if (key.startsWith("_")) {
                     continue;
@@ -89,7 +91,7 @@ public class OutputTableMain implements DotNetTable.DotNetTableEvents {
                     l.onKeyUpdate(tableKey, key, value);
                 }
             }
-            for (String key : new ArrayList<String>(valueTable.keySet())) {
+            for (String key : new ArrayList<>(valueTable.keySet())) {
                 if (!dnt.exists(key)) {
                     valueTable.remove(key);
                     l.onKeyDelete(tableKey, key);

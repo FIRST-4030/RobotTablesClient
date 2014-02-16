@@ -16,6 +16,10 @@
  */
 package net.daboross.outputtablesclient.output;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,11 +34,7 @@ public class Output {
     }
 
     public static void setLogger(StaticLogger logger) {
-        if (logger == null) {
-            Output.logger = new DefaultLogger();
-        } else {
-            Output.logger = logger;
-        }
+        Output.logger = logger;
     }
 
     public static interface StaticLogger {
@@ -47,6 +47,21 @@ public class Output {
         @Override
         public void log(String message) {
             System.out.println(message);
+        }
+    }
+
+    public static class StaticOutputStream extends OutputStream {
+
+        private StringBuffer currentBuffer = new StringBuffer();
+
+        @Override
+        public void write(final int b) throws IOException {
+            String str = new String(new byte[b], Charset.forName("UTF-8"));
+            if (str.equals("\n") || (str.length() > 1 && str.contains("\n"))) {
+                currentBuffer.append(str);
+                log(currentBuffer.toString());
+                currentBuffer = new StringBuffer();
+            }
         }
     }
 }
