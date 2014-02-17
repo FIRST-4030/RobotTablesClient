@@ -48,6 +48,7 @@ public class OutputTablesInterfaceMain implements OutputListener {
     final JPanel mainTabPanel;
     final JPanel toggleButtonPanel;
     final JPanel tableRootPanel;
+    final Map<String, JToggleButton> tableKeyToTableButton;
     final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
@@ -80,12 +81,12 @@ public class OutputTablesInterfaceMain implements OutputListener {
 
 
         // maps
+        tableKeyToTableButton = new TreeMap<>();
         tableKeyToTableEnabled = new TreeMap<>();
         tableKeyToTablePanel = new HashMap<>();
         tableKeyAndKeyToValuePanel = new HashMap<>();
         tableKeyAndKeyToValueLabel = new HashMap<>();
     }
-
 
     private void ensureTableExists(String tableKey) {
         if (tableKeyToTablePanel.get(tableKey) == null) {
@@ -106,7 +107,11 @@ public class OutputTablesInterfaceMain implements OutputListener {
         TableToggleListener listener = new TableToggleListener(toggleButton, tableKey);
         toggleButton.addItemListener(listener);
         listener.initialAdd();
-        toggleButtonPanel.add(toggleButton, toggleButtonConstraints);
+        tableKeyToTableButton.put(tableKey, toggleButton);
+        toggleButtonPanel.removeAll();
+        for (JToggleButton button : tableKeyToTableButton.values()) {
+            toggleButtonPanel.add(button, toggleButtonConstraints);
+        }
 
         tableKeyAndKeyToValuePanel.put(tableKey, new HashMap<String, JPanel>());
         tableKeyAndKeyToValueLabel.put(tableKey, new HashMap<String, JLabel>());
