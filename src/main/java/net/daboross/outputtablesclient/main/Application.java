@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
 import net.daboross.outputtablesclient.gui.OutputTablesInterfaceMain;
 import net.daboross.outputtablesclient.gui.OutputTablesInterfaceRoot;
+import net.daboross.outputtablesclient.gui.OutputTablesNetConsole;
 import net.daboross.outputtablesclient.gui.SwingListenerForward;
 import net.daboross.outputtablesclient.output.LoggerListener;
 import net.daboross.outputtablesclient.output.Output;
@@ -43,6 +44,14 @@ public class Application {
                 Output.setLogger(new GUIOutput(root));
                 System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
                 System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
+            }
+        });
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Output.log("Starting NetConsole");
+                new OutputTablesNetConsole().addTo(root);
+                Output.log("Done starting NetConsole");
             }
         });
         Output.log("Starting client on " + CLIENT_ADDRESS);

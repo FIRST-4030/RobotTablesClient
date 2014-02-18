@@ -16,46 +16,86 @@
  */
 package net.daboross.outputtablesclient.gui;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultCaret;
+import net.daboross.outputtablesclient.output.Output;
 
 public class OutputTablesNetConsole {
 
     private static final String ADDRESS = "10.40.30.2";
     private static final int RECEIVING_PORT = 6666;
     private static final int SENDING_PORT = 6668;
-    private final JPanel outputPanel;
-    private InetAddress address;
+    private final JPanel rootPanel;
+    private final JTextArea textArea;
     private DatagramSocket receiving;
-    private DatagramSocket sending;
+//    private InetAddress address;
+//    private DatagramSocket sending;
 
     public OutputTablesNetConsole() {
         // GUI
-        outputPanel = new JPanel();
+        rootPanel = new JPanel(new BorderLayout());
+
+        textArea = new JTextArea();
+        ((DefaultCaret) textArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane textPane = new JScrollPane(textArea);
+        rootPanel.add(textPane, BorderLayout.CENTER);
 
 
         // Init
         try {
-            this.address = InetAddress.getByName(ADDRESS);
             this.receiving = new DatagramSocket(RECEIVING_PORT);
-            this.sending = new DatagramSocket(SENDING_PORT);
-            this.receiving.connect(address, RECEIVING_PORT);
-        } catch (SocketException | UnknownHostException e) {
+//            this.address = InetAddress.getByName(ADDRESS);
+//            this.sending = new DatagramSocket(SENDING_PORT);
+        } catch (SocketException e) {
+            e.printStackTrace();
             return;
         }
+
+        new NetConsoleListenerThread().start();
     }
 
-    private void send(String command) throws IOException {
-        byte[] buf = command.getBytes();
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, SENDING_PORT);
-        sending.send(packet);
+    public void addTo(OutputTablesInterfaceRoot root) {
+        root.tabbedPane.addTab("Console", rootPanel);
     }
 
-    private void recieve(String str) {
+//    private void send(String command) throws IOException {
+//        byte[] buf = command.getBytes();
+//        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, SENDING_PORT);
+//        sending.send(packet);
+//    }
+
+    public class NetConsoleListenerThread extends Thread {
+
+        private byte[] buffer = new byte[2048];
+
+        @Override
+        public void run() {
+            while (true) {
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                try {
+                    receiving.receive(packet);
+                } catch (IOException e) {
+                    Output.log("IOException receiving DatagramPacket: %s", e);
+                }
+                if (packet.getLength() != 0) {
+                    final String str = new String(buffer, 0, packet.getLength(), Charset.forName("UTF-8"));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            textArea.append(str);
+                        }
+                    });
+                }
+            }
+        }
     }
 }
