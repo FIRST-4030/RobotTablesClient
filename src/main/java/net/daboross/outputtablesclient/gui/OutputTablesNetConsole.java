@@ -37,8 +37,6 @@ public class OutputTablesNetConsole {
     private final JPanel rootPanel;
     private final JTextArea textArea;
     private DatagramSocket receiving;
-//    private InetAddress address;
-//    private DatagramSocket sending;
 
     public OutputTablesNetConsole() {
         // GUI
@@ -49,12 +47,9 @@ public class OutputTablesNetConsole {
         JScrollPane textPane = new JScrollPane(textArea);
         rootPanel.add(textPane, BorderLayout.CENTER);
 
-
         // Init
         try {
             this.receiving = new DatagramSocket(RECEIVING_PORT);
-//            this.address = InetAddress.getByName(ADDRESS);
-//            this.sending = new DatagramSocket(SENDING_PORT);
         } catch (SocketException e) {
             e.printStackTrace();
             return;
@@ -66,12 +61,6 @@ public class OutputTablesNetConsole {
     public void addTo(OutputTablesInterfaceRoot root) {
         root.tabbedPane.addTab("Console", rootPanel);
     }
-
-//    private void send(String command) throws IOException {
-//        byte[] buf = command.getBytes();
-//        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, SENDING_PORT);
-//        sending.send(packet);
-//    }
 
     public class NetConsoleListenerThread extends Thread {
 
