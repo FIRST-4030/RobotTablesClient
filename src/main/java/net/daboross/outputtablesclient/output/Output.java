@@ -27,7 +27,13 @@ public class Output {
 
     public static void log(String message, Object... args) {
         if (logger != null) {
-            logger.log(String.format("[%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
+            logger.log(String.format("[output] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
+        }
+    }
+
+    public static void logI(String message, Object... args) {
+        if (logger != null) {
+            logger.log(String.format("[input] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
         }
     }
 

@@ -16,12 +16,12 @@
  */
 package net.daboross.outputtablesclient.main;
 
-import net.daboross.outputtablesclient.output.Output;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.output.Output;
 
-public class ListenerForward implements OutputListener {
+public class OutputListenerForward implements OutputListener {
 
     private final Set<OutputListener> listeners = new LinkedHashSet<>();
 
@@ -61,7 +61,7 @@ public class ListenerForward implements OutputListener {
             try {
                 listener.onKeyCreate(tableKey, keyName, keyValue);
             } catch (Throwable t) {
-                Output.log("Error onKeyCreate", t);
+                Output.log("Error onCreateDefaultKey", t);
             }
         }
     }
@@ -72,7 +72,7 @@ public class ListenerForward implements OutputListener {
             try {
                 listener.onKeyUpdate(tableKey, keyName, keyValue);
             } catch (Throwable t) {
-                Output.log("Error onKeyUpdate", t);
+                Output.log("Error onUpdateDefaultKey", t);
             }
         }
     }
@@ -83,7 +83,7 @@ public class ListenerForward implements OutputListener {
             try {
                 listener.onKeyDelete(tableKey, keyName);
             } catch (Throwable t) {
-                Output.log("Error onKeyDelete", t);
+                Output.log("Error onDeleteDefaultkey", t);
             }
         }
     }

@@ -28,7 +28,7 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
 
-    private final ListenerForward l = new ListenerForward();
+    private final OutputListenerForward l = new OutputListenerForward();
     private final Map<String, Map<String, String>> values = new HashMap<>();
     private final DotNetTable nameTable;
 

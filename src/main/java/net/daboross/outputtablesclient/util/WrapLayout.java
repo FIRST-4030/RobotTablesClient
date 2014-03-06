@@ -16,7 +16,11 @@
  */
 package net.daboross.outputtablesclient.util;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
@@ -52,15 +56,15 @@ public class WrapLayout extends FlowLayout {
     /**
      * Creates a new flow layout manager with the indicated alignment and the
      * indicated horizontal and vertical gaps.
-     * <p>
+     * <p/>
      * The value of the alignment argument must be one of
      * <code>WrapLayout</code>,
      * <code>WrapLayout</code>, or
      * <code>WrapLayout</code>.
      *
      * @param align the alignment value
-     * @param hgap the horizontal gap between components
-     * @param vgap the vertical gap between components
+     * @param hgap  the horizontal gap between components
+     * @param vgap  the vertical gap between components
      */
     public WrapLayout(int align, int hgap, int vgap) {
         super(align, hgap, vgap);
@@ -98,7 +102,7 @@ public class WrapLayout extends FlowLayout {
      * Returns the minimum or preferred dimension needed to layout the target
      * container.
      *
-     * @param target target to get layout size for
+     * @param target    target to get layout size for
      * @param preferred should preferred size be calculated
      * @return the dimension to layout the target container
      */
@@ -177,8 +181,8 @@ public class WrapLayout extends FlowLayout {
      * A new row has been completed. Use the dimensions of this row to update
      * the preferred size for the container.
      *
-     * @param dim update the width and height when appropriate
-     * @param rowWidth the width of the row to add
+     * @param dim       update the width and height when appropriate
+     * @param rowWidth  the width of the row to add
      * @param rowHeight the height of the row to add
      */
     private void addRow(Dimension dim, int rowWidth, int rowHeight) {
