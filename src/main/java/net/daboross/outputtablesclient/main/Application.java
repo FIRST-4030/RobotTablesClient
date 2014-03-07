@@ -21,7 +21,6 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
-import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.InterfaceRoot;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
 import net.daboross.outputtablesclient.gui.OutputInterface;
@@ -32,8 +31,7 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
-    //    private static final String CLIENT_ADDRESS = "4030";
-    private static final String CLIENT_ADDRESS = "127.0.0.1";
+    private static final String CLIENT_ADDRESS = "4030";
     private InterfaceRoot root;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
@@ -60,7 +58,7 @@ public class Application {
         DotNetTables.startClient(CLIENT_ADDRESS);
         Output.log("Initiating OutputTablesMain");
         final OutputTablesMain outputMain = new OutputTablesMain();
-        final InputTablesMain inputMain = new InputTablesMain();
+//        final InputTablesMain inputMain = new InputTablesMain();
         Output.log("Initiating LoggerListener");
         LoggerListener loggerListener = new LoggerListener(outputMain);
         outputMain.addListener(loggerListener);
@@ -72,15 +70,15 @@ public class Application {
                 OutputInterface outputGui = new OutputInterface(outputMain, root);
                 Output.log("Adding listener");
                 outputMain.addListener(new SwingOutputForward(outputGui));
-                Output.logI("Initiating input interface");
-                InputInterface inputGui = new InputInterface(inputMain, root);
-                Output.logI("Adding input listener");
-                inputMain.addListener(inputGui);
+//                Output.logI("Initiating input interface");
+//                InputInterface inputGui = new InputInterface(inputMain, root);
+//                Output.logI("Adding input listener");
+//                inputMain.addListener(inputGui);
             }
         });
         Output.log("Subscribing to output-tables");
         outputMain.subscribe();
-        inputMain.subscribe();
+//        inputMain.subscribe();
         Output.log("Finished startup sequence");
     }
 
