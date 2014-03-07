@@ -86,7 +86,7 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
                 if (!valueTable.containsKey(key)) {
                     valueTable.put(key, value);
                     l.onKeyCreate(tableKey, key, value);
-                } else if (!valueTable.get(key).equals(key)) {
+                } else if (!valueTable.get(key).equals(value)) {
                     valueTable.put(key, value);
                     l.onKeyUpdate(tableKey, key, value);
                 }

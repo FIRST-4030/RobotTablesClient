@@ -18,6 +18,7 @@ package net.daboross.outputtablesclient.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,8 +30,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import net.daboross.outputtablesclient.api.InputListener;
 import net.daboross.outputtablesclient.main.InputTablesMain;
+import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 
 public class InputInterface implements InputListener {
@@ -39,10 +43,10 @@ public class InputInterface implements InputListener {
     final GridBagConstraints toggleButtonConstraints;
     final GridBagConstraints tablePanelConstraints;
     final JPanel mainTabPanel;
-    final JPanel toggleButtonPanel;
     final JPanel tableRootPanel;
     final Map<String, JPanel> keyToValuePanel;
     final Map<String, JTextField> keyToValueField;
+    final JLabel statusLabel;
 
     public InputInterface(InputTablesMain main, InterfaceRoot root) {
         this.main = main;
@@ -55,20 +59,21 @@ public class InputInterface implements InputListener {
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-        root.tabbedPane.addTab("Input", mainTabPanel);
-        root.tabbedPane.setSelectedComponent(mainTabPanel);
-
-
-        // toggleButtonPanel
-        toggleButtonPanel = new JPanel();
-        toggleButtonPanel.setLayout(new GridBagLayout());
-        mainTabPanel.add(toggleButtonPanel, new GBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
-
+//        root.tabbedPane.addTab("Input", mainTabPanel);
+        root.inputOutput.add(mainTabPanel);
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
         mainTabPanel.add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
 
+        // statusLabel
+        statusLabel = new JLabel();
+        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
+        statusLabel.setText("Not connected");
+        tableRootPanel.add(statusLabel, new GBC().gridx(0).anchor(GBC.NORTH).insets(new Insets(30, 0, 30, 0)));
+
+        // tableRootPanel refresh
+        tableRootPanel.revalidate();
 
         // maps
         keyToValuePanel = new HashMap<>();
@@ -77,10 +82,12 @@ public class InputInterface implements InputListener {
 
     @Override
     public void onNotStale() {
+        statusLabel.setText("Connected - Robot Up To Date");
     }
 
     @Override
     public void onStale() {
+        statusLabel.setText("!!!WARNING!!! - Robot disconnected");
     }
 
     @Override
@@ -97,12 +104,13 @@ public class InputInterface implements InputListener {
         separator.setPreferredSize(new Dimension(2, 20));
         panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
-        JTextField valueField = new JTextField(keyValue);
+        JTextField valueField = new JTextField(keyValue, 20);
         valueField.setBorder(new EmptyBorder(5, 5, 5, 5));
+        valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
         panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
         keyToValueField.put(keyName, valueField);
 
-        tableRootPanel.add(panel);
+        tableRootPanel.add(panel, new GBC().gridx(0).insets(new Insets(5, 0, 5, 0)).anchor(GBC.EAST));
         tableRootPanel.revalidate();
     }
 
@@ -115,5 +123,37 @@ public class InputInterface implements InputListener {
         JPanel valuePanel = keyToValuePanel.get(keyName);
         tableRootPanel.remove(valuePanel);
         tableRootPanel.revalidate();
+    }
+
+    public class JFieldActionListener implements DocumentListener {
+
+        private final String key;
+        private final JTextField field;
+
+        public JFieldActionListener(final String key, final JTextField field) {
+            this.key = key;
+            this.field = field;
+        }
+
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
+            String text = field.getText();
+            Output.logI("Updated key '%s': '%s'", key, text);
+            main.updateKey(key, field.getText());
+        }
+
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
+            String text = field.getText();
+            Output.logI("Updated key '%s': '%s'", key, text);
+            main.updateKey(key, field.getText());
+        }
+
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
+            String text = field.getText();
+            Output.logI("Updated key '%s': '%s'", key, text);
+            main.updateKey(key, field.getText());
+        }
     }
 }

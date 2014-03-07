@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
+import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.InterfaceRoot;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
 import net.daboross.outputtablesclient.gui.OutputInterface;
@@ -49,37 +50,48 @@ public class Application {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Output.log("Starting NetConsole");
+                Output.log("Initiating NetConsole");
                 new NetConsoleInterface().addTo(root);
-                Output.log("Done starting NetConsole");
+                Output.log("NetConsole initiated");
             }
         });
         Output.log("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
-        Output.log("Initiating OutputTablesMain");
+        startOutput();
+        startInput();
+        Output.log("Finished startup sequence");
+    }
+
+    public void startOutput() throws InvocationTargetException, InterruptedException {
+        Output.log("Initiating output-tables");
         final OutputTablesMain outputMain = new OutputTablesMain();
-//        final InputTablesMain inputMain = new InputTablesMain();
-        Output.log("Initiating LoggerListener");
+        Output.log("Initiating output-tables logger");
         LoggerListener loggerListener = new LoggerListener(outputMain);
         outputMain.addListener(loggerListener);
-        Output.log("Starting main interface initiation");
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Output.log("Initiating output interface");
+                Output.log("Initiating output-tables interface");
                 OutputInterface outputGui = new OutputInterface(outputMain, root);
-                Output.log("Adding listener");
                 outputMain.addListener(new SwingOutputForward(outputGui));
-//                Output.logI("Initiating input interface");
-//                InputInterface inputGui = new InputInterface(inputMain, root);
-//                Output.logI("Adding input listener");
-//                inputMain.addListener(inputGui);
             }
         });
         Output.log("Subscribing to output-tables");
         outputMain.subscribe();
-//        inputMain.subscribe();
-        Output.log("Finished startup sequence");
+    }
+
+    public void startInput() throws InvocationTargetException, InterruptedException {
+        final InputTablesMain inputMain = new InputTablesMain();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                Output.logI("Initiating input-tables interface");
+                InputInterface inputGui = new InputInterface(inputMain, root);
+                inputMain.addListener(inputGui);
+            }
+        });
+        Output.logI("Subscribing to input-tables");
+        inputMain.subscribe();
     }
 
     public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {

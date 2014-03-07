@@ -65,8 +65,9 @@ public class OutputInterface implements OutputListener {
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-        root.tabbedPane.addTab("Main", mainTabPanel);
-        root.tabbedPane.setSelectedComponent(mainTabPanel);
+//        root.tabbedPane.addTab("Main", mainTabPanel);
+//        root.tabbedPane.setSelectedComponent(mainTabPanel);
+        root.inputOutput.add(mainTabPanel);
 
 
         // toggleButtonPanel

@@ -31,11 +31,11 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     private static final String FEEDBACK_KEY = "_DRIVER_FEEDBACK_KEY";
     private final InputListenerForward l = new InputListenerForward();
-    private final Map<String, Map<String, String>> values = new HashMap<>();
+    private final Map<String, String> values = new HashMap<>();
     private final DotNetTable defaultSettingsTable;
     private final DotNetTable settingsTable;
     private final Timer timer = new Timer();
-    private boolean stale = false;
+    private boolean stale = true;
     private long currentFeedback;
 
     public InputTablesMain() {
@@ -80,25 +80,23 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         }
         updateStale();
         Output.logI("Table changed");
-        String tableKey = dnt.name();
-        Map<String, String> valueTable = values.get(tableKey);
         for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             if (key.startsWith("_")) {
                 continue;
             }
             String value = dnt.getValue(key);
-            if (!valueTable.containsKey(key)) {
-                valueTable.put(key, value);
+            if (!values.containsKey(key)) {
+                values.put(key, value);
                 l.onCreateDefaultKey(key, value);
-            } else if (!valueTable.get(key).equals(key)) {
-                valueTable.put(key, value);
+            } else if (!values.get(key).equals(value)) {
+                values.put(key, value);
                 l.onUpdateDefaultKey(key, value);
             }
         }
-        for (String key : new ArrayList<>(valueTable.keySet())) {
+        for (String key : new ArrayList<>(values.keySet())) {
             if (!dnt.exists(key)) {
-                valueTable.remove(key);
+                values.remove(key);
                 l.onDeleteKey(key);
             }
         }
@@ -110,18 +108,26 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     private void updateStale() {
-        if (defaultSettingsTable.exists(FEEDBACK_KEY))
+        if (defaultSettingsTable.exists(FEEDBACK_KEY)) {
+            String feedbackStr = defaultSettingsTable.getValue(FEEDBACK_KEY);
+            double feedback = -1;
+            try {
+                feedback = Double.parseDouble(feedbackStr);
+            } catch (NumberFormatException ex) {
+                Output.logI("Non-number feedback '%s'.", feedbackStr);
+            }
             if (stale) {
-                if (defaultSettingsTable.exists(FEEDBACK_KEY) && currentFeedback < defaultSettingsTable.getInt(FEEDBACK_KEY) + 2) {
+                if (currentFeedback < feedback + 2) {
                     stale = false;
                     l.onNotStale();
                 }
             } else {
-                if ((!defaultSettingsTable.exists(FEEDBACK_KEY)) || currentFeedback > defaultSettingsTable.getInt(FEEDBACK_KEY) + 2) {
+                if (currentFeedback > feedback + 2) {
                     stale = true;
                     l.onStale();
                 }
             }
+        }
     }
 
     private void sendSettings() {

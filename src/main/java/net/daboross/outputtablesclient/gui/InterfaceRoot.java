@@ -18,10 +18,13 @@ package net.daboross.outputtablesclient.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
 public class InterfaceRoot {
@@ -29,6 +32,7 @@ public class InterfaceRoot {
     final JFrame rootFrame;
     final JTabbedPane tabbedPane;
     final JTextArea loggingTextArea;
+    final JPanel inputOutput;
 
     public InterfaceRoot() {
         // rootFrame
@@ -36,7 +40,7 @@ public class InterfaceRoot {
         rootFrame.setMinimumSize(new Dimension(640, 480));
         rootFrame.setPreferredSize(new Dimension(640, 480));
         rootFrame.setLayout(new BorderLayout());
-        rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
         rootFrame.setTitle("Robot Output " + OutputInterface.class.getPackage().getImplementationVersion());
 
@@ -49,6 +53,11 @@ public class InterfaceRoot {
         ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane loggingPane = new JScrollPane(loggingTextArea);
         tabbedPane.addTab("Log", loggingPane);
+
+        // inputOutput
+        inputOutput = new JPanel(new GridLayout(1, 2));
+        tabbedPane.add(inputOutput, "Main");
+        tabbedPane.setSelectedComponent(inputOutput);
     }
 
     public void show() {
