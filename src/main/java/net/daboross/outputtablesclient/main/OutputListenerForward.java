@@ -83,7 +83,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onKeyDelete(tableKey, keyName);
             } catch (Throwable t) {
-                Output.log("Error onDeleteDefaultkey", t);
+                Output.log("Error onDeleteKey", t);
             }
         }
     }

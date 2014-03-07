@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import net.daboross.outputtablesclient.api.InputListener;
 import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
@@ -32,7 +34,9 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final Map<String, Map<String, String>> values = new HashMap<>();
     private final DotNetTable defaultSettingsTable;
     private final DotNetTable settingsTable;
-    private int currentFeedback;
+    private final Timer timer = new Timer();
+    private boolean stale = false;
+    private long currentFeedback;
 
     public InputTablesMain() {
         defaultSettingsTable = DotNetTables.subscribe("robot-input-default");
@@ -40,7 +44,19 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     public void subscribe() {
-        settingsTable.onChange(this);
+        defaultSettingsTable.onChange(this);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateStale();
+            }
+        }, 300, 300);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sendSettings();
+            }
+        }, 1000, 1000);
     }
 
     public void addListener(InputListener listener) {
@@ -52,17 +68,17 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     public void updateKey(String key, String newValue) {
-        currentFeedback++;
-        settingsTable.setValue(FEEDBACK_KEY, currentFeedback);
-
+        settingsTable.setValue(key, newValue);
+        sendSettings();
     }
 
     @Override
     public synchronized void changed(DotNetTable dnt) {
         if (!dnt.name().equals("robot-input-default")) {
-            Output.logI("Warning, non-input table '%s' ignored", dnt.name());
+            Output.logI("Non-input table '%s' ignored", dnt.name());
             return;
         }
+        updateStale();
         Output.logI("Table changed");
         String tableKey = dnt.name();
         Map<String, String> valueTable = values.get(tableKey);
@@ -83,7 +99,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         for (String key : new ArrayList<>(valueTable.keySet())) {
             if (!dnt.exists(key)) {
                 valueTable.remove(key);
-                l.onDeleteDefaultkey(key);
+                l.onDeleteKey(key);
             }
         }
     }
@@ -91,5 +107,26 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     @Override
     public synchronized void stale(DotNetTable dnt) {
         l.onStale();
+    }
+
+    private void updateStale() {
+        if (defaultSettingsTable.exists(FEEDBACK_KEY))
+            if (stale) {
+                if (defaultSettingsTable.exists(FEEDBACK_KEY) && currentFeedback < defaultSettingsTable.getInt(FEEDBACK_KEY) + 2) {
+                    stale = false;
+                    l.onNotStale();
+                }
+            } else {
+                if ((!defaultSettingsTable.exists(FEEDBACK_KEY)) || currentFeedback > defaultSettingsTable.getInt(FEEDBACK_KEY) + 2) {
+                    stale = true;
+                    l.onStale();
+                }
+            }
+    }
+
+    private void sendSettings() {
+        currentFeedback++;
+        settingsTable.setValue(FEEDBACK_KEY, currentFeedback);
+        settingsTable.send();
     }
 }

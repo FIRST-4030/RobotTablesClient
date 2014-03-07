@@ -64,6 +64,27 @@ public class Server {
 //                    break;
 //            }
 //        }
+        final DotNetTable robotInput = DotNetTables.subscribe("robot-input");
+        final DotNetTable robotInputDefault = DotNetTables.publish("robot-input-default");
+        robotInputDefault.setInterval(2000);
+        robotInputDefault.setValue("key-1", "key-2");
+        robotInputDefault.setValue("key-2", "key-2asdf");
+        robotInputDefault.setValue("key-3", "key-2fdsa");
+        robotInput.onChange(new DotNetTable.DotNetTableEvents() {
+            @Override
+            public void changed(final DotNetTable table) {
+                String value = robotInput.getValue("_DRIVER_FEEDBACK_KEY");
+                System.out.println("Input: " + value);
+                if (value != null) {
+                    robotInputDefault.setValue("_DRIVER_FEEDBACK_KEY", value);
+                }
+            }
+
+            @Override
+            public void stale(final DotNetTable table) {
+
+            }
+        });
         DotNetTable[] tables = new DotNetTable[10];
         for (int i = 0; true; i++) {
             if (tables[i % 10] == null) {

@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.output.Output;
 
-public class OutputTablesNetConsole {
+public class NetConsoleInterface {
 
     private static final String ADDRESS = "10.40.30.2";
     private static final int RECEIVING_PORT = 6666;
@@ -38,7 +38,7 @@ public class OutputTablesNetConsole {
     private final JTextArea textArea;
     private DatagramSocket receiving;
 
-    public OutputTablesNetConsole() {
+    public NetConsoleInterface() {
         // GUI
         rootPanel = new JPanel(new BorderLayout());
 
@@ -58,7 +58,7 @@ public class OutputTablesNetConsole {
         new NetConsoleListenerThread().start();
     }
 
-    public void addTo(OutputTablesInterfaceRoot root) {
+    public void addTo(InterfaceRoot root) {
         root.tabbedPane.addTab("Console", rootPanel);
     }
 

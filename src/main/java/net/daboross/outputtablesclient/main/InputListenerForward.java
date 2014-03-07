@@ -34,12 +34,12 @@ public class InputListenerForward implements InputListener {
     }
 
     @Override
-    public void onUpdate() {
+    public void onNotStale() {
         for (InputListener listener : listeners) {
             try {
-                listener.onUpdate();
+                listener.onNotStale();
             } catch (Throwable t) {
-                Output.logI("Error onUpdate", t);
+                Output.logI("Error onNotStale", t);
             }
         }
     }
@@ -78,12 +78,12 @@ public class InputListenerForward implements InputListener {
     }
 
     @Override
-    public void onDeleteDefaultkey(String keyName) {
+    public void onDeleteKey(String keyName) {
         for (InputListener listener : listeners) {
             try {
-                listener.onDeleteDefaultkey(keyName);
+                listener.onDeleteKey(keyName);
             } catch (Throwable t) {
-                Output.logI("Error onDeleteDefaultkey", t);
+                Output.logI("Error onDeleteKey", t);
             }
         }
     }

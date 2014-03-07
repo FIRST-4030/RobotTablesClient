@@ -17,62 +17,62 @@
 package net.daboross.outputtablesclient.gui;
 
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.api.InputListener;
 
-public class SwingListenerForward implements OutputListener {
+public class SwingInputForward implements InputListener {
 
-    private final OutputListener innerListener;
+    private final InputListener innerListener;
 
-    public SwingListenerForward(OutputListener innerListener) {
+    public SwingInputForward(InputListener innerListener) {
         this.innerListener = innerListener;
     }
 
     @Override
-    public void onTableCreate(final String tableKey, final String tableName) {
+    public void onNotStale() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onTableCreate(tableKey, tableName);
+                innerListener.onNotStale();
             }
         });
     }
 
     @Override
-    public void onTableStale(final String tableKey) {
+    public void onStale() {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onTableStale(tableKey);
+                innerListener.onStale();
             }
         });
     }
 
     @Override
-    public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
+    public void onCreateDefaultKey(final String keyName, final String keyValue) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onKeyCreate(tableKey, keyName, keyValue);
+                innerListener.onCreateDefaultKey(keyName, keyValue);
             }
         });
     }
 
     @Override
-    public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
+    public void onUpdateDefaultKey(final String keyName, final String keyValue) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onKeyUpdate(tableKey, keyName, keyValue);
+                innerListener.onUpdateDefaultKey(keyName, keyValue);
             }
         });
     }
 
     @Override
-    public void onKeyDelete(final String tableKey, final String keyName) {
+    public void onDeleteKey(final String keyName) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onKeyDelete(tableKey, keyName);
+                innerListener.onDeleteKey(keyName);
             }
         });
     }

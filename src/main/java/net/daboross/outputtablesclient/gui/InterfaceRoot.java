@@ -24,13 +24,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
-public class OutputTablesInterfaceRoot {
+public class InterfaceRoot {
 
     final JFrame rootFrame;
     final JTabbedPane tabbedPane;
     final JTextArea loggingTextArea;
 
-    public OutputTablesInterfaceRoot() {
+    public InterfaceRoot() {
         // rootFrame
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));
@@ -38,7 +38,7 @@ public class OutputTablesInterfaceRoot {
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
-        rootFrame.setTitle("Robot Output " + OutputTablesInterfaceMain.class.getPackage().getImplementationVersion());
+        rootFrame.setTitle("Robot Output " + OutputInterface.class.getPackage().getImplementationVersion());
 
         // tabbedPane
         tabbedPane = new JTabbedPane();

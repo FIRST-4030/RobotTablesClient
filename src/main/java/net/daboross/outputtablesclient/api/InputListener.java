@@ -18,7 +18,7 @@ package net.daboross.outputtablesclient.api;
 
 public interface InputListener {
 
-    public void onUpdate();
+    public void onNotStale();
 
     public void onStale();
 
@@ -26,5 +26,5 @@ public interface InputListener {
 
     public void onUpdateDefaultKey(String keyName, String keyValue);
 
-    public void onDeleteDefaultkey(String keyName);
+    public void onDeleteKey(String keyName);
 }

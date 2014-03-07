@@ -21,9 +21,9 @@ import net.daboross.outputtablesclient.output.Output;
 
 public class GUIOutput implements Output.StaticLogger {
 
-    private final OutputTablesInterfaceRoot root;
+    private final InterfaceRoot root;
 
-    public GUIOutput(OutputTablesInterfaceRoot root) {
+    public GUIOutput(InterfaceRoot root) {
         this.root = root;
     }
 

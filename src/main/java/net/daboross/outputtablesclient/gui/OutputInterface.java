@@ -40,7 +40,7 @@ import net.daboross.outputtablesclient.main.OutputTablesMain;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
 
-public class OutputTablesInterfaceMain implements OutputListener {
+public class OutputInterface implements OutputListener {
 
     private final OutputTablesMain main;
     final GridBagConstraints toggleButtonConstraints;
@@ -54,7 +54,7 @@ public class OutputTablesInterfaceMain implements OutputListener {
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
 
-    public OutputTablesInterfaceMain(OutputTablesMain main, OutputTablesInterfaceRoot root) {
+    public OutputInterface(OutputTablesMain main, InterfaceRoot root) {
         this.main = main;
 
         // constraints

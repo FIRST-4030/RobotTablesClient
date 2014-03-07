@@ -21,25 +21,27 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.GUIOutput;
-import net.daboross.outputtablesclient.gui.OutputTablesInterfaceMain;
-import net.daboross.outputtablesclient.gui.OutputTablesInterfaceRoot;
-import net.daboross.outputtablesclient.gui.OutputTablesNetConsole;
-import net.daboross.outputtablesclient.gui.SwingListenerForward;
+import net.daboross.outputtablesclient.gui.InputInterface;
+import net.daboross.outputtablesclient.gui.InterfaceRoot;
+import net.daboross.outputtablesclient.gui.NetConsoleInterface;
+import net.daboross.outputtablesclient.gui.OutputInterface;
+import net.daboross.outputtablesclient.gui.SwingOutputForward;
 import net.daboross.outputtablesclient.output.LoggerListener;
 import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
-    private static final String CLIENT_ADDRESS = "4030";
-    private OutputTablesInterfaceRoot root;
+    //    private static final String CLIENT_ADDRESS = "4030";
+    private static final String CLIENT_ADDRESS = "127.0.0.1";
+    private InterfaceRoot root;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.log("Initiating root interface");
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                root = new OutputTablesInterfaceRoot();
+                root = new InterfaceRoot();
                 root.show();
                 Output.setLogger(new GUIOutput(root));
                 System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
@@ -50,29 +52,35 @@ public class Application {
             @Override
             public void run() {
                 Output.log("Starting NetConsole");
-                new OutputTablesNetConsole().addTo(root);
+                new NetConsoleInterface().addTo(root);
                 Output.log("Done starting NetConsole");
             }
         });
         Output.log("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
         Output.log("Initiating OutputTablesMain");
-        final OutputTablesMain main = new OutputTablesMain();
+        final OutputTablesMain outputMain = new OutputTablesMain();
+        final InputTablesMain inputMain = new InputTablesMain();
         Output.log("Initiating LoggerListener");
-        LoggerListener loggerListener = new LoggerListener(main);
-        main.addListener(loggerListener);
+        LoggerListener loggerListener = new LoggerListener(outputMain);
+        outputMain.addListener(loggerListener);
         Output.log("Starting main interface initiation");
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Output.log("Initiating main interface");
-                OutputTablesInterfaceMain gui = new OutputTablesInterfaceMain(main, root);
+                Output.log("Initiating output interface");
+                OutputInterface outputGui = new OutputInterface(outputMain, root);
                 Output.log("Adding listener");
-                main.addListener(new SwingListenerForward(gui));
+                outputMain.addListener(new SwingOutputForward(outputGui));
+                Output.logI("Initiating input interface");
+                InputInterface inputGui = new InputInterface(inputMain, root);
+                Output.logI("Adding input listener");
+                inputMain.addListener(inputGui);
             }
         });
         Output.log("Subscribing to output-tables");
-        main.subscribe();
+        outputMain.subscribe();
+        inputMain.subscribe();
         Output.log("Finished startup sequence");
     }
 
