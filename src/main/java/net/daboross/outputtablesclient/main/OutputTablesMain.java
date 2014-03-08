@@ -21,7 +21,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.listener.OutputListener;
+import net.daboross.outputtablesclient.listener.OutputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
@@ -58,7 +59,7 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
 
     @Override
     public synchronized void changed(DotNetTable dnt) {
-        Output.log("Table changed '%s'", dnt.name());
+        Output.oLog("Table changed '%s'", dnt.name());
         if (dnt.name().equals("output-tables")) {
             for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
                 String tableKey = e.nextElement();

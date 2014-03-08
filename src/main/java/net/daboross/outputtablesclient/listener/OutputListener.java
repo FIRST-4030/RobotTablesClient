@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.api;
+package net.daboross.outputtablesclient.listener;
 
 public interface OutputListener {
 

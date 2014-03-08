@@ -58,7 +58,7 @@ public class NetConsoleInterface {
         new NetConsoleListenerThread().start();
     }
 
-    public void addTo(InterfaceRoot root) {
+    public void addTo(RootInterface root) {
         root.tabbedPane.addTab("Console", rootPanel);
     }
 
@@ -73,7 +73,7 @@ public class NetConsoleInterface {
                 try {
                     receiving.receive(packet);
                 } catch (IOException e) {
-                    Output.log("IOException receiving DatagramPacket: %s", e);
+                    Output.oLog("IOException receiving DatagramPacket: %s", e);
                 }
                 if (packet.getLength() != 0) {
                     final String str = new String(buffer, 0, packet.getLength(), Charset.forName("UTF-8"));

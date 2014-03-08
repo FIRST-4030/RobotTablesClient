@@ -96,12 +96,12 @@ public class JSONHomeStorage {
             if (!saveFileBuffer.exists()) {
                 try {
                     if (!saveFileBuffer.createNewFile()) {
-                        Output.logO("Failed to create file '%s'.", saveFileBuffer);
+                        Output.logError("Failed to create file '%s'.", saveFileBuffer);
                         return;
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    Output.logO("Failed to create file '%s'.", saveFileBuffer);
+                    Output.logError("Failed to create file '%s'.", saveFileBuffer);
                     return;
                 }
             }
@@ -111,14 +111,14 @@ public class JSONHomeStorage {
                 }
             } catch (IOException | JSONException ex) {
                 ex.printStackTrace();
-                Output.logO("Couldn't write to %s", saveFileBuffer.getAbsolutePath());
+                Output.logError("Couldn't write to %s", saveFileBuffer.getAbsolutePath());
                 return;
             }
             try {
                 Files.move(saveFileBuffer.toPath(), saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                Output.logO("Failed to move buffer file '%s' to actual save location '%s'", saveFileBuffer.getAbsolutePath(), saveFile);
+                Output.logError("Failed to move buffer file '%s' to actual save location '%s'", saveFileBuffer.getAbsolutePath(), saveFile);
                 return;
             }
         }

@@ -16,20 +16,20 @@
  */
 package net.daboross.outputtablesclient.output;
 
-import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.main.OutputTablesMain;
 
-public class LoggerListener implements OutputListener {
+public class OutputLoggerListener implements OutputListener {
 
     private final OutputTablesMain main;
 
-    public LoggerListener(OutputTablesMain main) {
+    public OutputLoggerListener(OutputTablesMain main) {
         this.main = main;
     }
 
     @Override
     public void onTableCreate(String tableKey, String tableName) {
-        Output.log(" * table(key: %s, name: %s)", tableKey, tableName);
+        Output.oLog(" * table(key: %s, name: %s)", tableKey, tableName);
     }
 
     @Override
@@ -38,16 +38,16 @@ public class LoggerListener implements OutputListener {
 
     @Override
     public void onKeyCreate(String tableKey, String keyName, String keyValue) {
-        Output.log("[%s][%s*] %s", main.getTableName(tableKey), keyName, keyValue);
+        Output.oLog("[%s][%s*] %s", main.getTableName(tableKey), keyName, keyValue);
     }
 
     @Override
     public void onKeyUpdate(String tableKey, String keyName, String keyValue) {
-        Output.log("[%s][%s] %s", main.getTableName(tableKey), keyName, keyValue);
+        Output.oLog("[%s][%s] %s", main.getTableName(tableKey), keyName, keyValue);
     }
 
     @Override
     public void onKeyDelete(String tableKey, String keyName) {
-        Output.log("[%s] delete(%s)", main.getTableName(tableKey), keyName);
+        Output.oLog("[%s] delete(%s)", main.getTableName(tableKey), keyName);
     }
 }

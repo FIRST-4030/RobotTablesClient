@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import net.daboross.outputtablesclient.api.InputListener;
+import net.daboross.outputtablesclient.listener.InputListener;
+import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.persist.JSONHomeStorage;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
@@ -95,11 +96,11 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     @Override
     public synchronized void changed(DotNetTable dnt) {
         if (!dnt.name().equals("robot-input-default")) {
-            Output.logI("Non-input table '%s' ignored", dnt.name());
+            Output.iLog("Non-input table '%s' ignored", dnt.name());
             return;
         }
         updateStale();
-        Output.logI("Table changed");
+        Output.iLog("Table changed");
         for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             if (key.startsWith("_")) {
@@ -134,7 +135,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
             try {
                 feedback = Double.parseDouble(feedbackStr);
             } catch (NumberFormatException ex) {
-                Output.logI("Non-number feedback '%s'.", feedbackStr);
+                Output.iLog("Non-number feedback '%s'.", feedbackStr);
             }
             if (stale) {
                 if (currentFeedback < feedback + 2) {

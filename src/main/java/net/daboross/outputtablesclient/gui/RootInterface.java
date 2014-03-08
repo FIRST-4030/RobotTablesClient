@@ -27,14 +27,14 @@ import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
-public class InterfaceRoot {
+public class RootInterface {
 
     final JFrame rootFrame;
     final JTabbedPane tabbedPane;
     final JTextArea loggingTextArea;
     final JPanel inputOutput;
 
-    public InterfaceRoot() {
+    public RootInterface() {
         // rootFrame
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));

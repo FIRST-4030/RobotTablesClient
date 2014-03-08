@@ -25,23 +25,23 @@ public class Output {
 
     private static StaticLogger logger = new DefaultLogger();
 
-    public static void log(String message, Object... args) {
+    public static void oLog(String message, Object... args) {
         if (logger != null) {
             logger.log(String.format("[output] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
         }
     }
 
-    public static void logI(String message, Object... args) {
+    public static void iLog(String message, Object... args) {
         if (logger != null) {
             logger.log(String.format("[input] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
         }
     }
-    public static void logO(String message, Object... args) {
+
+    public static void logError(String message, Object... args) {
         if (logger != null) {
             logger.log(String.format("[error] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
         }
     }
-
 
     public static void setLogger(StaticLogger logger) {
         Output.logger = logger;
@@ -67,7 +67,7 @@ public class Output {
         @Override
         public void write(final int b) throws IOException {
             if (b == '\n') {
-                logO(buffer.toString());
+                logError(buffer.toString());
             } else {
                 buffer.append((char) b);
             }

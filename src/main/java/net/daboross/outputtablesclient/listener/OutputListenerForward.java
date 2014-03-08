@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.main;
+package net.daboross.outputtablesclient.listener;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.daboross.outputtablesclient.api.OutputListener;
 import net.daboross.outputtablesclient.output.Output;
 
 public class OutputListenerForward implements OutputListener {
@@ -39,7 +38,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onTableCreate(tableKey, tableName);
             } catch (Throwable t) {
-                Output.log("Error onTableCreate", t);
+                Output.oLog("Error onTableCreate", t);
             }
         }
     }
@@ -50,7 +49,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onTableStale(tableKey);
             } catch (Throwable t) {
-                Output.log("Error onTableStale", t);
+                Output.oLog("Error onTableStale", t);
             }
         }
     }
@@ -61,7 +60,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onKeyCreate(tableKey, keyName, keyValue);
             } catch (Throwable t) {
-                Output.log("Error onCreateDefaultKey", t);
+                Output.oLog("Error onCreateDefaultKey", t);
             }
         }
     }
@@ -72,7 +71,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onKeyUpdate(tableKey, keyName, keyValue);
             } catch (Throwable t) {
-                Output.log("Error onUpdateDefaultKey", t);
+                Output.oLog("Error onUpdateDefaultKey", t);
             }
         }
     }
@@ -83,7 +82,7 @@ public class OutputListenerForward implements OutputListener {
             try {
                 listener.onKeyDelete(tableKey, keyName);
             } catch (Throwable t) {
-                Output.log("Error onDeleteKey", t);
+                Output.oLog("Error onDeleteKey", t);
             }
         }
     }

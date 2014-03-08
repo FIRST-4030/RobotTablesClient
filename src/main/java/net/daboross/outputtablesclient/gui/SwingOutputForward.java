@@ -17,7 +17,7 @@
 package net.daboross.outputtablesclient.gui;
 
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.listener.OutputListener;
 
 public class SwingOutputForward implements OutputListener {
 

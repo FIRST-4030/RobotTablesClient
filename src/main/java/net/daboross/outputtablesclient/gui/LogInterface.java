@@ -19,11 +19,11 @@ package net.daboross.outputtablesclient.gui;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.output.Output;
 
-public class GUIOutput implements Output.StaticLogger {
+public class LogInterface implements Output.StaticLogger {
 
-    private final InterfaceRoot root;
+    private final RootInterface root;
 
-    public GUIOutput(InterfaceRoot root) {
+    public LogInterface(RootInterface root) {
         this.root = root;
     }
 

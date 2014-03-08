@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.main;
+package net.daboross.outputtablesclient.listener;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.daboross.outputtablesclient.api.InputListener;
 import net.daboross.outputtablesclient.output.Output;
 
 public class InputListenerForward implements InputListener {
@@ -39,7 +38,7 @@ public class InputListenerForward implements InputListener {
             try {
                 listener.onNotStale();
             } catch (Throwable t) {
-                Output.logI("Error onNotStale", t);
+                Output.iLog("Error onNotStale", t);
             }
         }
     }
@@ -50,7 +49,7 @@ public class InputListenerForward implements InputListener {
             try {
                 listener.onStale();
             } catch (Throwable t) {
-                Output.logI("Error onStale", t);
+                Output.iLog("Error onStale", t);
             }
         }
     }
@@ -61,7 +60,7 @@ public class InputListenerForward implements InputListener {
             try {
                 listener.onCreateDefaultKey(keyName, keyValue);
             } catch (Throwable t) {
-                Output.logI("Error onCreateDefaultKey", t);
+                Output.iLog("Error onCreateDefaultKey", t);
             }
         }
     }
@@ -72,7 +71,7 @@ public class InputListenerForward implements InputListener {
             try {
                 listener.onUpdateDefaultKey(keyName, keyValue);
             } catch (Throwable t) {
-                Output.logI("Error onUpdateDefaultKey", t);
+                Output.iLog("Error onUpdateDefaultKey", t);
             }
         }
     }
@@ -83,7 +82,7 @@ public class InputListenerForward implements InputListener {
             try {
                 listener.onDeleteKey(keyName);
             } catch (Throwable t) {
-                Output.logI("Error onDeleteKey", t);
+                Output.iLog("Error onDeleteKey", t);
             }
         }
     }

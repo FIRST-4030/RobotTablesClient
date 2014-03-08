@@ -32,7 +32,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.daboross.outputtablesclient.api.InputListener;
+import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.main.InputTablesMain;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
@@ -48,7 +48,7 @@ public class InputInterface implements InputListener {
     final Map<String, JTextField> keyToValueField;
     final JLabel statusLabel;
 
-    public InputInterface(InputTablesMain main, InterfaceRoot root) {
+    public InputInterface(InputTablesMain main, RootInterface root) {
         this.main = main;
 
         // constraints
@@ -138,21 +138,21 @@ public class InputInterface implements InputListener {
         @Override
         public void insertUpdate(final DocumentEvent e) {
             String text = field.getText();
-            Output.logI("Updated key '%s': '%s'", key, text);
+            Output.iLog("Updated key '%s': '%s'", key, text);
             main.updateKey(key, field.getText());
         }
 
         @Override
         public void removeUpdate(final DocumentEvent e) {
             String text = field.getText();
-            Output.logI("Updated key '%s': '%s'", key, text);
+            Output.iLog("Updated key '%s': '%s'", key, text);
             main.updateKey(key, field.getText());
         }
 
         @Override
         public void changedUpdate(final DocumentEvent e) {
             String text = field.getText();
-            Output.logI("Updated key '%s': '%s'", key, text);
+            Output.iLog("Updated key '%s': '%s'", key, text);
             main.updateKey(key, field.getText());
         }
     }

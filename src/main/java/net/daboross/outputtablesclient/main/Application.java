@@ -20,29 +20,29 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.gui.GUIOutput;
+import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.InputInterface;
-import net.daboross.outputtablesclient.gui.InterfaceRoot;
+import net.daboross.outputtablesclient.gui.RootInterface;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
 import net.daboross.outputtablesclient.gui.OutputInterface;
 import net.daboross.outputtablesclient.gui.SwingOutputForward;
-import net.daboross.outputtablesclient.output.LoggerListener;
 import net.daboross.outputtablesclient.output.Output;
+import net.daboross.outputtablesclient.output.OutputLoggerListener;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
     private static final String CLIENT_ADDRESS = "4030";
-    private InterfaceRoot root;
+    private RootInterface root;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
-        Output.log("Initiating root interface");
+        Output.oLog("Initiating root interface");
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                root = new InterfaceRoot();
+                root = new RootInterface();
                 root.show();
-                Output.setLogger(new GUIOutput(root));
+                Output.setLogger(new LogInterface(root));
                 System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
                 System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
             }
@@ -50,33 +50,33 @@ public class Application {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Output.log("Initiating NetConsole");
+                Output.oLog("Initiating NetConsole");
                 new NetConsoleInterface().addTo(root);
-                Output.log("NetConsole initiated");
+                Output.oLog("NetConsole initiated");
             }
         });
-        Output.log("Starting client on " + CLIENT_ADDRESS);
+        Output.oLog("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
         startOutput();
         startInput();
-        Output.log("Finished startup sequence");
+        Output.oLog("Finished startup sequence");
     }
 
     public void startOutput() throws InvocationTargetException, InterruptedException {
-        Output.log("Initiating output-tables");
+        Output.oLog("Initiating output-tables");
         final OutputTablesMain outputMain = new OutputTablesMain();
-        Output.log("Initiating output-tables logger");
-        LoggerListener loggerListener = new LoggerListener(outputMain);
-        outputMain.addListener(loggerListener);
+        Output.oLog("Initiating output-tables logger");
+        OutputLoggerListener outputLoggerListener = new OutputLoggerListener(outputMain);
+        outputMain.addListener(outputLoggerListener);
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Output.log("Initiating output-tables interface");
+                Output.oLog("Initiating output-tables interface");
                 OutputInterface outputGui = new OutputInterface(outputMain, root);
                 outputMain.addListener(new SwingOutputForward(outputGui));
             }
         });
-        Output.log("Subscribing to output-tables");
+        Output.oLog("Subscribing to output-tables");
         outputMain.subscribe();
     }
 
@@ -85,12 +85,12 @@ public class Application {
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Output.logI("Initiating input-tables interface");
+                Output.iLog("Initiating input-tables interface");
                 InputInterface inputGui = new InputInterface(inputMain, root);
                 inputMain.addListener(inputGui);
             }
         });
-        Output.logI("Subscribing to input-tables");
+        Output.iLog("Subscribing to input-tables");
         inputMain.subscribe();
     }
 

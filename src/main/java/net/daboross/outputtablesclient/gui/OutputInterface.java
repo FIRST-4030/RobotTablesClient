@@ -35,7 +35,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import net.daboross.outputtablesclient.api.OutputListener;
+import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.main.OutputTablesMain;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
@@ -54,7 +54,7 @@ public class OutputInterface implements OutputListener {
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
 
-    public OutputInterface(OutputTablesMain main, InterfaceRoot root) {
+    public OutputInterface(OutputTablesMain main, RootInterface root) {
         this.main = main;
 
         // constraints
