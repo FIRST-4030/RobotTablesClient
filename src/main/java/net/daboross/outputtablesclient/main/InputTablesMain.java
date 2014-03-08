@@ -20,12 +20,15 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import net.daboross.outputtablesclient.api.InputListener;
 import net.daboross.outputtablesclient.output.Output;
+import net.daboross.outputtablesclient.persist.JSONHomeStorage;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
+import org.json.JSONObject;
 
 public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
@@ -37,13 +40,28 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final Timer timer = new Timer();
     private boolean stale = true;
     private long currentFeedback;
+    private final JSONHomeStorage storage;
+    private final JSONObject storageObj;
 
     public InputTablesMain() {
         defaultSettingsTable = DotNetTables.subscribe("robot-input-default");
         settingsTable = DotNetTables.publish("robot-input");
+        storage = new JSONHomeStorage();
+        JSONObject tempObject = storage.obj().optJSONObject("input-save");
+        if (tempObject == null) {
+            tempObject = new JSONObject();
+            storage.obj().put("input-save", tempObject);
+        }
+        storageObj = tempObject;
     }
 
     public void subscribe() {
+        for (String key : (Set<String>) storageObj.keySet()) {
+            String value = storageObj.getString(key);
+            settingsTable.setValue(key, value);
+            values.put(key, value);
+            l.onCreateDefaultKey(key, value);
+        }
         defaultSettingsTable.onChange(this);
         timer.schedule(new TimerTask() {
             @Override
@@ -69,6 +87,8 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     public void updateKey(String key, String newValue) {
         settingsTable.setValue(key, newValue);
+        storageObj.put(key, newValue);
+        storage.save();
         sendSettings();
     }
 
@@ -134,5 +154,9 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         currentFeedback++;
         settingsTable.setValue(FEEDBACK_KEY, currentFeedback);
         settingsTable.send();
+    }
+
+    public JSONHomeStorage getStorage() {
+        return storage;
     }
 }

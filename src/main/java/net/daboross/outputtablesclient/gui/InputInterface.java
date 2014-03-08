@@ -82,12 +82,12 @@ public class InputInterface implements InputListener {
 
     @Override
     public void onNotStale() {
-        statusLabel.setText("Connected - Robot Up To Date");
+        statusLabel.setText("Connected - Robot up to date");
     }
 
     @Override
     public void onStale() {
-        statusLabel.setText("!!!WARNING!!! - Robot disconnected");
+        statusLabel.setText("<!> Disconnected - Robot out of date <!>");
     }
 
     @Override
