@@ -66,8 +66,9 @@ public class Output {
 
         @Override
         public void write(final int b) throws IOException {
-            if (b == '\n') {
+            if (b == '\n' || b == '\r') {
                 logError(buffer.toString());
+                buffer = new StringBuffer();
             } else {
                 buffer.append((char) b);
             }

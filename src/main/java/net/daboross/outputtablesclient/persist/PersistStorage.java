@@ -31,7 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class JSONHomeStorage {
+public class PersistStorage {
 
     private final ExecutorService saveService = Executors.newSingleThreadExecutor();
     private final SaveRunnable saveRunnable = new SaveRunnable();
@@ -39,7 +39,7 @@ public class JSONHomeStorage {
     private final File saveFile;
     private final JSONObject mainObj;
 
-    public JSONHomeStorage() {
+    public PersistStorage() {
         this.saveFile = new File(System.getProperty("user.home"), ".java-output-client-persist.json");
         this.saveFileBuffer = new File(System.getProperty("user.home"), ".java-output-client-persist.json~");
         JSONObject tempObj;

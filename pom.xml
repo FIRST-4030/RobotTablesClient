@@ -110,8 +110,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputPrefix>v${project.version} (git-</outputPrefix>
-                    <outputPostfix>)</outputPostfix>
+                    <outputPrefix>v${project.version}-</outputPrefix>
                 </configuration>
             </plugin>
             <plugin>

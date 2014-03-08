@@ -18,7 +18,6 @@ package net.daboross.outputtablesclient.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -33,61 +32,47 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import net.daboross.outputtablesclient.listener.InputListener;
+import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.main.InputTablesMain;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 
 public class InputInterface implements InputListener {
 
+    private final Application application;
     private final InputTablesMain main;
-    final GridBagConstraints toggleButtonConstraints;
-    final GridBagConstraints tablePanelConstraints;
-    final JPanel mainTabPanel;
-    final JPanel tableRootPanel;
-    final Map<String, JPanel> keyToValuePanel;
-    final Map<String, JTextField> keyToValueField;
-    final JLabel statusLabel;
+    private final JPanel mainTabPanel;
+    private final JPanel tableRootPanel;
+    private final Map<String, JPanel> keyToValuePanel;
 
-    public InputInterface(InputTablesMain main, RootInterface root) {
-        this.main = main;
-
-        // constraints
-        toggleButtonConstraints = new GBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
-        tablePanelConstraints = new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH);
-
+    public InputInterface(final Application application) {
+        this.application = application;
+        this.main = application.getInput();
 
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-//        root.tabbedPane.addTab("Input", mainTabPanel);
-        root.inputOutput.add(mainTabPanel);
+        application.getRoot().getInputOutputPanel().add(mainTabPanel);
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
         mainTabPanel.add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
-
-        // statusLabel
-        statusLabel = new JLabel();
-        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-        statusLabel.setText("Not connected");
-        tableRootPanel.add(statusLabel, new GBC().gridx(0).anchor(GBC.NORTH).insets(new Insets(30, 0, 30, 0)));
 
         // tableRootPanel refresh
         tableRootPanel.revalidate();
 
         // maps
         keyToValuePanel = new HashMap<>();
-        keyToValueField = new HashMap<>();
     }
 
     @Override
     public void onNotStale() {
-        statusLabel.setText("Connected - Robot up to date");
+        application.getRoot().getStatusLabel().setText("Connected to " + application.getClientAddress() + " - Robot up to date");
     }
 
     @Override
     public void onStale() {
-        statusLabel.setText("<!> Disconnected - Robot out of date <!>");
+        application.getRoot().getStatusLabel().setText("! Disconnected from " + application.getClientAddress() + " - Robot out of date !");
     }
 
     @Override
@@ -108,7 +93,6 @@ public class InputInterface implements InputListener {
         valueField.setBorder(new EmptyBorder(5, 5, 5, 5));
         valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
         panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
-        keyToValueField.put(keyName, valueField);
 
         tableRootPanel.add(panel, new GBC().gridx(0).insets(new Insets(5, 0, 5, 0)).anchor(GBC.EAST));
         tableRootPanel.revalidate();

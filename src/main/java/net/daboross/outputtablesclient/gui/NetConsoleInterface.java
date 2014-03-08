@@ -31,9 +31,7 @@ import net.daboross.outputtablesclient.output.Output;
 
 public class NetConsoleInterface {
 
-    private static final String ADDRESS = "10.40.30.2";
     private static final int RECEIVING_PORT = 6666;
-    private static final int SENDING_PORT = 6668;
     private final JPanel rootPanel;
     private final JTextArea textArea;
     private DatagramSocket receiving;
@@ -46,7 +44,6 @@ public class NetConsoleInterface {
         ((DefaultCaret) textArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane textPane = new JScrollPane(textArea);
         rootPanel.add(textPane, BorderLayout.CENTER);
-
         // Init
         try {
             this.receiving = new DatagramSocket(RECEIVING_PORT);
@@ -59,7 +56,7 @@ public class NetConsoleInterface {
     }
 
     public void addTo(RootInterface root) {
-        root.tabbedPane.addTab("Console", rootPanel);
+        root.getTabbedPane().addTab("Robot NetConsole", rootPanel);
     }
 
     public class NetConsoleListenerThread extends Thread {

@@ -20,27 +20,38 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.InputInterface;
-import net.daboross.outputtablesclient.gui.RootInterface;
+import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
 import net.daboross.outputtablesclient.gui.OutputInterface;
+import net.daboross.outputtablesclient.gui.RootInterface;
+import net.daboross.outputtablesclient.gui.SwingInputForward;
 import net.daboross.outputtablesclient.gui.SwingOutputForward;
+import net.daboross.outputtablesclient.listener.InputListener;
+import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.output.OutputLoggerListener;
+import net.daboross.outputtablesclient.persist.PersistStorage;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
     private static final String CLIENT_ADDRESS = "4030";
     private RootInterface root;
+    private OutputTablesMain outputMain;
+    private InputTablesMain inputMain;
+    private OutputInterface outputInterface;
+    private InputInterface inputInterface;
+    private InputListener inputInterfaceListener;
+    private OutputListener outputInterfaceListener;
+    private PersistStorage persistStorage;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.oLog("Initiating root interface");
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                root = new RootInterface();
+                root = new RootInterface(Application.this);
                 root.show();
                 Output.setLogger(new LogInterface(root));
                 System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
@@ -57,6 +68,8 @@ public class Application {
         });
         Output.oLog("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
+        Output.oLog("Loading persist");
+        persistStorage = new PersistStorage();
         startOutput();
         startInput();
         Output.oLog("Finished startup sequence");
@@ -64,7 +77,7 @@ public class Application {
 
     public void startOutput() throws InvocationTargetException, InterruptedException {
         Output.oLog("Initiating output-tables");
-        final OutputTablesMain outputMain = new OutputTablesMain();
+        outputMain = new OutputTablesMain();
         Output.oLog("Initiating output-tables logger");
         OutputLoggerListener outputLoggerListener = new OutputLoggerListener(outputMain);
         outputMain.addListener(outputLoggerListener);
@@ -72,8 +85,9 @@ public class Application {
             @Override
             public void run() {
                 Output.oLog("Initiating output-tables interface");
-                OutputInterface outputGui = new OutputInterface(outputMain, root);
-                outputMain.addListener(new SwingOutputForward(outputGui));
+                outputInterface = new OutputInterface(Application.this);
+                outputInterfaceListener = new SwingOutputForward(outputInterface);
+                outputMain.addListener(outputInterfaceListener);
             }
         });
         Output.oLog("Subscribing to output-tables");
@@ -81,13 +95,14 @@ public class Application {
     }
 
     public void startInput() throws InvocationTargetException, InterruptedException {
-        final InputTablesMain inputMain = new InputTablesMain();
+        inputMain = new InputTablesMain();
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 Output.iLog("Initiating input-tables interface");
-                InputInterface inputGui = new InputInterface(inputMain, root);
-                inputMain.addListener(inputGui);
+                inputInterface = new InputInterface(Application.this);
+                inputInterfaceListener = new SwingInputForward(inputInterface);
+                inputMain.addListener(inputInterfaceListener);
             }
         });
         Output.iLog("Subscribing to input-tables");
@@ -96,5 +111,25 @@ public class Application {
 
     public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {
         new Application().run();
+    }
+
+    public RootInterface getRoot() {
+        return root;
+    }
+
+    public String getClientAddress() {
+        return CLIENT_ADDRESS;
+    }
+
+    public OutputTablesMain getOutput() {
+        return outputMain;
+    }
+
+    public InputTablesMain getInput() {
+        return inputMain;
+    }
+
+    public PersistStorage getPersist() {
+        return persistStorage;
     }
 }

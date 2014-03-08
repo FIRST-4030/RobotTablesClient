@@ -18,23 +18,33 @@ package net.daboross.outputtablesclient.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
+import net.daboross.outputtablesclient.main.Application;
+import net.daboross.outputtablesclient.util.GBC;
 
 public class RootInterface {
 
-    final JFrame rootFrame;
-    final JTabbedPane tabbedPane;
-    final JTextArea loggingTextArea;
-    final JPanel inputOutput;
+    private final Application application;
+    private final JFrame rootFrame;
+    private final JTabbedPane tabbedPane;
+    private final JTextArea loggingTextArea;
+    private final JPanel mainPanel;
+    private final JPanel inputOutputPanel;
+    private final JLabel statusLabel;
 
-    public RootInterface() {
+    public RootInterface(final Application application) {
+        this.application = application;
         // rootFrame
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));
@@ -42,7 +52,8 @@ public class RootInterface {
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
-        rootFrame.setTitle("Robot Output " + OutputInterface.class.getPackage().getImplementationVersion());
+        rootFrame.setTitle(String.format("NullPointerException Interface %s: %s",
+                application.getClientAddress(), OutputInterface.class.getPackage().getImplementationVersion()));
 
         // tabbedPane
         tabbedPane = new JTabbedPane();
@@ -54,13 +65,45 @@ public class RootInterface {
         JScrollPane loggingPane = new JScrollPane(loggingTextArea);
         tabbedPane.addTab("Log", loggingPane);
 
-        // inputOutput
-        inputOutput = new JPanel(new GridLayout(1, 2));
-        tabbedPane.add(inputOutput, "Main");
-        tabbedPane.setSelectedComponent(inputOutput);
+        // mainPanel
+        mainPanel = new JPanel(new BorderLayout());
+        tabbedPane.add(mainPanel, "Main");
+        tabbedPane.setSelectedComponent(mainPanel);
+
+
+        // statusLabel
+        statusLabel = new JLabel();
+        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
+        statusLabel.setText("Not connected");
+        statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        mainPanel.add(statusLabel, BorderLayout.NORTH);
+        // inputOutputPanel
+        inputOutputPanel = new JPanel(new GridLayout(1, 2));
+        mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
     }
 
     public void show() {
         rootFrame.setVisible(true);
+    }
+
+    public JFrame getRootFrame() {
+        return rootFrame;
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
+    }
+
+    public JTextArea getLoggingTextArea() {
+        return loggingTextArea;
+    }
+
+    public JPanel getInputOutputPanel() {
+        return inputOutputPanel;
+    }
+
+    public JLabel getStatusLabel() {
+        return statusLabel;
     }
 }

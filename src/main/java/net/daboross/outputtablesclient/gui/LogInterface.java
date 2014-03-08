@@ -30,12 +30,12 @@ public class LogInterface implements Output.StaticLogger {
     @Override
     public void log(final String message) {
         if (SwingUtilities.isEventDispatchThread()) {
-            root.loggingTextArea.append(message + "\n");
+            root.getLoggingTextArea().append(message + "\n");
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    root.loggingTextArea.append(message + "\n");
+                    root.getLoggingTextArea().append(message + "\n");
                 }
             });
         }

@@ -36,12 +36,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import net.daboross.outputtablesclient.listener.OutputListener;
+import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.main.OutputTablesMain;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
+import org.json.JSONObject;
 
 public class OutputInterface implements OutputListener {
 
+    private final Application application;
     private final OutputTablesMain main;
     final GridBagConstraints toggleButtonConstraints;
     final GridBagConstraints tablePanelConstraints;
@@ -53,9 +56,20 @@ public class OutputInterface implements OutputListener {
     final Map<String, JPanel> tableKeyToTablePanel;
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
+    final JSONObject persistEnabled;
 
-    public OutputInterface(OutputTablesMain main, RootInterface root) {
-        this.main = main;
+    public OutputInterface(final Application application) {
+        this.application = application;
+        this.main = application.getOutput();
+
+        // persistEnabled
+        JSONObject parentObj = application.getPersist().obj();
+        JSONObject tempPersistEnabled = parentObj.optJSONObject("last-shown-panels");
+        if (tempPersistEnabled == null) {
+            tempPersistEnabled = new JSONObject();
+            parentObj.put("last-shown-panels", tempPersistEnabled);
+        }
+        persistEnabled = tempPersistEnabled;
 
         // constraints
         toggleButtonConstraints = new GBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
@@ -65,9 +79,7 @@ public class OutputInterface implements OutputListener {
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-//        root.tabbedPane.addTab("Main", mainTabPanel);
-//        root.tabbedPane.setSelectedComponent(mainTabPanel);
-        root.inputOutput.add(mainTabPanel);
+        application.getRoot().getInputOutputPanel().add(mainTabPanel);
 
 
         // toggleButtonPanel
@@ -177,19 +189,24 @@ public class OutputInterface implements OutputListener {
         }
 
         private void initialAdd() {
-            tableKeyToTableEnabled.put(tableKey, Boolean.TRUE);
+            boolean enabled = persistEnabled.optBoolean(tableKey, true);
+            tableKeyToTableEnabled.put(tableKey, enabled);
             JPanel panel = tableKeyToTablePanel.get(tableKey);
             tableRootPanel.add(panel, tablePanelConstraints);
-            button.setSelected(true);
+            button.setSelected(!enabled); // twice to make sure itemStateChanged is called
+            button.setSelected(enabled);
         }
 
         @Override
         public void itemStateChanged(ItemEvent event) {
+            boolean isSelected = button.isSelected();
             tableRootPanel.removeAll();
             for (Map.Entry<String, Boolean> e : tableKeyToTableEnabled.entrySet()) {
                 if (e.getKey().equals(tableKey)) {
-                    if (button.isSelected() != e.getValue()) {
-                        e.setValue(button.isSelected());
+                    if (isSelected != e.getValue()) {
+                        e.setValue(isSelected);
+                        persistEnabled.put(tableKey, isSelected);
+                        application.getPersist().save();
                     }
                 }
                 if (e.getValue()) {

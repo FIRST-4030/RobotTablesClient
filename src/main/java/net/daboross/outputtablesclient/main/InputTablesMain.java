@@ -26,7 +26,7 @@ import java.util.TimerTask;
 import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
-import net.daboross.outputtablesclient.persist.JSONHomeStorage;
+import net.daboross.outputtablesclient.persist.PersistStorage;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 import org.json.JSONObject;
@@ -41,13 +41,13 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final Timer timer = new Timer();
     private boolean stale = true;
     private long currentFeedback;
-    private final JSONHomeStorage storage;
+    private final PersistStorage storage;
     private final JSONObject storageObj;
 
     public InputTablesMain() {
         defaultSettingsTable = DotNetTables.subscribe("robot-input-default");
         settingsTable = DotNetTables.publish("robot-input");
-        storage = new JSONHomeStorage();
+        storage = new PersistStorage();
         JSONObject tempObject = storage.obj().optJSONObject("input-save");
         if (tempObject == null) {
             tempObject = new JSONObject();
@@ -157,7 +157,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         settingsTable.send();
     }
 
-    public JSONHomeStorage getStorage() {
+    public PersistStorage getStorage() {
         return storage;
     }
 }
