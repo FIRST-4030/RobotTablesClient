@@ -38,6 +38,7 @@ import javax.swing.border.TitledBorder;
 import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.main.OutputTablesMain;
+import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
 import org.json.JSONObject;
@@ -140,6 +141,15 @@ public class OutputInterface implements OutputListener {
 
     @Override
     public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
+        if (keyName.equalsIgnoreCase(":RangeGUI")) {
+            Output.oLog("Range: " + keyValue);
+            try {
+                application.getCustomInterface().setTo(Integer.parseInt(keyValue));
+            } catch (NumberFormatException ex) {
+                Output.oLog("Invalid range" + keyValue);
+            }
+            return;
+        }
         ensureTableExists(tableKey);
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new LineBorder(Color.BLACK));

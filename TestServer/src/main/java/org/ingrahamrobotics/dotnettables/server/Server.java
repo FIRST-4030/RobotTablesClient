@@ -1,6 +1,7 @@
 package org.ingrahamrobotics.dotnettables.server;
 
 import java.io.IOException;
+import java.util.Random;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -93,7 +94,13 @@ public class Server {
                 Thread.sleep(200);
                 outputTables.send();
             }
+            if (i == 0) {
+                int value = new Random().nextInt(99);
+                tables[0].setValue(":RangeGUI", value);
+                System.out.println("RangeGUI: " + value);
+            }
             tables[i % 10].setValue("Key" + (i % 7), "Value" + i);
+
             Thread.sleep(200);
             tables[i % 10].send();
             if (i % 2 == 0) {

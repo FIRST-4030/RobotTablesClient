@@ -40,8 +40,10 @@ public class PersistStorage {
     private final JSONObject mainObj;
 
     public PersistStorage() {
-        this.saveFile = new File(System.getProperty("user.home"), ".java-output-client-persist.json");
-        this.saveFileBuffer = new File(System.getProperty("user.home"), ".java-output-client-persist.json~");
+        String home = System.getProperty("user.home");
+        System.out.println("User.home = " + home);
+        this.saveFile = new File(home, ".java-output-client-persist.json");
+        this.saveFileBuffer = new File(home, ".java-output-client-persist.json~");
         JSONObject tempObj;
         try {
             tempObj = load();

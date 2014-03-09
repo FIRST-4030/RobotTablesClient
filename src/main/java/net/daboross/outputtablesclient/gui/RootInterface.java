@@ -31,7 +31,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.main.Application;
-import net.daboross.outputtablesclient.util.GBC;
 
 public class RootInterface {
 
@@ -105,5 +104,9 @@ public class RootInterface {
 
     public JLabel getStatusLabel() {
         return statusLabel;
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 }

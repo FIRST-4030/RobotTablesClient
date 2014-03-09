@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
+import net.daboross.outputtablesclient.gui.CustomInterface;
 import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
@@ -36,7 +37,7 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class Application {
 
-    private static final String CLIENT_ADDRESS = "4030";
+    private static final String CLIENT_ADDRESS = "127.0.0.1";//"4030";
     private RootInterface root;
     private OutputTablesMain outputMain;
     private InputTablesMain inputMain;
@@ -45,6 +46,7 @@ public class Application {
     private InputListener inputInterfaceListener;
     private OutputListener outputInterfaceListener;
     private PersistStorage persistStorage;
+    private CustomInterface customInterface;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.oLog("Initiating root interface");
@@ -70,6 +72,7 @@ public class Application {
         DotNetTables.startClient(CLIENT_ADDRESS);
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
+        customInterface = new CustomInterface(this);
         startOutput();
         startInput();
         Output.oLog("Finished startup sequence");
@@ -131,5 +134,9 @@ public class Application {
 
     public PersistStorage getPersist() {
         return persistStorage;
+    }
+
+    public CustomInterface getCustomInterface() {
+        return customInterface;
     }
 }
