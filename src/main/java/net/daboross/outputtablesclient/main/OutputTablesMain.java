@@ -29,12 +29,13 @@ import org.ingrahamrobotics.dotnettables.DotNetTables;
 
 public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
 
+    private static final String OUTPUT_TABLE = "output-tables";
     private final OutputListenerForward l = new OutputListenerForward();
     private final Map<String, Map<String, String>> values = new HashMap<>();
     private final DotNetTable nameTable;
 
     public OutputTablesMain() {
-        nameTable = DotNetTables.subscribe("output-tables");
+        nameTable = DotNetTables.subscribe(OUTPUT_TABLE);
     }
 
     public void subscribe() {
@@ -60,7 +61,7 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
     @Override
     public synchronized void changed(DotNetTable dnt) {
         Output.oLog("Table changed '%s'", dnt.name());
-        if (dnt.name().equals("output-tables")) {
+        if (dnt.name().equals(OUTPUT_TABLE)) {
             for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
                 String tableKey = e.nextElement();
                 if (tableKey.startsWith("_")) {
@@ -103,7 +104,7 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
 
     @Override
     public synchronized void stale(DotNetTable dnt) {
-        if (!dnt.name().equals("output-tables")) {
+        if (!dnt.name().equals(OUTPUT_TABLE)) {
             l.onTableStale(dnt.name());
         }
     }
