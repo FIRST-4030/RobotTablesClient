@@ -17,6 +17,7 @@
 package net.daboross.outputtablesclient.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -44,13 +45,47 @@ public class CustomInterface {
         progressBar = new JProgressBar(0, MAX);
         rangePanel.add(progressBar, new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH));
     }
+    
+    private int scaleToPercent(int value, int min, int max) {
+        int diff = max - min;
+        
+        // Sanity check
+        if (diff <= 0) {
+            throw new IllegalArgumentException("max must exceed min");
+        }
+        
+        value -= min;
+        if (value < 0) {
+            value = 0;
+        }
+        if (value > diff) {
+            value = diff;
+        }
+        return (value * 100) / diff;
+    }
 
     public void setTo(int value) {
         if (!shown) {
             shown = true;
             application.getRoot().getMainPanel().add(rangePanel, BorderLayout.SOUTH);
         }
-        progressBar.setStringPainted(true);
+
+        // Scale the value to match our ideal range
+        // This should be configurable, but we don't yet have a display-side config system
+        // (This should not be calculated at the robot; the robot doesn't care)
+        value = scaleToPercent(value, 50, 100);
+
+        // Color coding in quaters
+        if (value < 25 || value > 75) {
+            progressBar.setForeground(Color.RED);
+        } else if (value < 37 || value > 63) {
+            progressBar.setForeground(Color.YELLOW);
+        } else {
+            progressBar.setForeground(Color.GREEN);
+        }
+
+        // Update the element
         progressBar.setValue(value);
+        progressBar.setStringPainted(true);
     }
 }
