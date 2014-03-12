@@ -34,6 +34,7 @@ import org.json.JSONObject;
 public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     private static final String FEEDBACK_KEY = "_DRIVER_FEEDBACK_KEY";
+    private static final int FEEDBACK_THRESHOLD = 2;
     private static final String DEFAULT_TABLE = "robot-input-default";
     private static final String SETTING_TABLE = "robot-input";
     private final InputListenerForward l = new InputListenerForward();
@@ -98,7 +99,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         }
         updateStale();
         Output.iLog("Table changed");
-        for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
+        for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
             String key = e.nextElement();
             if (key.startsWith("_")) {
                 continue;
@@ -122,30 +123,41 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     @Override
     public synchronized void stale(DotNetTable dnt) {
-        l.onStale();
+        updateStale();
     }
 
     private void updateStale() {
+        // Check the feedback key, if it exists
+        boolean feedbackStale = true;
         if (defaultSettingsTable.exists(FEEDBACK_KEY)) {
-            String feedbackStr = defaultSettingsTable.getValue(FEEDBACK_KEY);
             double feedback = -1;
             try {
-                feedback = Double.parseDouble(feedbackStr);
+                feedback = defaultSettingsTable.getDouble(FEEDBACK_KEY);
             } catch (NumberFormatException ex) {
-                Output.iLog("Non-number feedback '%s'.", feedbackStr);
+                Output.iLog("Non-number feedback '%s'.", defaultSettingsTable.getValue(FEEDBACK_KEY));
             }
-            if (stale) {
-                if (currentFeedback < feedback + 2) {
-                    stale = false;
-                    l.onNotStale();
-                }
-            } else {
-                if (currentFeedback > feedback + 2) {
-                    stale = true;
-                    l.onStale();
-                }
+            if (currentFeedback < feedback + FEEDBACK_THRESHOLD) {
+                feedbackStale = false;
             }
         }
+        
+        // Determine the new master stale state
+        boolean masterStale = true;
+        if (!defaultSettingsTable.isStale() && !feedbackStale) {
+            masterStale = false;
+        }
+        
+        // Update the UI if needed
+        if (stale != masterStale) {
+            if (masterStale) {
+                l.onStale();
+            } else {
+                l.onNotStale();
+            }
+        }
+        
+        // Always save the new state
+        stale = masterStale;
     }
 
     private void sendSettings() {
