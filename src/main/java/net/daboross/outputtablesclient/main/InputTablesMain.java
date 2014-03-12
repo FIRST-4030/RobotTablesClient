@@ -67,13 +67,8 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
             l.onCreateDefaultKey(key, value);
         }
         defaultSettingsTable.onChange(this);
+        defaultSettingsTable.onStale(this);
         defaultSettingsTable.setInterval(1000);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateStale();
-            }
-        }, 300, 300);
     }
 
     public void addListener(InputListener listener) {
