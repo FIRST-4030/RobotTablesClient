@@ -92,7 +92,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     @Override
     public synchronized void changed(DotNetTable dnt) {
-        if (!dnt.name().equals("robot-input-default")) {
+        if (!dnt.name().equals(DEFAULT_TABLE)) {
             Output.iLog("Non-input table '%s' ignored", dnt.name());
             return;
         }
