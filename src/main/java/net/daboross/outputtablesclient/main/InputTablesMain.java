@@ -34,6 +34,8 @@ import org.json.JSONObject;
 public class InputTablesMain implements DotNetTable.DotNetTableEvents {
 
     private static final String FEEDBACK_KEY = "_DRIVER_FEEDBACK_KEY";
+    private static final String DEFAULT_TABLE = "robot-input-default";
+    private static final String SETTING_TABLE = "robot-input";
     private final InputListenerForward l = new InputListenerForward();
     private final Map<String, String> values = new HashMap<>();
     private final DotNetTable defaultSettingsTable;
@@ -45,8 +47,8 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final JSONObject storageObj;
 
     public InputTablesMain() {
-        defaultSettingsTable = DotNetTables.subscribe("robot-input-default");
-        settingsTable = DotNetTables.publish("robot-input");
+        defaultSettingsTable = DotNetTables.subscribe(DEFAULT_TABLE);
+        settingsTable = DotNetTables.publish(SETTING_TABLE);
         storage = new PersistStorage();
         JSONObject tempObject = storage.obj().optJSONObject("input-save");
         if (tempObject == null) {
