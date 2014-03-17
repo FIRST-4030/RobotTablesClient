@@ -45,15 +45,15 @@ public class CustomInterface {
         progressBar = new JProgressBar(0, MAX);
         rangePanel.add(progressBar, new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH));
     }
-    
+
     private int scaleToPercent(int value, int min, int max) {
         int diff = max - min;
-        
+
         // Sanity check
         if (diff <= 0) {
             throw new IllegalArgumentException("max must exceed min");
         }
-        
+
         value -= min;
         if (value < 0) {
             value = 0;

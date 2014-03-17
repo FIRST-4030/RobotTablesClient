@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
 import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
@@ -94,7 +93,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         }
         updateStale();
         Output.iLog("Table changed");
-        for (Enumeration<String> e = dnt.keys(); e.hasMoreElements();) {
+        for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
             String key = e.nextElement();
             if (key.startsWith("_")) {
                 continue;
@@ -135,24 +134,21 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
                 feedbackStale = false;
             }
         }
-        
+
         // Determine the new master stale state
-        boolean masterStale = true;
-        if (!defaultSettingsTable.isStale() && !feedbackStale) {
-            masterStale = false;
-        }
-        
+        boolean newStale = feedbackStale || defaultSettingsTable.isStale();
+
         // Update the UI if needed
-        if (stale != masterStale) {
-            if (masterStale) {
+        if (stale != newStale) {
+            if (newStale) {
                 l.onStale();
             } else {
                 l.onNotStale();
             }
         }
-        
+
         // Always save the new state
-        stale = masterStale;
+        stale = newStale;
     }
 
     private void sendSettings() {
