@@ -21,7 +21,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
 import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
@@ -40,7 +39,6 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final Map<String, String> values = new HashMap<>();
     private final DotNetTable defaultSettingsTable;
     private final DotNetTable settingsTable;
-    private final Timer timer = new Timer();
     private boolean stale = true;
     private long currentFeedback;
     private final PersistStorage storage;
@@ -68,6 +66,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         defaultSettingsTable.onChange(this);
         defaultSettingsTable.onStale(this);
         settingsTable.setInterval(1000);
+        sendSettings();
     }
 
     public void addListener(InputListener listener) {
@@ -152,8 +151,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     private void sendSettings() {
-        currentFeedback++;
-        settingsTable.setValue(FEEDBACK_KEY, currentFeedback);
+        settingsTable.setValue(FEEDBACK_KEY, ++currentFeedback);
         settingsTable.send();
     }
 
