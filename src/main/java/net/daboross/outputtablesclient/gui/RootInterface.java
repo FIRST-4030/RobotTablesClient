@@ -73,7 +73,7 @@ public class RootInterface {
         // statusLabel
         statusLabel = new JLabel();
         statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-        statusLabel.setText("Not connected");
+        statusLabel.setText("Client Initializing");
         statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(statusLabel, BorderLayout.NORTH);

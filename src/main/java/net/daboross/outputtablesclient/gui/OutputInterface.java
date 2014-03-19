@@ -175,9 +175,18 @@ public class OutputInterface implements OutputListener {
 
     @Override
     public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
-        ensureTableExists(tableKey);
-        JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
-        valueLabel.setText(keyValue);
+        if (keyName.equalsIgnoreCase(":RangeGUI")) {
+            Output.oLog("Range: " + keyValue);
+            try {
+                application.getCustomInterface().setTo(Integer.parseInt(keyValue));
+            } catch (NumberFormatException ex) {
+                Output.oLog("Invalid range" + keyValue);
+            }
+        } else {
+            ensureTableExists(tableKey);
+            JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
+            valueLabel.setText(keyValue);
+        }
     }
 
     @Override

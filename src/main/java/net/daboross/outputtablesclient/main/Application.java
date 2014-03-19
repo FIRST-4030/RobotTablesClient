@@ -19,6 +19,7 @@ package net.daboross.outputtablesclient.main;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.CustomInterface;
 import net.daboross.outputtablesclient.gui.InputInterface;
@@ -76,6 +77,15 @@ public class Application {
         startOutput();
         startInput();
         Output.oLog("Finished startup sequence");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JLabel label = root.getStatusLabel();
+                if (label.getText().equals("Client Initializing")) {
+                    label.setText("Not connected");
+                }
+            }
+        });
     }
 
     public void startOutput() throws InvocationTargetException, InterruptedException {

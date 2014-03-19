@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import net.daboross.outputtablesclient.main.Application;
+import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 
 public class CustomInterface {
