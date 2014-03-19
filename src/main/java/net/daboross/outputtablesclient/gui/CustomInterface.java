@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import net.daboross.outputtablesclient.main.Application;
-import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 
 public class CustomInterface {
@@ -47,7 +46,7 @@ public class CustomInterface {
         rangePanel.add(progressBar, new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.BOTH));
     }
 
-    private int scaleToPercent(int value, int min, int max) {
+    private int scaleToPercent(double value, int min, int max) {
         int diff = max - min;
 
         // Sanity check
@@ -62,10 +61,10 @@ public class CustomInterface {
         if (value > diff) {
             value = diff;
         }
-        return (value * 100) / diff;
+        return (int) (value * 100.0 / diff);
     }
 
-    public void setTo(int value) {
+    public void setTo(double value) {
         if (!shown) {
             shown = true;
             application.getRoot().getMainPanel().add(rangePanel, BorderLayout.SOUTH);
@@ -74,19 +73,19 @@ public class CustomInterface {
         // Scale the value to match our ideal range
         // This should be configurable, but we don't yet have a display-side config system
         // (This should not be calculated at the robot; the robot doesn't care)
-        value = scaleToPercent(value, 50, 100);
+        int intValue = scaleToPercent(value, 50, 100);
 
         // Color coding in quaters
-        if (value < 25 || value > 75) {
+        if (intValue < 25 || intValue > 75) {
             progressBar.setForeground(Color.RED);
-        } else if (value < 37 || value > 63) {
+        } else if (intValue < 37 || intValue > 63) {
             progressBar.setForeground(Color.YELLOW);
         } else {
             progressBar.setForeground(Color.GREEN);
         }
 
         // Update the element
-        progressBar.setValue(value);
+        progressBar.setValue(intValue);
         progressBar.setStringPainted(true);
     }
 }

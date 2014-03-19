@@ -178,7 +178,7 @@ public class OutputInterface implements OutputListener {
         if (keyName.equalsIgnoreCase(":RangeGUI")) {
             Output.oLog("Range: " + keyValue);
             try {
-                application.getCustomInterface().setTo(Integer.parseInt(keyValue));
+                application.getCustomInterface().setTo(Double.parseDouble(keyValue));
             } catch (NumberFormatException ex) {
                 Output.oLog("Invalid range" + keyValue);
             }
