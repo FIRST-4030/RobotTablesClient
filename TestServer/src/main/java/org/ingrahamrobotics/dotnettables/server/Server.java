@@ -95,7 +95,7 @@ public class Server {
                 outputTables.send();
             }
             if (i % 10 == 0) {
-                int value = new Random().nextInt(50) + 50;
+                double value = new Random().nextDouble() * 50 + 50;
                 tables[0].setValue(":RangeGUI", value);
                 System.out.println("RangeGUI: " + value);
             }

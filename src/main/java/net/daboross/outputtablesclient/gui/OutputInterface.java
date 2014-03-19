@@ -142,11 +142,11 @@ public class OutputInterface implements OutputListener {
     @Override
     public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
         if (keyName.equalsIgnoreCase(":RangeGUI")) {
-            Output.oLog("Range: " + keyValue);
+            Output.oLog("Range: %s", keyValue);
             try {
-                application.getCustomInterface().setTo(Integer.parseInt(keyValue));
+                application.getCustomInterface().setTo(Double.parseDouble(keyValue));
             } catch (NumberFormatException ex) {
-                Output.oLog("Invalid range" + keyValue);
+                Output.oLog("Invalid range '%s'", keyValue);
             }
             return;
         }
@@ -176,11 +176,11 @@ public class OutputInterface implements OutputListener {
     @Override
     public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
         if (keyName.equalsIgnoreCase(":RangeGUI")) {
-            Output.oLog("Range: " + keyValue);
+            Output.oLog("Range: %s", keyValue);
             try {
                 application.getCustomInterface().setTo(Double.parseDouble(keyValue));
             } catch (NumberFormatException ex) {
-                Output.oLog("Invalid range" + keyValue);
+                Output.oLog("Invalid range '%s'", keyValue);
             }
         } else {
             ensureTableExists(tableKey);
