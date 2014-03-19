@@ -44,10 +44,10 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private final PersistStorage storage;
     private final JSONObject storageObj;
 
-    public InputTablesMain() {
+    public InputTablesMain(Application application) {
         defaultSettingsTable = DotNetTables.subscribe(DEFAULT_TABLE);
         settingsTable = DotNetTables.publish(SETTING_TABLE);
-        storage = new PersistStorage();
+        storage = application.getPersist();
         JSONObject tempObject = storage.obj().optJSONObject("input-save");
         if (tempObject == null) {
             tempObject = new JSONObject();

@@ -108,7 +108,7 @@ public class Application {
     }
 
     public void startInput() throws InvocationTargetException, InterruptedException {
-        inputMain = new InputTablesMain();
+        inputMain = new InputTablesMain(this);
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
