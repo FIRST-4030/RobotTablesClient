@@ -20,6 +20,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,6 +30,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.main.Application;
 
@@ -39,8 +42,8 @@ public class RootInterface {
     private final JTabbedPane tabbedPane;
     private final JTextArea loggingTextArea;
     private final JPanel mainPanel;
-    private final JPanel inputOutputPanel;
-    private final JLabel statusLabel;
+    private JPanel inputOutputPanel;
+    private JLabel statusLabel;
 
     public RootInterface(final Application application) {
         this.application = application;
@@ -77,9 +80,49 @@ public class RootInterface {
         statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(statusLabel, BorderLayout.NORTH);
+
         // inputOutputPanel
         inputOutputPanel = new JPanel(new GridLayout(1, 2));
         mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
+    }
+
+    public void registerRestart() {
+        final JPanel emptyPanel = new JPanel();
+        tabbedPane.add("Restart", emptyPanel);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent evt) {
+                if (tabbedPane.getSelectedComponent() == emptyPanel) {
+                    tabbedPane.setSelectedComponent(mainPanel);
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            try {
+                                mainPanel.removeAll();
+
+                                // statusLabel
+                                statusLabel = new JLabel();
+                                statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
+                                statusLabel.setText("Not connected");
+                                statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
+                                statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                                mainPanel.add(statusLabel, BorderLayout.NORTH);
+
+                                // inputOutputPanel
+                                inputOutputPanel = new JPanel(new GridLayout(1, 2));
+                                mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
+
+                                // restart input & output
+                                application.startInput();
+                                application.startOutput();
+                            } catch (InvocationTargetException | InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }.start();
+                }
+            }
+        });
     }
 
     public void show() {

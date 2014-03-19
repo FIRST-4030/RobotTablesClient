@@ -69,6 +69,12 @@ public class Application {
                 Output.oLog("NetConsole initiated");
             }
         });
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                root.registerRestart();
+            }
+        });
         Output.oLog("Starting client on " + CLIENT_ADDRESS);
         DotNetTables.startClient(CLIENT_ADDRESS);
         Output.oLog("Loading persist");
