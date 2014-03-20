@@ -65,7 +65,7 @@ public class Application {
             @Override
             public void run() {
                 Output.oLog("Initiating NetConsole");
-                new NetConsoleInterface().addTo(root);
+                new NetConsoleInterface(Application.this).addTo(root);
                 Output.oLog("NetConsole initiated");
             }
         });

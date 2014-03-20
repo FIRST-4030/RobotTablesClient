@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
+import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.output.Output;
 
 public class NetConsoleInterface {
@@ -34,9 +35,11 @@ public class NetConsoleInterface {
     private static final int RECEIVING_PORT = 6666;
     private final JPanel rootPanel;
     private final JTextArea textArea;
+    private final Application application;
     private DatagramSocket receiving;
 
-    public NetConsoleInterface() {
+    public NetConsoleInterface(Application application) {
+        this.application = application;
         // GUI
         rootPanel = new JPanel(new BorderLayout());
 
@@ -85,6 +88,14 @@ public class NetConsoleInterface {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            if (str.contains(" [Important][:RangeGUI] ")) {
+                                String[] split = str.split(" \\[Important\\]\\[:RangeGUI\\] ");
+                                try {
+                                    application.getCustomInterface().setTo(Double.parseDouble(split[split.length - 1]));
+                                } catch (NumberFormatException ex) {
+                                    System.out.printf("Invalid RangeGUI '%s'%n", split[split.length - 1]);
+                                }
+                            }
                             textArea.append(str);
                         }
                     });
