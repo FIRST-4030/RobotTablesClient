@@ -22,6 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -29,6 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.output.Output;
+import sun.misc.Regexp;
 
 public class NetConsoleInterface {
 
@@ -88,13 +90,16 @@ public class NetConsoleInterface {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (str.contains(" [Important][:RangeGUI] ")) {
-                                String[] split = str.split(" \\[Important\\]\\[:RangeGUI\\] ");
+                            if (str.contains("[Important][:RangeGUI] ")) {
+                                String[] split = str.split(Pattern.quote("[Important][:RangeGUI] "));
+                                double parsed = -1;
                                 try {
-                                    application.getCustomInterface().setTo(Double.parseDouble(split[split.length - 1]));
+                                    parsed = Double.parseDouble(split[split.length - 1]);
                                 } catch (NumberFormatException ex) {
                                     System.out.printf("Invalid RangeGUI '%s'%n", split[split.length - 1]);
                                 }
+                                application.getCustomInterface().setTo(parsed);
+                                System.out.println("Parsed range " + parsed);
                             }
                             textArea.append(str);
                         }
