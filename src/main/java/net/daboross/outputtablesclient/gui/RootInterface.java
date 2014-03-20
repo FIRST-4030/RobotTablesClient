@@ -21,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -133,12 +134,12 @@ public class RootInterface {
                         @Override
                         public void run() {
                             try {
-                                String path = Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+                                String path = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
                                 PrintStream originalSystemOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
                                 originalSystemOut.println("Starting: java -jar " + path);
                                 Runtime.getRuntime().exec(new String[]{"java", "-jar", path});
                                 System.exit(0);
-                            } catch (IOException | URISyntaxException e) {
+                            } catch (IOException | URISyntaxException ignored) {
                             }
                         }
                     }).start();
