@@ -16,14 +16,11 @@
  */
 package net.daboross.outputtablesclient.main;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.listener.OutputListenerForward;
-import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 
@@ -33,6 +30,7 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
     private final OutputListenerForward l = new OutputListenerForward();
     private final Map<String, Map<String, String>> values = new HashMap<>();
     private final DotNetTable nameTable;
+    private final HashMap<String, String> nameMap = new HashMap<>();
 
     public OutputTablesMain() {
         nameTable = DotNetTables.subscribe(OUTPUT_TABLE);
@@ -43,7 +41,8 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     public synchronized String getTableName(String tableKey) {
-        return nameTable.getValue(tableKey);
+        String value = nameTable.getValue(tableKey);
+        return value == null ? nameMap.get(tableKey) : value;
     }
 
     public synchronized Map<String, String> getTable(String tableKey) {
@@ -58,48 +57,72 @@ public class OutputTablesMain implements DotNetTable.DotNetTableEvents {
         l.removeListener(listener);
     }
 
+    public synchronized void manualUpdate(String tableKey, String key, String value) {
+        Map<String, String> valueTable = values.get(tableKey);
+        if (valueTable == null) {
+            valueTable = new HashMap<>();
+            values.put(tableKey, valueTable);
+            String name = nameTable.getValue(tableKey);
+            if (name == null) {
+                name = tableKey;
+                nameMap.put(tableKey, name);
+            }
+            l.onTableCreate(tableKey, name);
+            DotNetTable dotNetTable = DotNetTables.subscribe(tableKey);
+            dotNetTable.onChange(this);
+        }
+        if (!valueTable.containsKey(key)) {
+            valueTable.put(key, value);
+            l.onKeyCreate(tableKey, key, value);
+        } else if (!valueTable.get(key).equals(value)) {
+            valueTable.put(key, value);
+            l.onKeyUpdate(tableKey, key, value);
+        }
+    }
+
     @Override
     public synchronized void changed(DotNetTable dnt) {
-        Output.oLog("Table changed '%s'", dnt.name());
-        if (dnt.name().equals(OUTPUT_TABLE)) {
-            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
-                String tableKey = e.nextElement();
-                if (tableKey.startsWith("_")) {
-                    continue;
-                }
-                Map<String, String> valueTable = values.get(tableKey);
-                if (valueTable == null) {
-                    valueTable = new HashMap<>();
-                    values.put(tableKey, valueTable);
-                    l.onTableCreate(tableKey, dnt.getValue(tableKey));
-                    DotNetTable dotNetTable = DotNetTables.subscribe(tableKey);
-                    dotNetTable.onChange(this);
-                }
-            }
-        } else {
-            String tableKey = dnt.name();
-            Map<String, String> valueTable = values.get(tableKey);
-            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
-                String key = e.nextElement();
-                if (key.startsWith("_")) {
-                    continue;
-                }
-                String value = dnt.getValue(key);
-                if (!valueTable.containsKey(key)) {
-                    valueTable.put(key, value);
-                    l.onKeyCreate(tableKey, key, value);
-                } else if (!valueTable.get(key).equals(value)) {
-                    valueTable.put(key, value);
-                    l.onKeyUpdate(tableKey, key, value);
-                }
-            }
-            for (String key : new ArrayList<>(valueTable.keySet())) {
-                if (!dnt.exists(key)) {
-                    valueTable.remove(key);
-                    l.onKeyDelete(tableKey, key);
-                }
-            }
-        }
+        // Disabled until we can fix this
+//        Output.oLog("Table changed '%s'", dnt.name());
+//        if (dnt.name().equals(OUTPUT_TABLE)) {
+//            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
+//                String tableKey = e.nextElement();
+//                if (tableKey.startsWith("_")) {
+//                    continue;
+//                }
+//                Map<String, String> valueTable = values.get(tableKey);
+//                if (valueTable == null) {
+//                    valueTable = new HashMap<>();
+//                    values.put(tableKey, valueTable);
+//                    l.onTableCreate(tableKey, dnt.getValue(tableKey));
+//                    DotNetTable dotNetTable = DotNetTables.subscribe(tableKey);
+//                    dotNetTable.onChange(this);
+//                }
+//            }
+//        } else {
+//            String tableKey = dnt.name();
+//            Map<String, String> valueTable = values.get(tableKey);
+//            for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
+//                String key = e.nextElement();
+//                if (key.startsWith("_")) {
+//                    continue;
+//                }
+//                String value = dnt.getValue(key);
+//                if (!valueTable.containsKey(key)) {
+//                    valueTable.put(key, value);
+//                    l.onKeyCreate(tableKey, key, value);
+//                } else if (!valueTable.get(key).equals(value)) {
+//                    valueTable.put(key, value);
+//                    l.onKeyUpdate(tableKey, key, value);
+//                }
+//            }
+//            for (String key : new ArrayList<>(valueTable.keySet())) {
+//                if (!dnt.exists(key)) {
+//                    valueTable.remove(key);
+//                    l.onKeyDelete(tableKey, key);
+//                }
+//            }
+//        }
     }
 
     @Override

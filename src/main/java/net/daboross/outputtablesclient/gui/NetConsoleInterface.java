@@ -100,19 +100,21 @@ public class NetConsoleInterface {
                                     String key = mr.group(2);
                                     String value = mr.group(3);
 
-                                    if (!"".equals(table) && !"".equals(key)) {
-                                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
+                                    if (!table.isEmpty() && !key.isEmpty()) {
+//                                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
+//
+//                                        // Special handling for Important.:RangeGUI
+//                                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
+//                                            try {
+//                                                double parsed = Double.parseDouble(value);
+//                                                application.getCustomInterface().setTo(parsed);
+//                                            } catch (NumberFormatException ex) {
+//                                                System.out.printf("Invalid double: %s\n", value);
+//                                            }
+//                                        }
 
-                                        // Special handling for Important.:RangeGUI
-                                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
-                                            try {
-                                                double parsed = Double.parseDouble(value);
-                                                application.getCustomInterface().setTo(parsed);
-                                            } catch (NumberFormatException ex) {
-                                                System.out.printf("Invalid double: %s\n", value);
-                                            }
-                                        }
-
+                                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
+                                        application.getOutput().manualUpdate(table, key, value);
                                     }
                                 } catch (IllegalStateException | IndexOutOfBoundsException ex) {
                                 }
