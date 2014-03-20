@@ -22,6 +22,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,7 +32,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.output.Output;
-import sun.misc.Regexp;
 
 public class NetConsoleInterface {
 
@@ -90,17 +91,33 @@ public class NetConsoleInterface {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (str.contains("[Important][:RangeGUI] ")) {
-                                String[] split = str.split(Pattern.quote("[Important][:RangeGUI] "));
-                                double parsed = -1;
+                            Pattern regex = Pattern.compile("^\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$");
+                            Matcher m = regex.matcher(str);
+                            if (m.find()) {
                                 try {
-                                    parsed = Double.parseDouble(split[split.length - 1]);
-                                } catch (NumberFormatException ex) {
-                                    System.out.printf("Invalid RangeGUI '%s'%n", split[split.length - 1]);
+                                    MatchResult mr = m.toMatchResult();
+                                    String table = mr.group(1);
+                                    String key = mr.group(2);
+                                    String value = mr.group(3);
+
+                                    if (!"".equals(table) && !"".equals(key)) {
+                                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
+
+                                        // Special handling for Important.:RangeGUI
+                                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
+                                            try {
+                                                double parsed = Double.parseDouble(value);
+                                                application.getCustomInterface().setTo(parsed);
+                                            } catch (NumberFormatException ex) {
+                                                System.out.printf("Invalid double: %s\n", value);
+                                            }
+                                        }
+
+                                    }
+                                } catch (IllegalStateException | IndexOutOfBoundsException ex) {
                                 }
-                                application.getCustomInterface().setTo(parsed);
-                                System.out.println("Parsed range " + parsed);
                             }
+
                             textArea.append(str);
                         }
                     });
