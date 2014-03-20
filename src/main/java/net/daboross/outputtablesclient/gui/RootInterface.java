@@ -20,7 +20,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,10 +52,9 @@ public class RootInterface {
         // rootFrame
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));
-        rootFrame.setPreferredSize(new Dimension(640, 480));
+        rootFrame.setSize(new Dimension((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), 480));
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        rootFrame.setExtendedState(rootFrame.getExtendedState() | JFrame.MAXIMIZED_HORIZ);
         rootFrame.setTitle(String.format("NullPointerException Interface %s: %s",
                 application.getClientAddress(), OutputInterface.class.getPackage().getImplementationVersion()));
 
@@ -94,32 +95,47 @@ public class RootInterface {
             public void stateChanged(final ChangeEvent evt) {
                 if (tabbedPane.getSelectedComponent() == emptyPanel) {
                     tabbedPane.setSelectedComponent(mainPanel);
-                    new Thread() {
+//                    SwingUtilities.invokeLater(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mainPanel.removeAll();
+//
+//                            // statusLabel
+//                            statusLabel = new JLabel();
+//                            statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
+//                            statusLabel.setText("Not connected");
+//                            statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
+//                            statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+//                            mainPanel.add(statusLabel, BorderLayout.NORTH);
+//
+//                            // inputOutputPanel
+//                            inputOutputPanel = new JPanel(new GridLayout(1, 2));
+//                            mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
+//
+//                            new Thread() {
+//                                @Override
+//                                public void run() {
+//                                    try {
+//                                        // restart input & output
+//                                        application.startInput();
+//                                        application.startOutput();
+//                                    } catch (InvocationTargetException | InterruptedException ex) {
+//                                        ex.printStackTrace();
+//                                    }
+//                                }
+//                            }.start();
+//                        }
+//                    });
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                mainPanel.removeAll();
-
-                                // statusLabel
-                                statusLabel = new JLabel();
-                                statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-                                statusLabel.setText("Not connected");
-                                statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
-                                statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                                mainPanel.add(statusLabel, BorderLayout.NORTH);
-
-                                // inputOutputPanel
-                                inputOutputPanel = new JPanel(new GridLayout(1, 2));
-                                mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
-
-                                // restart input & output
-                                application.startInput();
-                                application.startOutput();
-                            } catch (InvocationTargetException | InterruptedException ex) {
-                                ex.printStackTrace();
+                                Runtime.getRuntime().exec(new String[]{"java", "-jar", Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()});
+                            } catch (IOException | URISyntaxException e) {
                             }
+                            System.exit(0);
                         }
-                    }.start();
+                    }).start();
                 }
             }
         });

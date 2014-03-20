@@ -44,13 +44,6 @@ public class NetConsoleInterface {
         ((DefaultCaret) textArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane textPane = new JScrollPane(textArea);
         rootPanel.add(textPane, BorderLayout.CENTER);
-        // Init
-        try {
-            this.receiving = new DatagramSocket(RECEIVING_PORT);
-        } catch (SocketException e) {
-            e.printStackTrace();
-            return;
-        }
 
         new NetConsoleListenerThread().start();
     }
@@ -65,6 +58,21 @@ public class NetConsoleInterface {
 
         @Override
         public void run() {
+            // Init
+            try {
+                for (boolean started = false; !started; Thread.sleep(2000)) {
+                    try {
+                        NetConsoleInterface.this.receiving = new DatagramSocket(RECEIVING_PORT);
+                        started = true;
+                    } catch (SocketException e) {
+                        // e.printStackTrace();
+                        // return;
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 try {
