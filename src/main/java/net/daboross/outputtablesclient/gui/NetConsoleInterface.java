@@ -91,7 +91,7 @@ public class NetConsoleInterface {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            Pattern regex = Pattern.compile("^\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$");
+                            Pattern regex = Pattern.compile("^\\[Output\\]\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$");
                             Matcher m = regex.matcher(str);
                             if (m.find()) {
                                 try {
