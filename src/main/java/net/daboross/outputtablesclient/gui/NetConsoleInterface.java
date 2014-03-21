@@ -140,7 +140,7 @@ public class NetConsoleInterface {
                 @Override
                 public void run() {
 
-                    textArea.append(line);
+                    textArea.append(line + "\n");
                 }
             });
         }

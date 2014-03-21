@@ -65,47 +65,50 @@ public class Server {
 //                    break;
 //            }
 //        }
-        final DotNetTable robotInput = DotNetTables.subscribe("robot-input");
-        final DotNetTable robotInputDefault = DotNetTables.publish("robot-input-default");
-        robotInputDefault.setInterval(2000);
-        robotInputDefault.setValue("key-1", "key-2");
-        robotInputDefault.setValue("key-2", "key-2asdf");
-        robotInputDefault.setValue("key-3", "key-2fdsa");
-        robotInput.onChange(new DotNetTable.DotNetTableEvents() {
-            @Override
-            public void changed(final DotNetTable table) {
-                String value = robotInput.getValue("_DRIVER_FEEDBACK_KEY");
-                System.out.println("Input: " + value);
-                if (value != null) {
-                    robotInputDefault.setValue("_DRIVER_FEEDBACK_KEY", value);
-                }
-            }
 
-            @Override
-            public void stale(final DotNetTable table) {
+        // v2
 
-            }
-        });
-        DotNetTable[] tables = new DotNetTable[10];
-        for (int i = 0; true; i++) {
-            if (tables[i % 10] == null) {
-                tables[i % 10] = DotNetTables.publish("table-" + i % 10);
-                outputTables.setValue("table-" + (i % 10), "Level" + i % 10);
-                Thread.sleep(200);
-                outputTables.send();
-            }
-            if (i % 10 == 0) {
-                double value = new Random().nextDouble() * 50 + 50;
-                tables[0].setValue(":RangeGUI", value);
-                System.out.println("RangeGUI: " + value);
-            }
-            tables[i % 10].setValue("Key" + (i % 7), "Value" + i);
-
-            Thread.sleep(200);
-            tables[i % 10].send();
-            if (i % 2 == 0) {
-                outputTables.send();
-            }
-        }
+//        final DotNetTable robotInput = DotNetTables.subscribe("robot-input");
+//        final DotNetTable robotInputDefault = DotNetTables.publish("robot-input-default");
+//        robotInputDefault.setInterval(2000);
+//        robotInputDefault.setValue("key-1", "key-2");
+//        robotInputDefault.setValue("key-2", "key-2asdf");
+//        robotInputDefault.setValue("key-3", "key-2fdsa");
+//        robotInput.onChange(new DotNetTable.DotNetTableEvents() {
+//            @Override
+//            public void changed(final DotNetTable table) {
+//                String value = robotInput.getValue("_DRIVER_FEEDBACK_KEY");
+//                System.out.println("Input: " + value);
+//                if (value != null) {
+//                    robotInputDefault.setValue("_DRIVER_FEEDBACK_KEY", value);
+//                }
+//            }
+//
+//            @Override
+//            public void stale(final DotNetTable table) {
+//
+//            }
+//        });
+//        DotNetTable[] tables = new DotNetTable[10];
+//        for (int i = 0; true; i++) {
+//            if (tables[i % 10] == null) {
+//                tables[i % 10] = DotNetTables.publish("table-" + i % 10);
+//                outputTables.setValue("table-" + (i % 10), "Level" + i % 10);
+//                Thread.sleep(200);
+//                outputTables.send();
+//            }
+//            if (i % 10 == 0) {
+//                double value = new Random().nextDouble() * 50 + 50;
+//                tables[0].setValue(":RangeGUI", value);
+//                System.out.println("RangeGUI: " + value);
+//            }
+//            tables[i % 10].setValue("Key" + (i % 7), "Value" + i);
+//
+//            Thread.sleep(200);
+//            tables[i % 10].send();
+//            if (i % 2 == 0) {
+//                outputTables.send();
+//            }
+//        }
     }
 }

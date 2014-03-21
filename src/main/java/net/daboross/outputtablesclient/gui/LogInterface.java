@@ -16,15 +16,41 @@
  */
 package net.daboross.outputtablesclient.gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.output.Output;
 
 public class LogInterface implements Output.StaticLogger {
 
     private final RootInterface root;
+    private final PrintStream loggingStream;
 
     public LogInterface(RootInterface root) {
         this.root = root;
+        DateFormat format = new SimpleDateFormat("java-output-log-%Y-%d-%m-%s");
+        String fileName = format.format(new Date());
+        File file = new File(System.getProperty("user.home"), fileName);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        PrintStream temp = null;
+        try {
+            temp = new PrintStream(new FileOutputStream(file), true);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        loggingStream = temp;
     }
 
     @Override
@@ -39,5 +65,6 @@ public class LogInterface implements Output.StaticLogger {
                 }
             });
         }
+        loggingStream.append(message).append("\n");
     }
 }
