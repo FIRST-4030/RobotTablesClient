@@ -64,7 +64,7 @@ public class NetConsoleInterface {
     public class NetConsoleListenerThread extends Thread {
 
         private byte[] buffer = new byte[2048];
-        private StringBuilder lineBuilder;
+        private StringBuilder lineBuilder = new StringBuilder();
 
         @Override
         public void run() {
