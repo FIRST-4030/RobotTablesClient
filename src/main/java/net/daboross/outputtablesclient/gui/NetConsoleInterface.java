@@ -35,6 +35,9 @@ import net.daboross.outputtablesclient.output.Output;
 
 public class NetConsoleInterface {
 
+    private static final Pattern outputPattern = Pattern.compile(
+            "^\\[Output\\]\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$"
+    );
     private static final int RECEIVING_PORT = 6666;
     private final JPanel rootPanel;
     private final JTextArea textArea;
@@ -61,6 +64,7 @@ public class NetConsoleInterface {
     public class NetConsoleListenerThread extends Thread {
 
         private byte[] buffer = new byte[2048];
+        private StringBuilder lineBuilder;
 
         @Override
         public void run() {
@@ -87,20 +91,33 @@ public class NetConsoleInterface {
                     Output.oLog("IOException receiving DatagramPacket: %s", e);
                 }
                 if (packet.getLength() != 0) {
-                    final String str = new String(buffer, 0, packet.getLength(), Charset.forName("UTF-8"));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            Pattern regex = Pattern.compile("^\\[Output\\]\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$");
-                            Matcher m = regex.matcher(str);
-                            if (m.find()) {
-                                try {
-                                    MatchResult mr = m.toMatchResult();
-                                    String table = mr.group(1);
-                                    String key = mr.group(2);
-                                    String value = mr.group(3);
+                    String str = new String(buffer, 0, packet.getLength(), Charset.forName("UTF-8"));
+                    while (str.contains("\n")) {
+                        String[] split = str.split("\n", 2);
+                        lineBuilder.append(split[0]);
+                        processLine(lineBuilder.toString().trim());
+                        lineBuilder = new StringBuilder();
+                        if (split.length == 2) {
+                            str = split[1];
+                        }
+                    }
+                    if (!str.isEmpty()) {
+                        lineBuilder.append(str);
+                    }
+                }
+            }
+        }
 
-                                    if (!table.isEmpty() && !key.isEmpty()) {
+        private void processLine(final String line) {
+            Matcher m = outputPattern.matcher(line);
+            if (m.find()) {
+                try {
+                    MatchResult mr = m.toMatchResult();
+                    String table = mr.group(1);
+                    String key = mr.group(2);
+                    String value = mr.group(3);
+
+                    if (!table.isEmpty() && !key.isEmpty()) {
 //                                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
 //
 //                                        // Special handling for Important.:RangeGUI
@@ -113,18 +130,19 @@ public class NetConsoleInterface {
 //                                            }
 //                                        }
 
-                                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
-                                        application.getOutput().manualUpdate(table, key, value);
-                                    }
-                                } catch (IllegalStateException | IndexOutOfBoundsException ex) {
-                                }
-                            }
-
-                            textArea.append(str);
-                        }
-                    });
+                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
+                        application.getOutput().manualUpdate(table, key.trim(), value.trim());
+                    }
+                } catch (IllegalStateException | IndexOutOfBoundsException ignored) {
                 }
             }
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+
+                    textArea.append(line);
+                }
+            });
         }
     }
 }
