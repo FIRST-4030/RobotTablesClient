@@ -148,7 +148,6 @@ public class OutputInterface implements OutputListener {
             } catch (NumberFormatException ex) {
                 Output.oLog("Invalid range '%s'", keyValue);
             }
-            return;
         }
         ensureTableExists(tableKey);
         JPanel panel = new JPanel(new GridBagLayout());
@@ -182,11 +181,10 @@ public class OutputInterface implements OutputListener {
             } catch (NumberFormatException ex) {
                 Output.oLog("Invalid range '%s'", keyValue);
             }
-        } else {
-            ensureTableExists(tableKey);
-            JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
-            valueLabel.setText(keyValue);
         }
+        ensureTableExists(tableKey);
+        JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
+        valueLabel.setText(keyValue);
     }
 
     @Override
