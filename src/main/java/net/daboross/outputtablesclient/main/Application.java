@@ -57,10 +57,10 @@ public class Application {
                 root = new RootInterface(Application.this);
                 root.show();
                 Output.setLogger(new LogInterface(root));
-                System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
-                System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
             }
         });
+        System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
+        System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

@@ -34,9 +34,14 @@ public class LogInterface implements Output.StaticLogger {
 
     public LogInterface(RootInterface root) {
         this.root = root;
-        DateFormat format = new SimpleDateFormat("java-output-log-%Y-%d-%m-%s");
-        String fileName = format.format(new Date());
-        File file = new File(System.getProperty("user.home"), fileName);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String fileName = "java-output-log-" + format.format(new Date()) + System.currentTimeMillis();
+        File dir = new File(System.getProperty("user.home"), "logs");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File file = new File(dir, fileName);
+        System.out.printf("Log file is '%s'%n", file.getAbsolutePath());
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -65,6 +70,8 @@ public class LogInterface implements Output.StaticLogger {
                 }
             });
         }
-        loggingStream.append(message).append("\n");
+        if (loggingStream != null) {
+            loggingStream.append(message).append("\n");
+        }
     }
 }
