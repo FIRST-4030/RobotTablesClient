@@ -35,7 +35,7 @@ public class LogInterface implements Output.StaticLogger {
     public LogInterface(RootInterface root) {
         this.root = root;
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String fileName = "java-output-log-" + format.format(new Date()) + System.currentTimeMillis();
+        String fileName = "java-output-log-" + format.format(new Date()) + "-" + System.currentTimeMillis();
         File dir = new File(System.getProperty("user.home"), "logs");
         if (!dir.exists()) {
             dir.mkdirs();
