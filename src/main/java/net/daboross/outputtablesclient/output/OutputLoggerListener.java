@@ -17,19 +17,17 @@
 package net.daboross.outputtablesclient.output;
 
 import net.daboross.outputtablesclient.listener.OutputListener;
-import net.daboross.outputtablesclient.main.OutputTablesMain;
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
 
 public class OutputLoggerListener implements OutputListener {
 
-    private final OutputTablesMain main;
-
-    public OutputLoggerListener(OutputTablesMain main) {
-        this.main = main;
+    public OutputLoggerListener() {
     }
 
     @Override
-    public void onTableCreate(String tableKey, String tableName) {
-        Output.oLog(" * table(key: %s, name: %s)", tableKey, tableName);
+    public void onTableCreate(RobotTable table) {
+        Output.oLog(" created table: %s", table.getName());
     }
 
     @Override
@@ -37,17 +35,17 @@ public class OutputLoggerListener implements OutputListener {
     }
 
     @Override
-    public void onKeyCreate(String tableKey, String keyName, String keyValue) {
-        Output.oLog("[%s][%s*] %s", main.getTableName(tableKey), keyName, keyValue);
+    public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
+        if (action == UpdateAction.NEW) {
+            Output.oLog("[%s][%s*] %s", table.getName(), key, value);
+        } else if (action == UpdateAction.UPDATE) {
+            Output.oLog("[%s][%s] %s", table.getName(), key, value);
+        } else if (action == UpdateAction.DELETE) {
+            Output.oLog("[%s] delete: %s)", table.getName(), key);
+        }
     }
 
     @Override
-    public void onKeyUpdate(String tableKey, String keyName, String keyValue) {
-        Output.oLog("[%s][%s] %s", main.getTableName(tableKey), keyName, keyValue);
-    }
-
-    @Override
-    public void onKeyDelete(String tableKey, String keyName) {
-        Output.oLog("[%s] delete(%s)", main.getTableName(tableKey), keyName);
+    public void onTableCleared(final RobotTable table) {
     }
 }

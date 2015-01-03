@@ -41,12 +41,13 @@ import net.daboross.outputtablesclient.main.OutputTablesMain;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
 import org.json.JSONObject;
 
 public class OutputInterface implements OutputListener {
 
     private final Application application;
-    private final OutputTablesMain main;
     final GridBagConstraints toggleButtonConstraints;
     final GridBagConstraints tablePanelConstraints;
     final JPanel mainTabPanel;
@@ -61,7 +62,6 @@ public class OutputInterface implements OutputListener {
 
     public OutputInterface(final Application application) {
         this.application = application;
-        this.main = application.getOutput();
 
         // persistEnabled
         JSONObject parentObj = application.getPersist().obj();
@@ -104,20 +104,20 @@ public class OutputInterface implements OutputListener {
 
     private void ensureTableExists(String tableKey) {
         if (tableKeyToTablePanel.get(tableKey) == null) {
-            createTable(tableKey, String.valueOf(main.getTableName(tableKey)));
+            createTable(tableKey);
         }
     }
 
-    private void createTable(String tableKey, String tableName) {
+    private void createTable(String tableKey) {
         JPanel tablePanel = new JPanel(new WrapLayout());
         Border lineBorder = new LineBorder(new Color(0, 0, 0));
-        Border titleBorder = new TitledBorder(lineBorder, tableName);
+        Border titleBorder = new TitledBorder(lineBorder, tableKey);
         Border spaceBorder = new EmptyBorder(5, 5, 5, 5);
         Border compoundBorder = new CompoundBorder(titleBorder, spaceBorder);
         tablePanel.setBorder(compoundBorder);
         tableKeyToTablePanel.put(tableKey, tablePanel);
 
-        JToggleButton toggleButton = new JToggleButton(tableName);
+        JToggleButton toggleButton = new JToggleButton(tableKey);
         TableToggleListener listener = new TableToggleListener(toggleButton, tableKey);
         toggleButton.addItemListener(listener);
         listener.initialAdd();
@@ -132,7 +132,7 @@ public class OutputInterface implements OutputListener {
     }
 
     @Override
-    public void onTableCreate(final String tableKey, final String tableName) {
+    public void onTableCreate(final RobotTable table) {
     }
 
     @Override
@@ -140,59 +140,59 @@ public class OutputInterface implements OutputListener {
     }
 
     @Override
-    public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
-        if (keyName.equalsIgnoreCase(":RangeGUI")) {
-            Output.oLog("Range: %s", keyValue);
-            try {
-                application.getCustomInterface().setTo(Double.parseDouble(keyValue));
-            } catch (NumberFormatException ex) {
-                Output.oLog("Invalid range '%s'", keyValue);
+    public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
+        if (action == UpdateAction.NEW) {
+            if (key.equalsIgnoreCase(":RangeGUI")) {
+                Output.oLog("Range: %s", value);
+                try {
+                    application.getCustomInterface().setTo(Double.parseDouble(value));
+                } catch (NumberFormatException ex) {
+                    Output.oLog("Invalid range '%s'", value);
+                }
             }
+            ensureTableExists(table.getName());
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.setBorder(new LineBorder(Color.BLACK));
+            tableKeyAndKeyToValuePanel.get(table.getName()).put(key, panel);
+
+            JLabel keyLabel = new JLabel(key);
+            keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            panel.add(keyLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+
+            JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+            separator.setPreferredSize(new Dimension(2, 20));
+            panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+
+            JLabel valueLabel = new JLabel(value);
+            valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            panel.add(valueLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+            tableKeyAndKeyToValueLabel.get(table.getName()).put(value, valueLabel);
+
+            JPanel parentPanel = tableKeyToTablePanel.get(table.getName());
+            parentPanel.add(panel);
+            parentPanel.revalidate();
+        } else if (action == UpdateAction.UPDATE) {
+            if (key.equalsIgnoreCase(":RangeGUI")) {
+                Output.oLog("Range: %s", value);
+                try {
+                    application.getCustomInterface().setTo(Double.parseDouble(value));
+                } catch (NumberFormatException ex) {
+                    Output.oLog("Invalid range '%s'", value);
+                }
+            }
+            ensureTableExists(table.getName());
+            JLabel valueLabel = tableKeyAndKeyToValueLabel.get(table.getName()).get(key);
+            valueLabel.setText(value);
+        } else if (action == UpdateAction.DELETE) {
+            JPanel parentPanel = tableKeyToTablePanel.get(table.getName());
+            JPanel valuePanel = tableKeyAndKeyToValuePanel.get(table.getName()).get(key);
+            parentPanel.remove(valuePanel);
+            parentPanel.revalidate();
         }
-        ensureTableExists(tableKey);
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new LineBorder(Color.BLACK));
-        tableKeyAndKeyToValuePanel.get(tableKey).put(keyName, panel);
-
-        JLabel keyLabel = new JLabel(keyName);
-        keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        panel.add(keyLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
-
-        JSeparator separator = new JSeparator(JSeparator.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 20));
-        panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
-
-        JLabel valueLabel = new JLabel(keyValue);
-        valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        panel.add(valueLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
-        tableKeyAndKeyToValueLabel.get(tableKey).put(keyName, valueLabel);
-
-        JPanel parentPanel = tableKeyToTablePanel.get(tableKey);
-        parentPanel.add(panel);
-        parentPanel.revalidate();
     }
 
     @Override
-    public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
-        if (keyName.equalsIgnoreCase(":RangeGUI")) {
-            Output.oLog("Range: %s", keyValue);
-            try {
-                application.getCustomInterface().setTo(Double.parseDouble(keyValue));
-            } catch (NumberFormatException ex) {
-                Output.oLog("Invalid range '%s'", keyValue);
-            }
-        }
-        ensureTableExists(tableKey);
-        JLabel valueLabel = tableKeyAndKeyToValueLabel.get(tableKey).get(keyName);
-        valueLabel.setText(keyValue);
-    }
-
-    @Override
-    public void onKeyDelete(final String tableKey, final String keyName) {
-        JPanel parentPanel = tableKeyToTablePanel.get(tableKey);
-        JPanel valuePanel = tableKeyAndKeyToValuePanel.get(tableKey).get(keyName);
-        parentPanel.remove(valuePanel);
-        parentPanel.revalidate();
+    public void onTableCleared(final RobotTable table) {
     }
 
     private class TableToggleListener implements ItemListener {

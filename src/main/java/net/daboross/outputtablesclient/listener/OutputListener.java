@@ -16,15 +16,16 @@
  */
 package net.daboross.outputtablesclient.listener;
 
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
+
 public interface OutputListener {
 
-    public void onTableCreate(String tableKey, String tableName);
+    public void onTableCreate(RobotTable table);
 
     public void onTableStale(String tableKey);
 
-    public void onKeyCreate(String tableKey, String keyName, String keyValue);
+    public void onUpdate(RobotTable table, String key, String value, UpdateAction action);
 
-    public void onKeyUpdate(String tableKey, String keyName, String keyValue);
-
-    public void onKeyDelete(String tableKey, String keyName);
+    public void onTableCleared(RobotTable table);
 }

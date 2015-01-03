@@ -34,11 +34,12 @@ import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.output.OutputLoggerListener;
 import net.daboross.outputtablesclient.persist.PersistStorage;
-import org.ingrahamrobotics.dotnettables.DotNetTables;
+import org.ingrahamrobotics.robottables.RobotTables;
+import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 
 public class Application {
 
-    private static final String CLIENT_ADDRESS = "4030";
+    private RobotTablesClient tables;
     private RootInterface root;
     private OutputTablesMain outputMain;
     private InputTablesMain inputMain;
@@ -75,8 +76,10 @@ public class Application {
                 root.registerRestart();
             }
         });
-        Output.oLog("Starting client on " + CLIENT_ADDRESS);
-        DotNetTables.startClient(CLIENT_ADDRESS);
+        Output.oLog("Starting RobotTables");
+        RobotTables tablesStart = new RobotTables();
+        tablesStart.run();
+        tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
         customInterface = new CustomInterface(this);
@@ -96,9 +99,9 @@ public class Application {
 
     public void startOutput() throws InvocationTargetException, InterruptedException {
         Output.oLog("Initiating output-tables");
-        outputMain = new OutputTablesMain();
+        outputMain = new OutputTablesMain(this);
         Output.oLog("Initiating output-tables logger");
-        OutputLoggerListener outputLoggerListener = new OutputLoggerListener(outputMain);
+        OutputLoggerListener outputLoggerListener = new OutputLoggerListener();
         outputMain.addListener(outputLoggerListener);
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
@@ -136,10 +139,6 @@ public class Application {
         return root;
     }
 
-    public String getClientAddress() {
-        return CLIENT_ADDRESS;
-    }
-
     public OutputTablesMain getOutput() {
         return outputMain;
     }
@@ -154,5 +153,9 @@ public class Application {
 
     public CustomInterface getCustomInterface() {
         return customInterface;
+    }
+
+    public RobotTablesClient getTables() {
+        return tables;
     }
 }

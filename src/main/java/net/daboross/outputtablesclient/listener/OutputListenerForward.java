@@ -19,6 +19,8 @@ package net.daboross.outputtablesclient.listener;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.daboross.outputtablesclient.output.Output;
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
 
 public class OutputListenerForward implements OutputListener {
 
@@ -33,10 +35,10 @@ public class OutputListenerForward implements OutputListener {
     }
 
     @Override
-    public void onTableCreate(String tableKey, String tableName) {
+    public void onTableCreate(final RobotTable table) {
         for (OutputListener listener : listeners) {
             try {
-                listener.onTableCreate(tableKey, tableName);
+                listener.onTableCreate(table);
             } catch (Throwable t) {
                 Output.oLog("Error onTableCreate", t);
             }
@@ -55,10 +57,10 @@ public class OutputListenerForward implements OutputListener {
     }
 
     @Override
-    public void onKeyCreate(String tableKey, String keyName, String keyValue) {
+    public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
         for (OutputListener listener : listeners) {
             try {
-                listener.onKeyCreate(tableKey, keyName, keyValue);
+                listener.onUpdate(table, key, value, action);
             } catch (Throwable t) {
                 Output.oLog("Error onCreateDefaultKey", t);
             }
@@ -66,23 +68,12 @@ public class OutputListenerForward implements OutputListener {
     }
 
     @Override
-    public void onKeyUpdate(String tableKey, String keyName, String keyValue) {
+    public void onTableCleared(final RobotTable table) {
         for (OutputListener listener : listeners) {
             try {
-                listener.onKeyUpdate(tableKey, keyName, keyValue);
+                listener.onTableCleared(table);
             } catch (Throwable t) {
-                Output.oLog("Error onUpdateDefaultKey", t);
-            }
-        }
-    }
-
-    @Override
-    public void onKeyDelete(String tableKey, String keyName) {
-        for (OutputListener listener : listeners) {
-            try {
-                listener.onKeyDelete(tableKey, keyName);
-            } catch (Throwable t) {
-                Output.oLog("Error onDeleteKey", t);
+                Output.oLog("Error onCreateDefaultKey", t);
             }
         }
     }

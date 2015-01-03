@@ -59,8 +59,7 @@ public class RootInterface {
         rootFrame.setSize(new Dimension((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), 480));
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        rootFrame.setTitle(String.format("NullPointerException Interface %s: %s",
-                application.getClientAddress(), OutputInterface.class.getPackage().getImplementationVersion()));
+        rootFrame.setTitle(String.format("NullPointerException Interface %s", OutputInterface.class.getPackage().getImplementationVersion()));
 
         // tabbedPane
         tabbedPane = new JTabbedPane();

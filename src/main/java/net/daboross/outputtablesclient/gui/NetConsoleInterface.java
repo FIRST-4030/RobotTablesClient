@@ -118,20 +118,20 @@ public class NetConsoleInterface {
                     String value = mr.group(3);
 
                     if (!table.isEmpty() && !key.isEmpty()) {
-//                                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
-//
-//                                        // Special handling for Important.:RangeGUI
-//                                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
-//                                            try {
-//                                                double parsed = Double.parseDouble(value);
-//                                                application.getCustomInterface().setTo(parsed);
-//                                            } catch (NumberFormatException ex) {
-//                                                System.out.printf("Invalid double: %s\n", value);
-//                                            }
-//                                        }
+                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
 
-                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
-                        application.getOutput().manualUpdate(table, key.trim(), value.trim());
+                        // Special handling for Important.:RangeGUI
+                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
+                            try {
+                                double parsed = Double.parseDouble(value);
+                                application.getCustomInterface().setTo(parsed);
+                            } catch (NumberFormatException ex) {
+                                System.out.printf("Invalid double: %s\n", value);
+                            }
+                        }
+
+//                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
+//                        application.getOutput().manualUpdate(table, key.trim(), value.trim());
                     }
                 } catch (IllegalStateException | IndexOutOfBoundsException ignored) {
                 }

@@ -16,8 +16,11 @@
  */
 package net.daboross.outputtablesclient.gui;
 
+import java.awt.Robot;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.listener.OutputListener;
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
 
 public class SwingOutputForward implements OutputListener {
 
@@ -28,11 +31,11 @@ public class SwingOutputForward implements OutputListener {
     }
 
     @Override
-    public void onTableCreate(final String tableKey, final String tableName) {
+    public void onTableCreate(final RobotTable table) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onTableCreate(tableKey, tableName);
+                innerListener.onTableCleared(table);
             }
         });
     }
@@ -48,31 +51,21 @@ public class SwingOutputForward implements OutputListener {
     }
 
     @Override
-    public void onKeyCreate(final String tableKey, final String keyName, final String keyValue) {
+    public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onKeyCreate(tableKey, keyName, keyValue);
+                innerListener.onUpdate(table, key, value, action);
             }
         });
     }
 
     @Override
-    public void onKeyUpdate(final String tableKey, final String keyName, final String keyValue) {
+    public void onTableCleared(final RobotTable table) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onKeyUpdate(tableKey, keyName, keyValue);
-            }
-        });
-    }
-
-    @Override
-    public void onKeyDelete(final String tableKey, final String keyName) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onKeyDelete(tableKey, keyName);
+                innerListener.onTableCleared(table);
             }
         });
     }

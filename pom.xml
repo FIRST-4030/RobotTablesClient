@@ -54,15 +54,9 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>edu.wpi.first.wpilibj</groupId>
-            <artifactId>networktables</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.ingrahamrobotics</groupId>
-            <artifactId>dotnettables</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <artifactId>robottables</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

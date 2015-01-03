@@ -16,8 +16,6 @@
  */
 package net.daboross.outputtablesclient.main;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,11 +23,14 @@ import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.persist.PersistStorage;
-import org.ingrahamrobotics.dotnettables.DotNetTable;
-import org.ingrahamrobotics.dotnettables.DotNetTables;
+import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.TableType;
+import org.ingrahamrobotics.robottables.api.UpdateAction;
+import org.ingrahamrobotics.robottables.api.listeners.ClientUpdateListener;
+import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
 import org.json.JSONObject;
 
-public class InputTablesMain implements DotNetTable.DotNetTableEvents {
+public class InputTablesMain implements TableUpdateListener, ClientUpdateListener {
 
     private static final String FEEDBACK_KEY = "_DRIVER_FEEDBACK_KEY";
     private static final int FEEDBACK_THRESHOLD = 2;
@@ -37,16 +38,16 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     private static final String SETTING_TABLE = "robot-input";
     private final InputListenerForward l = new InputListenerForward();
     private final Map<String, String> values = new HashMap<>();
-    private final DotNetTable defaultSettingsTable;
-    private final DotNetTable settingsTable;
+    private RobotTable defaultSettingsTable;
+    private final RobotTable settingsTable;
     private boolean stale = true;
     private long currentFeedback;
     private final PersistStorage storage;
     private final JSONObject storageObj;
 
     public InputTablesMain(Application application) {
-        defaultSettingsTable = DotNetTables.subscribe(DEFAULT_TABLE);
-        settingsTable = DotNetTables.publish(SETTING_TABLE);
+        defaultSettingsTable = application.getTables().getTable(DEFAULT_TABLE);
+        settingsTable = application.getTables().publishTable(SETTING_TABLE);
         storage = application.getPersist();
         JSONObject tempObject = storage.obj().optJSONObject("input-save");
         if (tempObject == null) {
@@ -59,13 +60,14 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     public void subscribe() {
         for (String key : (Set<String>) storageObj.keySet()) {
             String value = storageObj.getString(key);
-            settingsTable.setValue(key, value);
+            settingsTable.set(key, value);
             values.put(key, value);
             l.onCreateDefaultKey(key, value);
         }
-        defaultSettingsTable.onChange(this);
-        defaultSettingsTable.onStale(this);
-        settingsTable.setInterval(1000);
+        if (defaultSettingsTable != null) {
+            defaultSettingsTable.addUpdateListener(this);
+        }
+//        settingsTable.setInterval(1000);
         sendSettings();
     }
 
@@ -78,56 +80,22 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     public void updateKey(String key, String newValue) {
-        settingsTable.setValue(key, newValue);
+        settingsTable.set(key, newValue);
         storageObj.put(key, newValue);
         storage.save();
         sendSettings();
     }
 
-    @Override
-    public synchronized void changed(DotNetTable dnt) {
-        if (!dnt.name().equals(DEFAULT_TABLE)) {
-            Output.iLog("Non-input table '%s' ignored", dnt.name());
-            return;
-        }
-        updateStale();
-        Output.iLog("Table changed");
-        for (Enumeration<String> e = dnt.keys(); e.hasMoreElements(); ) {
-            String key = e.nextElement();
-            if (key.startsWith("_")) {
-                continue;
-            }
-            String value = dnt.getValue(key);
-            if (!values.containsKey(key)) {
-                values.put(key, value);
-                l.onCreateDefaultKey(key, value);
-            } else if (!values.get(key).equals(value)) {
-                values.put(key, value);
-                l.onUpdateDefaultKey(key, value);
-            }
-        }
-        for (String key : new ArrayList<>(values.keySet())) {
-            if (!dnt.exists(key)) {
-                values.remove(key);
-                l.onDeleteKey(key);
-            }
-        }
-    }
-
-    @Override
-    public synchronized void stale(DotNetTable dnt) {
-        updateStale();
-    }
-
     private void updateStale() {
+        // TODO: Use this when RobotTables is more complete
         // Check the feedback key, if it exists
         boolean feedbackStale = true;
-        if (defaultSettingsTable.exists(FEEDBACK_KEY)) {
+        if (defaultSettingsTable.contains(FEEDBACK_KEY)) {
             double feedback = -1;
             try {
                 feedback = defaultSettingsTable.getDouble(FEEDBACK_KEY);
             } catch (NumberFormatException ex) {
-                Output.iLog("Non-number feedback '%s'.", defaultSettingsTable.getValue(FEEDBACK_KEY));
+                Output.iLog("Non-number feedback '%s'.", defaultSettingsTable.get(FEEDBACK_KEY));
             }
             if (currentFeedback < feedback + FEEDBACK_THRESHOLD) {
                 feedbackStale = false;
@@ -135,7 +103,7 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
         }
 
         // Determine the new master stale state
-        boolean newStale = feedbackStale || defaultSettingsTable.isStale();
+        boolean newStale = feedbackStale;
 
         // Update the UI if needed
         if (stale != newStale) {
@@ -151,11 +119,55 @@ public class InputTablesMain implements DotNetTable.DotNetTableEvents {
     }
 
     private void sendSettings() {
-        settingsTable.setValue(FEEDBACK_KEY, ++currentFeedback);
-        settingsTable.send();
+        settingsTable.set(FEEDBACK_KEY, String.valueOf(++currentFeedback));
     }
 
     public PersistStorage getStorage() {
         return storage;
+    }
+
+    @Override
+    public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
+        if (table != defaultSettingsTable) {
+            Output.iLog("Non-input table '%s' ignored", table.getName());
+            return;
+        }
+        Output.iLog("Table updated");
+        if (action == UpdateAction.DELETE) {
+            values.remove(key);
+            l.onDeleteKey(key);
+        } else if (action == UpdateAction.NEW) {
+            values.put(key, value);
+            l.onCreateDefaultKey(key, value);
+        } else if (action == UpdateAction.UPDATE) {
+            values.put(key, value);
+            l.onUpdateDefaultKey(key, value);
+        }
+    }
+
+    @Override
+    public void onUpdateAdmin(final RobotTable table, final String key, final String value, final UpdateAction action) {
+
+    }
+
+    @Override
+    public void onTableCleared(final RobotTable table) {
+        for (String key : values.keySet()) {
+            l.onDeleteKey(key);
+        }
+        values.clear();
+    }
+
+    @Override
+    public void onTableChangeType(final RobotTable table, final TableType oldType, final TableType newType) {
+        // TODO: Handle other clients which also want to send settings here
+    }
+
+    @Override
+    public void onNewTable(final RobotTable table) {
+        if (table.getName().equals(DEFAULT_TABLE)) {
+            defaultSettingsTable = table;
+            table.addUpdateListener(this);
+        }
     }
 }

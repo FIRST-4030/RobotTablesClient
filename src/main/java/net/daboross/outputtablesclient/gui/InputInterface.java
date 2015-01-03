@@ -67,12 +67,12 @@ public class InputInterface implements InputListener {
 
     @Override
     public void onNotStale() {
-        application.getRoot().getStatusLabel().setText("Connected to " + application.getClientAddress() + " - Robot up to date");
+        application.getRoot().getStatusLabel().setText("Connected - Robot up to date");
     }
 
     @Override
     public void onStale() {
-        application.getRoot().getStatusLabel().setText("! Disconnected from " + application.getClientAddress() + " - Robot out of date !");
+        application.getRoot().getStatusLabel().setText("! Disconnected - Robot out of date !");
     }
 
     @Override
