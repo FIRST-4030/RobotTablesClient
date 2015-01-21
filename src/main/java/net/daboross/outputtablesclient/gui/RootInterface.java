@@ -59,7 +59,7 @@ public class RootInterface {
         rootFrame.setSize(new Dimension((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), 480));
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        rootFrame.setTitle(String.format("NullPointerException Interface %s", OutputInterface.class.getPackage().getImplementationVersion()));
+        rootFrame.setTitle(String.format("RobotTablesClient %s", OutputInterface.class.getPackage().getImplementationVersion()));
 
         // tabbedPane
         tabbedPane = new JTabbedPane();
@@ -78,12 +78,12 @@ public class RootInterface {
 
 
         // statusLabel
-        statusLabel = new JLabel();
-        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-        statusLabel.setText("Client Initializing");
-        statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
-        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mainPanel.add(statusLabel, BorderLayout.NORTH);
+//        statusLabel = new JLabel();
+//        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
+//        statusLabel.setText("Client Initializing");
+//        statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
+//        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+//        mainPanel.add(statusLabel, BorderLayout.NORTH);
 
         // inputOutputPanel
         inputOutputPanel = new JPanel(new GridLayout(1, 2));

@@ -39,6 +39,7 @@ import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 
 public class Application {
 
+    private static final String targetAddress = "10.40.30.255";
     private RobotTablesClient tables;
     private RootInterface root;
     private OutputTablesMain outputMain;
@@ -78,7 +79,7 @@ public class Application {
         });
         Output.oLog("Starting RobotTables");
         RobotTables tablesStart = new RobotTables();
-        tablesStart.run();
+        tablesStart.run(targetAddress);
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
@@ -90,7 +91,7 @@ public class Application {
             @Override
             public void run() {
                 JLabel label = root.getStatusLabel();
-                if (label.getText().equals("Client Initializing")) {
+                if (label != null && label.getText().equals("Client Initializing")) {
                     label.setText("Not connected");
                 }
             }

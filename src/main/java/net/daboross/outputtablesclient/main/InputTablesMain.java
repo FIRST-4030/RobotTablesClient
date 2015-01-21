@@ -58,7 +58,7 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
     }
 
     public void subscribe() {
-        for (String key : (Set<String>) storageObj.keySet()) {
+        for (String key : storageObj.keySet()) {
             String value = storageObj.getString(key);
             settingsTable.set(key, value);
             values.put(key, value);
