@@ -166,7 +166,7 @@ public class OutputInterface implements OutputListener {
             JLabel valueLabel = new JLabel(value);
             valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
             panel.add(valueLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
-            tableKeyAndKeyToValueLabel.get(table.getName()).put(value, valueLabel);
+            tableKeyAndKeyToValueLabel.get(table.getName()).put(key, valueLabel);
 
             JPanel parentPanel = tableKeyToTablePanel.get(table.getName());
             parentPanel.add(panel);
