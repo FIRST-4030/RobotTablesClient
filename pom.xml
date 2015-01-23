@@ -22,7 +22,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>JavaOutputTablesClient</name>
+    <name>RobotTablesClient</name>
     <description>Client for testing robot output class, using DotNetTables</description>
     <inceptionYear>2014</inceptionYear>
     <licenses>
