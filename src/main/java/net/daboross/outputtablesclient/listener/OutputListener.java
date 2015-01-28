@@ -23,7 +23,7 @@ public interface OutputListener {
 
     public void onTableCreate(RobotTable table);
 
-    public void onTableStale(String tableKey);
+    public void onTableStaleChange(String tableKey, boolean nowStale);
 
     public void onUpdate(RobotTable table, String key, String value, UpdateAction action);
 

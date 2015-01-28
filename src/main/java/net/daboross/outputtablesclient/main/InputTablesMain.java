@@ -164,6 +164,16 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
     }
 
     @Override
+    public void onTableStaleChange(final RobotTable table, final boolean nowStale) {
+        // TODO: This will show us when we don't have the latest robot values
+    }
+
+    @Override
+    public void onAllSubscribersStaleChange(final RobotTable table) {
+        // TODO: This will show us when the robot hasn't gotten input values
+    }
+
+    @Override
     public void onNewTable(final RobotTable table) {
         if (table.getName().equals(DEFAULT_TABLE)) {
             defaultSettingsTable = table;

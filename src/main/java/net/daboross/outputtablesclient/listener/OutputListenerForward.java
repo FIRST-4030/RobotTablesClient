@@ -46,10 +46,10 @@ public class OutputListenerForward implements OutputListener {
     }
 
     @Override
-    public void onTableStale(String tableKey) {
+    public void onTableStaleChange(String tableKey, boolean staleNow) {
         for (OutputListener listener : listeners) {
             try {
-                listener.onTableStale(tableKey);
+                listener.onTableStaleChange(tableKey, staleNow);
             } catch (Throwable t) {
                 Output.oLog("Error onTableStale", t);
             }

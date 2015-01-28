@@ -31,7 +31,7 @@ public class OutputLoggerListener implements OutputListener {
     }
 
     @Override
-    public void onTableStale(String tableKey) {
+    public void onTableStaleChange(String tableKey, boolean nowStale) {
     }
 
     @Override

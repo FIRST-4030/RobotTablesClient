@@ -37,7 +37,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.main.Application;
-import net.daboross.outputtablesclient.main.OutputTablesMain;
 import net.daboross.outputtablesclient.output.Output;
 import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
@@ -136,7 +135,7 @@ public class OutputInterface implements OutputListener {
     }
 
     @Override
-    public void onTableStale(final String tableKey) {
+    public void onTableStaleChange(final String tableKey, boolean nowStale) {
     }
 
     @Override

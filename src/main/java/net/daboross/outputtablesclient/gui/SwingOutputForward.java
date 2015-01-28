@@ -41,11 +41,11 @@ public class SwingOutputForward implements OutputListener {
     }
 
     @Override
-    public void onTableStale(final String tableKey) {
+    public void onTableStaleChange(final String tableKey, final boolean nowStale) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                innerListener.onTableStale(tableKey);
+                innerListener.onTableStaleChange(tableKey, nowStale);
             }
         });
     }

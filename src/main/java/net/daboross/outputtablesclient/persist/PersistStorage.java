@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,15 +37,16 @@ public class PersistStorage {
 
     private final ExecutorService saveService = Executors.newSingleThreadExecutor();
     private final SaveRunnable saveRunnable = new SaveRunnable();
-    private final File saveFileBuffer;
-    private final File saveFile;
+    private final Path saveFileBuffer;
+    private final Path saveFile;
     private final JSONObject mainObj;
 
     public PersistStorage() {
         String home = System.getProperty("user.home");
         System.out.println("User.home = " + home);
-        this.saveFile = new File(home, ".java-output-client-persist.json");
-        this.saveFileBuffer = new File(home, ".java-output-client-persist.json~");
+        Path homePath = Paths.get(home);
+        this.saveFile = homePath.resolve(".java-output-client-persist.json");
+        this.saveFileBuffer = homePath.resolve(".java-output-client-persist.json~");
         JSONObject tempObj;
         try {
             tempObj = load();
@@ -55,21 +58,18 @@ public class PersistStorage {
     }
 
     private JSONObject load() throws IOException {
-        if (!saveFile.exists()) {
-            if (saveFile.createNewFile()) {
-                return new JSONObject();
-            } else {
-                throw new IOException("Couldn't create file " + saveFile.getAbsolutePath());
-            }
+        if (!Files.exists(saveFile)) {
+            Files.createFile(saveFile);
+            return new JSONObject();
         }
-        if (!saveFile.isFile()) {
-            throw new IOException("File '" + saveFile.getAbsolutePath() + "' is not a file (perhaps a directory?).");
+        if (!Files.isRegularFile(saveFile)) {
+            throw new IOException("File '" + saveFile.toAbsolutePath() + "' is not a file (perhaps a directory?).");
         }
 
-        try (FileInputStream fis = new FileInputStream(saveFile)) {
+        try (FileInputStream fis = new FileInputStream(saveFile.toFile())) {
             return new JSONObject(new JSONTokener(fis));
         } catch (JSONException ex) {
-            try (FileInputStream fis = new FileInputStream(saveFile)) {
+            try (FileInputStream fis = new FileInputStream(saveFile.toFile())) {
                 byte[] buffer = new byte[10];
                 int read = fis.read(buffer);
                 if (read <= 0) return new JSONObject();
@@ -78,7 +78,7 @@ public class PersistStorage {
                     return new JSONObject();
                 }
             }
-            throw new IOException("JSONException loading " + saveFile.getAbsolutePath(), ex);
+            throw new IOException("JSONException loading " + saveFile.toAbsolutePath(), ex);
         }
     }
 
@@ -94,34 +94,29 @@ public class PersistStorage {
 
         @Override
         public void run() {
-
-            if (!saveFileBuffer.exists()) {
+            if (!Files.exists(saveFileBuffer)) {
                 try {
-                    if (!saveFileBuffer.createNewFile()) {
-                        Output.logError("Failed to create file '%s'.", saveFileBuffer);
-                        return;
-                    }
+                    Files.createFile(saveFileBuffer);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     Output.logError("Failed to create file '%s'.", saveFileBuffer);
                     return;
                 }
             }
-            try (FileOutputStream fos = new FileOutputStream(saveFileBuffer)) {
+            try (FileOutputStream fos = new FileOutputStream(saveFileBuffer.toFile())) {
                 try (OutputStreamWriter writer = new OutputStreamWriter(fos, Charset.forName("UTF-8"))) {
                     mainObj.write(writer);
                 }
             } catch (IOException | JSONException ex) {
                 ex.printStackTrace();
-                Output.logError("Couldn't write to %s", saveFileBuffer.getAbsolutePath());
+                Output.logError("Couldn't write to %s", saveFileBuffer.toAbsolutePath());
                 return;
             }
             try {
-                Files.move(saveFileBuffer.toPath(), saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.move(saveFileBuffer, saveFile, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ex) {
                 ex.printStackTrace();
-                Output.logError("Failed to move buffer file '%s' to actual save location '%s'", saveFileBuffer.getAbsolutePath(), saveFile);
-                return;
+                Output.logError("Failed to move buffer file '%s' to actual save location '%s'", saveFileBuffer.toAbsolutePath(), saveFile);
             }
         }
     }

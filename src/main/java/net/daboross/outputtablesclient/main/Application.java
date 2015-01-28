@@ -58,9 +58,9 @@ public class Application {
             public void run() {
                 root = new RootInterface(Application.this);
                 root.show();
-                Output.setLogger(new LogInterface(root));
             }
         });
+        Output.setLogger(new LogInterface(root));
         System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
         System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
         SwingUtilities.invokeLater(new Runnable() {

@@ -57,7 +57,17 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     @Override
     public void onTableChangeType(final RobotTable table, final TableType oldType, final TableType newType) {
+        // TODO: Something here, perhaps note when someone else has taken over dealing with input?
+    }
 
+    @Override
+    public void onTableStaleChange(final RobotTable table, final boolean nowStale) {
+        l.onTableStaleChange(table.getName(), nowStale);
+    }
+
+    @Override
+    public void onAllSubscribersStaleChange(final RobotTable table) {
+        // TODO: This would allow us to know when the robot doesn't have our input
     }
 
     @Override
@@ -75,7 +85,7 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     @Override
     public void onUpdateAdmin(final RobotTable table, final String key, final String value, final UpdateAction action) {
-        // TODO: Something here
+        // TODO: Do we want to display admin values at all?
     }
 
     @Override

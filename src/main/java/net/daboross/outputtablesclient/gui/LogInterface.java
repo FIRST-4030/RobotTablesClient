@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,22 +38,26 @@ public class LogInterface implements Output.StaticLogger {
         this.root = root;
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String fileName = "java-output-log-" + format.format(new Date()) + "-" + System.currentTimeMillis();
-        File dir = new File(System.getProperty("user.home"), "logs");
-        if (!dir.exists()) {
-            dir.mkdirs();
+        Path dir = new File(System.getProperty("user.home"), "logs").toPath();
+        try {
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-        File file = new File(dir, fileName);
-        System.out.printf("Log file is '%s'%n", file.getAbsolutePath());
-        if (!file.exists()) {
+        Path file = dir.resolve(fileName);
+        System.out.printf("Log file is '%s'%n", file.toAbsolutePath());
+        if (!Files.exists(file)) {
             try {
-                file.createNewFile();
+                Files.createFile(file);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
         PrintStream temp = null;
         try {
-            temp = new PrintStream(new FileOutputStream(file), true);
+            temp = new PrintStream(new FileOutputStream(file.toFile()), true);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
