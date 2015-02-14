@@ -22,30 +22,21 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
-import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.output.Output;
 
 public class NetConsoleInterface {
 
-    private static final Pattern outputPattern = Pattern.compile(
-            "^\\[Output\\]\\[\\s*([^\\]]+)\\s*\\]\\s*\\[\\s*([^\\]]+)\\s*\\]\\s*(\\S.*)$"
-    );
     private static final int RECEIVING_PORT = 6666;
     private final JPanel rootPanel;
     private final JTextArea textArea;
-    private final Application application;
     private DatagramSocket receiving;
 
-    public NetConsoleInterface(Application application) {
-        this.application = application;
+    public NetConsoleInterface() {
         // GUI
         rootPanel = new JPanel(new BorderLayout());
 
@@ -109,37 +100,9 @@ public class NetConsoleInterface {
         }
 
         private void processLine(final String line) {
-            Matcher m = outputPattern.matcher(line);
-            if (m.find()) {
-                try {
-                    MatchResult mr = m.toMatchResult();
-                    String table = mr.group(1);
-                    String key = mr.group(2);
-                    String value = mr.group(3);
-
-                    if (!table.isEmpty() && !key.isEmpty()) {
-                        System.out.println("Table data: [" + table + "] " + key + " => " + value);
-
-                        // Special handling for Important.:RangeGUI
-                        if ("Important".equals(table) && ":RangeGUI".equals(key)) {
-                            try {
-                                double parsed = Double.parseDouble(value);
-                                application.getCustomInterface().setTo(parsed);
-                            } catch (NumberFormatException ex) {
-                                System.out.printf("Invalid double: %s\n", value);
-                            }
-                        }
-
-//                        // Send a manual update to OutputTablesMain - this will automatically update the RangeGUI and other values.
-//                        application.getOutput().manualUpdate(table, key.trim(), value.trim());
-                    }
-                } catch (IllegalStateException | IndexOutOfBoundsException ignored) {
-                }
-            }
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-
                     textArea.append(line + "\n");
                 }
             });
