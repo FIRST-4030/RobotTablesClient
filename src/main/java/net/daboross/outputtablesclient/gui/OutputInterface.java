@@ -57,6 +57,7 @@ public class OutputInterface implements OutputListener {
     final Map<String, JPanel> tableKeyToTablePanel;
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
+    final Map<String, TitledBorder> tableKeyToTableTitledBoarder;
     final JSONObject persistEnabled;
 
     public OutputInterface(final Application application) {
@@ -99,6 +100,7 @@ public class OutputInterface implements OutputListener {
         tableKeyToTablePanel = new HashMap<>();
         tableKeyAndKeyToValuePanel = new HashMap<>();
         tableKeyAndKeyToValueLabel = new HashMap<>();
+        tableKeyToTableTitledBoarder = new HashMap<>();
     }
 
     private void ensureTableExists(String tableKey) {
@@ -108,15 +110,21 @@ public class OutputInterface implements OutputListener {
     }
 
     private void createTable(String tableKey) {
+        String displayName = application.getOutput().getNameTable().get(tableKey);
+        if (displayName == null) {
+            Output.logError("Warning! No known display name for table %s", tableKey);
+            displayName = tableKey;
+        }
         JPanel tablePanel = new JPanel(new WrapLayout());
         Border lineBorder = new LineBorder(new Color(0, 0, 0));
-        Border titleBorder = new TitledBorder(lineBorder, tableKey);
+        TitledBorder titleBorder = new TitledBorder(lineBorder, displayName);
+        tableKeyToTableTitledBoarder.put(tableKey, titleBorder);
         Border spaceBorder = new EmptyBorder(5, 5, 5, 5);
         Border compoundBorder = new CompoundBorder(titleBorder, spaceBorder);
         tablePanel.setBorder(compoundBorder);
         tableKeyToTablePanel.put(tableKey, tablePanel);
 
-        JToggleButton toggleButton = new JToggleButton(tableKey);
+        JToggleButton toggleButton = new JToggleButton(displayName);
         TableToggleListener listener = new TableToggleListener(toggleButton, tableKey);
         toggleButton.addItemListener(listener);
         listener.initialAdd();
@@ -136,6 +144,15 @@ public class OutputInterface implements OutputListener {
 
     @Override
     public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
+        if (tableKeyToTablePanel.get(table.getName()) == null) {
+            // In case we were out of date because we ignored the table updates
+            for (String key : table.getKeys()) {
+                this.onUpdate(table, key, table.get(key), UpdateAction.NEW);
+            }
+        } else {
+            tableKeyToTableButton.get(table.getName()).setText(newDisplayName);
+            tableKeyToTableTitledBoarder.get(table.getName()).setTitle(newDisplayName);
+        }
     }
 
     @Override
@@ -144,6 +161,9 @@ public class OutputInterface implements OutputListener {
 
     @Override
     public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
+        if (!application.getOutput().getNameTable().contains(table.getName())) {
+            return;
+        }
         if (action == UpdateAction.NEW) {
 //            if (key.equalsIgnoreCase(":RangeGUI")) {
 //                Output.oLog("Range: %s", value);
@@ -187,8 +207,11 @@ public class OutputInterface implements OutputListener {
             JLabel valueLabel = tableKeyAndKeyToValueLabel.get(table.getName()).get(key);
             valueLabel.setText(value);
         } else if (action == UpdateAction.DELETE) {
+            if (tableKeyToTablePanel.get(table.getName()) == null) {
+                return;
+            }
             JPanel parentPanel = tableKeyToTablePanel.get(table.getName());
-            JPanel valuePanel = tableKeyAndKeyToValuePanel.get(table.getName()).get(key);
+            JPanel valuePanel = tableKeyAndKeyToValuePanel.get(table.getName()).remove(key);
             parentPanel.remove(valuePanel);
             parentPanel.revalidate();
         }
@@ -196,6 +219,21 @@ public class OutputInterface implements OutputListener {
 
     @Override
     public void onTableCleared(final RobotTable table) {
+        if (!application.getOutput().getNameTable().contains(table.getName())) {
+            return;
+        }
+        if (tableKeyToTablePanel.get(table.getName()) == null) {
+            return;
+        }
+        JPanel parentPanel = tableKeyToTablePanel.get(table.getName());
+        if (parentPanel == null) {
+            return;
+        }
+        for (JPanel valuePanel : tableKeyAndKeyToValuePanel.get(table.getName()).values()) {
+            parentPanel.remove(valuePanel);
+        }
+        parentPanel.revalidate();
+        tableKeyAndKeyToValuePanel.get(table.getName()).clear();
     }
 
     private class TableToggleListener implements ItemListener {

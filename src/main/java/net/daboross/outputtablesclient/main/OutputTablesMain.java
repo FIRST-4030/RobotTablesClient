@@ -30,13 +30,16 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     private final OutputListenerForward l = new OutputListenerForward();
     private final RobotTablesClient client;
+    private final RobotTable nameTable;
 
     public OutputTablesMain(Application application) {
         client = application.getTables();
+        nameTable = client.subscribeToTable("__output_display_names");
     }
 
     public void subscribe() {
-        client.addClientListener(this);
+        client.addClientListener(this, true);
+        nameTable.addUpdateListener(this, true);
     }
 
     public void addListener(OutputListener listener) {
@@ -73,13 +76,25 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
     @Override
     public void onNewTable(final RobotTable table) {
         Output.oLog("Table created '%s'", table.getName());
-        table.addUpdateListener(this);
+        table.addUpdateListener(this, true);
         l.onTableCreate(table);
     }
 
     @Override
     public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
         Output.oLog("Table updated '%s'", table.getName());
+        if (table.getName().equals("__output_display_names")) {
+            if (action == UpdateAction.NEW || action == UpdateAction.UPDATE) {
+                RobotTable updatedTable = client.getTable(key);
+                if (updatedTable == null) {
+                    client.subscribeToTable(key).addUpdateListener(this, true);
+                } else {
+                    l.onTableDisplayNameChange(updatedTable, value);
+                }
+            }
+            // DELETE is ignored here, as it is never used and we wouldn't know what to do if it was.
+        }
+
         l.onUpdate(table, key, value, action);
     }
 
@@ -91,5 +106,9 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
     @Override
     public void onTableCleared(final RobotTable table) {
         l.onTableCleared(table);
+    }
+
+    public RobotTable getNameTable() {
+        return nameTable;
     }
 }
