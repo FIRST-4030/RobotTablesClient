@@ -16,7 +16,6 @@
  */
 package net.daboross.outputtablesclient.gui;
 
-import java.awt.Robot;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.listener.OutputListener;
 import org.ingrahamrobotics.robottables.api.RobotTable;

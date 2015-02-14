@@ -1,7 +1,6 @@
 package org.ingrahamrobotics.dotnettables.server;
 
 import java.io.IOException;
-import java.util.Random;
 import org.ingrahamrobotics.dotnettables.DotNetTable;
 import org.ingrahamrobotics.dotnettables.DotNetTables;
 

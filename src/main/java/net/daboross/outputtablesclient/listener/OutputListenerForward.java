@@ -54,7 +54,6 @@ public class OutputListenerForward implements OutputListener {
                 Output.oLog("Error onTableDisplayNameChange", t);
             }
         }
-
     }
 
     @Override
