@@ -18,7 +18,6 @@ package net.daboross.outputtablesclient.main;
 
 import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.listener.OutputListenerForward;
-import net.daboross.outputtablesclient.output.Output;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.api.TableType;
@@ -66,14 +65,14 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     @Override
     public void onNewTable(final RobotTable table) {
-        Output.oLog("Table created '%s'", table.getName());
+//        Output.oLog("Table created '%s'", table.getName());
         table.addUpdateListener(this, true);
         l.onTableCreate(table);
     }
 
     @Override
     public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
-        Output.oLog("Table updated '%s'", table.getName());
+//        Output.oLog("Table updated '%s'", table.getName());
         if (table.getName().equals("__output_display_names")) {
             if (action == UpdateAction.NEW || action == UpdateAction.UPDATE) {
                 RobotTable updatedTable = client.getTable(key);
