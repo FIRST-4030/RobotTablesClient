@@ -21,7 +21,6 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.gui.CustomInterface;
 import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
@@ -49,7 +48,7 @@ public class Application {
     private InputListener inputInterfaceListener;
     private OutputListener outputInterfaceListener;
     private PersistStorage persistStorage;
-    private CustomInterface customInterface;
+//    private CustomInterface customInterface;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.oLog("Initiating root interface");
@@ -83,7 +82,7 @@ public class Application {
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
-        customInterface = new CustomInterface(this);
+//        customInterface = new CustomInterface(this);
         startOutput();
         startInput();
         Output.oLog("Finished startup sequence");
@@ -152,9 +151,9 @@ public class Application {
         return persistStorage;
     }
 
-    public CustomInterface getCustomInterface() {
-        return customInterface;
-    }
+//    public CustomInterface getCustomInterface() {
+//        return customInterface;
+//    }
 
     public RobotTablesClient getTables() {
         return tables;
