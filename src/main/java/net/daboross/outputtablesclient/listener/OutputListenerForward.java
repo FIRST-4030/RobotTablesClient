@@ -46,6 +46,18 @@ public class OutputListenerForward implements OutputListener {
     }
 
     @Override
+    public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
+        for (OutputListener listener : listeners) {
+            try {
+                listener.onTableDisplayNameChange(table, newDisplayName);
+            } catch (Throwable t) {
+                Output.oLog("Error onTableDisplayNameChange", t);
+            }
+        }
+
+    }
+
+    @Override
     public void onTableStaleChange(String tableKey, boolean staleNow) {
         for (OutputListener listener : listeners) {
             try {

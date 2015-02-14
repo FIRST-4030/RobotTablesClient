@@ -135,6 +135,10 @@ public class OutputInterface implements OutputListener {
     }
 
     @Override
+    public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
+    }
+
+    @Override
     public void onTableStaleChange(final String tableKey, boolean nowStale) {
     }
 

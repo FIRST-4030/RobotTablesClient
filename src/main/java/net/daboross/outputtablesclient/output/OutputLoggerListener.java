@@ -31,6 +31,10 @@ public class OutputLoggerListener implements OutputListener {
     }
 
     @Override
+    public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
+    }
+
+    @Override
     public void onTableStaleChange(String tableKey, boolean nowStale) {
     }
 

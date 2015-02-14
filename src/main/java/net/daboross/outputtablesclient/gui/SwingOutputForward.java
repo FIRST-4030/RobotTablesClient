@@ -41,6 +41,16 @@ public class SwingOutputForward implements OutputListener {
     }
 
     @Override
+    public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                innerListener.onTableDisplayNameChange(table, newDisplayName);
+            }
+        });
+    }
+
+    @Override
     public void onTableStaleChange(final String tableKey, final boolean nowStale) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
