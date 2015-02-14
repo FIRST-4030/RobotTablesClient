@@ -86,15 +86,15 @@ public class Application {
             throw new IOException("Failed to find valid broadcast address!");
         }
         System.out.printf("Found broadcast address: %s%n", address);
-        Output.oLog("Starting RobotTables");
-        RobotTables tablesStart = new RobotTables();
-        tablesStart.run(targetAddress);
+        RobotTables tablesStart = new RobotTables(address);
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
 //        customInterface = new CustomInterface(this);
         startOutput();
         startInput();
+        Output.oLog("Starting RobotTables");
+        tablesStart.run();
         Output.oLog("Finished startup sequence");
         SwingUtilities.invokeLater(new Runnable() {
             @Override
