@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
@@ -111,33 +112,85 @@ public class InputInterface implements InputListener {
 
     public class JFieldActionListener implements DocumentListener {
 
+        /**
+         * This is the time that we should actually update the key. This is pushed to the current time + 1000 every time
+         * the field is updated, so we do automatically send, but not with the user's every keystroke.
+         */
+        private final UpdateRunnable updateRunnable;
+        private final Object updateLock;
         private final String key;
         private final JTextField field;
+        private long updateTime;
+        private boolean updaterRunning;
 
         public JFieldActionListener(final String key, final JTextField field) {
             this.key = key;
             this.field = field;
+            updateRunnable = new UpdateRunnable();
+            updateLock = new Object();
+        }
+
+        private void startUpdate() {
+            synchronized (updateLock) {
+                updateTime = System.currentTimeMillis() + 1000;
+                if (!updaterRunning) {
+                    new Thread(updateRunnable).start();
+                }
+            }
         }
 
         @Override
         public void insertUpdate(final DocumentEvent e) {
-            String text = field.getText();
-            Output.iLog("Updated key '%s': '%s'", key, text);
-            main.updateKey(key, field.getText());
+            startUpdate();
         }
 
         @Override
         public void removeUpdate(final DocumentEvent e) {
-            String text = field.getText();
-            Output.iLog("Updated key '%s': '%s'", key, text);
-            main.updateKey(key, field.getText());
+            startUpdate();
         }
 
         @Override
         public void changedUpdate(final DocumentEvent e) {
-            String text = field.getText();
-            Output.iLog("Updated key '%s': '%s'", key, text);
-            main.updateKey(key, field.getText());
+            startUpdate();
+        }
+
+        private class UpdateRunnable implements Runnable {
+
+            @Override
+            public void run() {
+                long currentUpdateTime;
+                synchronized (updateLock) {
+                    if (updaterRunning) {
+                        return;
+                    }
+                    updaterRunning = true;
+                    currentUpdateTime = updateTime;
+                }
+                while (true) {
+                    long waitTime = currentUpdateTime - System.currentTimeMillis();
+                    try {
+                        Thread.sleep(waitTime);
+                    } catch (InterruptedException e) {
+                        Output.logError("Warning! UpdateRunnable interrupted! Key %s will no longer be updated!", key);
+                        e.printStackTrace();
+                    }
+                    synchronized (updateLock) {
+                        if (updateTime > currentUpdateTime) {
+                            // If the updateTime has changed since we started, we should sleep again.
+                            currentUpdateTime = updateTime;
+                        } else {
+                            // Otherwise, let's update it!
+                            updaterRunning = false;
+                            break;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    String text = field.getText();
+                    Output.iLog("Updated key '%s': '%s'", key, text);
+                    main.updateKey(key, field.getText());
+                });
+            }
         }
     }
 }
