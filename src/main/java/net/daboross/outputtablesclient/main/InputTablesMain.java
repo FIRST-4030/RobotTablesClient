@@ -18,7 +18,6 @@ package net.daboross.outputtablesclient.main;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
@@ -32,8 +31,6 @@ import org.json.JSONObject;
 
 public class InputTablesMain implements TableUpdateListener, ClientUpdateListener {
 
-    private static final String FEEDBACK_KEY = "_DRIVER_FEEDBACK_KEY";
-    private static final int FEEDBACK_THRESHOLD = 2;
     private static final String DEFAULT_TABLE = "robot-input-default";
     private static final String SETTING_TABLE = "robot-input";
     private final InputListenerForward l = new InputListenerForward();
@@ -46,7 +43,7 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
     private final JSONObject storageObj;
 
     public InputTablesMain(Application application) {
-        defaultSettingsTable = application.getTables().getTable(DEFAULT_TABLE);
+        defaultSettingsTable = application.getTables().subscribeToTable(DEFAULT_TABLE);
         settingsTable = application.getTables().publishTable(SETTING_TABLE);
         storage = application.getPersist();
         JSONObject tempObject = storage.obj().optJSONObject("input-save");
@@ -64,11 +61,8 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
             values.put(key, value);
             l.onCreateDefaultKey(key, value);
         }
-        if (defaultSettingsTable != null) {
-            defaultSettingsTable.addUpdateListener(this);
-        }
+        defaultSettingsTable.addUpdateListener(this, true);
 //        settingsTable.setInterval(1000);
-        sendSettings();
     }
 
     public void addListener(InputListener listener) {
@@ -83,43 +77,6 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
         settingsTable.set(key, newValue);
         storageObj.put(key, newValue);
         storage.save();
-        sendSettings();
-    }
-
-    private void updateStale() {
-        // TODO: Use this when RobotTables is more complete
-        // Check the feedback key, if it exists
-        boolean feedbackStale = true;
-        if (defaultSettingsTable.contains(FEEDBACK_KEY)) {
-            double feedback = -1;
-            try {
-                feedback = defaultSettingsTable.getDouble(FEEDBACK_KEY);
-            } catch (NumberFormatException ex) {
-                Output.iLog("Non-number feedback '%s'.", defaultSettingsTable.get(FEEDBACK_KEY));
-            }
-            if (currentFeedback < feedback + FEEDBACK_THRESHOLD) {
-                feedbackStale = false;
-            }
-        }
-
-        // Determine the new master stale state
-        boolean newStale = feedbackStale;
-
-        // Update the UI if needed
-        if (stale != newStale) {
-            if (newStale) {
-                l.onStale();
-            } else {
-                l.onNotStale();
-            }
-        }
-
-        // Always save the new state
-        stale = newStale;
-    }
-
-    private void sendSettings() {
-        settingsTable.set(FEEDBACK_KEY, String.valueOf(++currentFeedback));
     }
 
     public PersistStorage getStorage() {
@@ -165,19 +122,19 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
 
     @Override
     public void onTableStaleChange(final RobotTable table, final boolean nowStale) {
-        // TODO: This will show us when we don't have the latest robot values
     }
 
     @Override
-    public void onAllSubscribersStaleChange(final RobotTable table) {
-        // TODO: This will show us when the robot hasn't gotten input values
+    public void onAllSubscribersStaleChange(final RobotTable table, boolean nowStale) {
+        // TODO: Complex hover-over interface which shows all tables which are and aren't up to date
+        if (nowStale) {
+            l.onStale();
+        } else {
+            l.onNotStale();
+        }
     }
 
     @Override
     public void onNewTable(final RobotTable table) {
-        if (table.getName().equals(DEFAULT_TABLE)) {
-            defaultSettingsTable = table;
-            table.addUpdateListener(this);
-        }
     }
 }
