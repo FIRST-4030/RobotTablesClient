@@ -67,6 +67,7 @@ public class RootInterface {
 
         // loggingTextArea
         loggingTextArea = new JTextArea();
+        loggingTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 10));
         ((DefaultCaret) loggingTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane loggingPane = new JScrollPane(loggingTextArea);
         tabbedPane.addTab("Log", loggingPane);
