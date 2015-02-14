@@ -66,18 +66,19 @@ public class LogInterface implements Output.StaticLogger {
 
     @Override
     public void log(final String message) {
+        final String processedMessage = message.replace("\0", "\\0") + "\n";
         if (SwingUtilities.isEventDispatchThread()) {
-            root.getLoggingTextArea().append(message + "\n");
+            root.getLoggingTextArea().append(processedMessage);
         } else {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    root.getLoggingTextArea().append(message + "\n");
+                    root.getLoggingTextArea().append(processedMessage);
                 }
             });
         }
         if (loggingStream != null) {
-            loggingStream.append(message).append("\n");
+            loggingStream.append(processedMessage);
         }
     }
 }
