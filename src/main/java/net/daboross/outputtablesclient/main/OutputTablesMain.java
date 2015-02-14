@@ -50,14 +50,6 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
         l.removeListener(listener);
     }
 
-    // TODO: Stale processing
-//    @Override
-//    public synchronized void stale(DotNetTable dnt) {
-//        if (!dnt.name().equals(OUTPUT_TABLE)) {
-//            l.onTableStale(dnt.name());
-//        }
-//    }
-
     @Override
     public void onTableChangeType(final RobotTable table, final TableType oldType, final TableType newType) {
         // TODO: Something here, perhaps note when someone else has taken over dealing with input?
@@ -69,8 +61,7 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
     }
 
     @Override
-    public void onAllSubscribersStaleChange(final RobotTable table) {
-        // TODO: This would allow us to know when the robot doesn't have our input
+    public void onAllSubscribersStaleChange(final RobotTable table, boolean nowStale) {
     }
 
     @Override
