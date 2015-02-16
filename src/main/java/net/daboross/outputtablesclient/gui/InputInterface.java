@@ -68,6 +68,7 @@ public class InputInterface implements InputListener {
 
     @Override
     public void onNotStale() {
+        // TODO: At this point, we should trim all keys which don't exist in the defaultSettingsTable
 //        application.getRoot().getStatusLabel().setText("Connected - Robot up to date");
     }
 
@@ -173,6 +174,10 @@ public class InputInterface implements InputListener {
                     } catch (InterruptedException e) {
                         Output.logError("Warning! UpdateRunnable interrupted! Key %s will no longer be updated!", key);
                         e.printStackTrace();
+                        synchronized (updateLock) {
+                            updaterRunning = false;
+                        }
+                        return;
                     }
                     synchronized (updateLock) {
                         if (updateTime > currentUpdateTime) {
