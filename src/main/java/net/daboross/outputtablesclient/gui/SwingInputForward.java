@@ -29,51 +29,26 @@ public class SwingInputForward implements InputListener {
 
     @Override
     public void onNotStale() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onNotStale();
-            }
-        });
+        SwingUtilities.invokeLater(innerListener::onNotStale);
     }
 
     @Override
     public void onStale() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onStale();
-            }
-        });
+        SwingUtilities.invokeLater(innerListener::onStale);
     }
 
     @Override
     public void onCreateDefaultKey(final String keyName, final String keyValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onCreateDefaultKey(keyName, keyValue);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onCreateDefaultKey(keyName, keyValue));
     }
 
     @Override
     public void onUpdateDefaultKey(final String keyName, final String keyValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onUpdateDefaultKey(keyName, keyValue);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onUpdateDefaultKey(keyName, keyValue));
     }
 
     @Override
     public void onDeleteKey(final String keyName) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onDeleteKey(keyName);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onDeleteKey(keyName));
     }
 }

@@ -57,30 +57,19 @@ public class Application {
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.oLog("Initiating root interface");
-        SwingUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                root = new RootInterface(Application.this);
-                root.show();
-            }
+        SwingUtilities.invokeAndWait(() -> {
+            root = new RootInterface(Application.this);
+            root.show();
         });
         Output.setLogger(new LogInterface(root));
         System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
         System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Output.oLog("Initiating NetConsole");
-                new NetConsoleInterface().addTo(root);
-                Output.oLog("NetConsole initiated");
-            }
+        SwingUtilities.invokeLater(() -> {
+            Output.oLog("Initiating NetConsole");
+            new NetConsoleInterface().addTo(root);
+            Output.oLog("NetConsole initiated");
         });
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                root.registerRestart();
-            }
-        });
+        SwingUtilities.invokeLater(root::registerRestart);
         InetAddress address = findValidBroadcastAddress();
         if (address == null) {
             throw new IOException("Failed to find valid broadcast address!");
@@ -131,14 +120,11 @@ public class Application {
         Output.oLog("Initiating output-tables logger");
         OutputLoggerListener outputLoggerListener = new OutputLoggerListener();
         outputMain.addListener(outputLoggerListener);
-        SwingUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                Output.oLog("Initiating output-tables interface");
-                outputInterface = new OutputInterface(Application.this);
-                outputInterfaceListener = new SwingOutputForward(outputInterface);
-                outputMain.addListener(outputInterfaceListener);
-            }
+        SwingUtilities.invokeAndWait(() -> {
+            Output.oLog("Initiating output-tables interface");
+            outputInterface = new OutputInterface(Application.this);
+            outputInterfaceListener = new SwingOutputForward(outputInterface);
+            outputMain.addListener(outputInterfaceListener);
         });
         Output.oLog("Subscribing to output-tables");
         outputMain.subscribe();
@@ -146,14 +132,11 @@ public class Application {
 
     public void startInput() throws InvocationTargetException, InterruptedException {
         inputMain = new InputTablesMain(this);
-        SwingUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                Output.iLog("Initiating input-tables interface");
-                inputInterface = new InputInterface(Application.this);
-                inputInterfaceListener = new SwingInputForward(inputInterface);
-                inputMain.addListener(inputInterfaceListener);
-            }
+        SwingUtilities.invokeAndWait(() -> {
+            Output.iLog("Initiating input-tables interface");
+            inputInterface = new InputInterface(Application.this);
+            inputInterfaceListener = new SwingInputForward(inputInterface);
+            inputMain.addListener(inputInterfaceListener);
         });
         Output.iLog("Subscribing to input-tables");
         inputMain.subscribe();

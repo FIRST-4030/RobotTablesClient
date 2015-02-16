@@ -31,51 +31,26 @@ public class SwingOutputForward implements OutputListener {
 
     @Override
     public void onTableCreate(final RobotTable table) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onTableCleared(table);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onTableCleared(table));
     }
 
     @Override
     public void onTableDisplayNameChange(final RobotTable table, final String newDisplayName) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onTableDisplayNameChange(table, newDisplayName);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onTableDisplayNameChange(table, newDisplayName));
     }
 
     @Override
     public void onTableStaleChange(final String tableKey, final boolean nowStale) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onTableStaleChange(tableKey, nowStale);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onTableStaleChange(tableKey, nowStale));
     }
 
     @Override
     public void onUpdate(final RobotTable table, final String key, final String value, final UpdateAction action) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onUpdate(table, key, value, action);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onUpdate(table, key, value, action));
     }
 
     @Override
     public void onTableCleared(final RobotTable table) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                innerListener.onTableCleared(table);
-            }
-        });
+        SwingUtilities.invokeLater(() -> innerListener.onTableCleared(table));
     }
 }

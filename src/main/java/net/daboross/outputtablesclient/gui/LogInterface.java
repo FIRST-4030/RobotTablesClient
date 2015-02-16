@@ -70,12 +70,7 @@ public class LogInterface implements Output.StaticLogger {
         if (SwingUtilities.isEventDispatchThread()) {
             root.getLoggingTextArea().append(processedMessage);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    root.getLoggingTextArea().append(processedMessage);
-                }
-            });
+            SwingUtilities.invokeLater(() -> root.getLoggingTextArea().append(processedMessage));
         }
         if (loggingStream != null) {
             loggingStream.append(processedMessage);

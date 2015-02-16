@@ -134,8 +134,8 @@ public class OutputInterface implements OutputListener {
             toggleButtonPanel.add(button, toggleButtonConstraints);
         }
 
-        tableKeyAndKeyToValuePanel.put(tableKey, new HashMap<String, JPanel>());
-        tableKeyAndKeyToValueLabel.put(tableKey, new HashMap<String, JLabel>());
+        tableKeyAndKeyToValuePanel.put(tableKey, new HashMap<>());
+        tableKeyAndKeyToValueLabel.put(tableKey, new HashMap<>());
     }
 
     @Override
@@ -229,9 +229,7 @@ public class OutputInterface implements OutputListener {
         if (parentPanel == null) {
             return;
         }
-        for (JPanel valuePanel : tableKeyAndKeyToValuePanel.get(table.getName()).values()) {
-            parentPanel.remove(valuePanel);
-        }
+        tableKeyAndKeyToValuePanel.get(table.getName()).values().forEach(parentPanel::remove);
         parentPanel.revalidate();
         tableKeyAndKeyToValuePanel.get(table.getName()).clear();
     }

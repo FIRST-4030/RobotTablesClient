@@ -100,12 +100,7 @@ public class NetConsoleInterface {
         }
 
         private void processLine(final String line) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    textArea.append(line + "\n");
-                }
-            });
+            SwingUtilities.invokeLater(() -> textArea.append(line + "\n"));
         }
     }
 }

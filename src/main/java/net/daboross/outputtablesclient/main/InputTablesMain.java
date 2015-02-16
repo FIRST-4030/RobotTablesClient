@@ -109,9 +109,7 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
 
     @Override
     public void onTableCleared(final RobotTable table) {
-        for (String key : values.keySet()) {
-            l.onDeleteKey(key);
-        }
+        values.keySet().forEach(l::onDeleteKey);
         values.clear();
     }
 

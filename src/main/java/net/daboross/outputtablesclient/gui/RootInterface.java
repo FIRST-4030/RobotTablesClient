@@ -92,11 +92,9 @@ public class RootInterface {
     public void registerRestart() {
         final JPanel emptyPanel = new JPanel();
         tabbedPane.add("Restart", emptyPanel);
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent evt) {
-                if (tabbedPane.getSelectedComponent() == emptyPanel) {
-                    tabbedPane.setSelectedComponent(mainPanel);
+        tabbedPane.addChangeListener(evt -> {
+            if (tabbedPane.getSelectedComponent() == emptyPanel) {
+                tabbedPane.setSelectedComponent(mainPanel);
 //                    SwingUtilities.invokeLater(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -128,20 +126,16 @@ public class RootInterface {
 //                            }.start();
 //                        }
 //                    });
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String path = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
-                                PrintStream originalSystemOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
-                                originalSystemOut.println("Starting: java -jar " + path);
-                                Runtime.getRuntime().exec(new String[]{"java", "-jar", path});
-                                System.exit(0);
-                            } catch (IOException | URISyntaxException ignored) {
-                            }
-                        }
-                    }).start();
-                }
+                new Thread(() -> {
+                    try {
+                        String path = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
+                        PrintStream originalSystemOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+                        originalSystemOut.println("Starting: java -jar " + path);
+                        Runtime.getRuntime().exec(new String[]{"java", "-jar", path});
+                        System.exit(0);
+                    } catch (IOException | URISyntaxException ignored) {
+                    }
+                }).start();
             }
         });
     }
