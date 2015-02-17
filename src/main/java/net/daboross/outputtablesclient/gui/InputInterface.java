@@ -40,24 +40,17 @@ import net.daboross.outputtablesclient.util.GBC;
 
 public class InputInterface implements InputListener {
 
-    private final Application application;
     private final InputTablesMain main;
-    private final JPanel mainTabPanel;
     private final JPanel tableRootPanel;
     private final Map<String, JPanel> keyToValuePanel;
 
     public InputInterface(final Application application) {
-        this.application = application;
         this.main = application.getInput();
-
-        // mainTabPanel
-        mainTabPanel = new JPanel();
-        mainTabPanel.setLayout(new GridBagLayout());
-        application.getRoot().getInputOutputPanel().add(mainTabPanel);
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
-        mainTabPanel.add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
+        tableRootPanel.setMinimumSize(new Dimension(600, 40));
+        application.getRoot().getInputOutputAndStalePanel().add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(1).gridy(0));
 
         // tableRootPanel refresh
         tableRootPanel.revalidate();
@@ -69,12 +62,10 @@ public class InputInterface implements InputListener {
     @Override
     public void onNotStale() {
         // TODO: At this point, we should trim all keys which don't exist in the defaultSettingsTable
-//        application.getRoot().getStatusLabel().setText("Connected - Robot up to date");
     }
 
     @Override
     public void onStale() {
-//        application.getRoot().getStatusLabel().setText("! Disconnected - Robot out of date !");
     }
 
     @Override
@@ -92,6 +83,7 @@ public class InputInterface implements InputListener {
         panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
         JTextField valueField = new JTextField(keyValue, 20);
+        valueField.setMinimumSize(new Dimension(100, 10));
         valueField.setBorder(new EmptyBorder(5, 5, 5, 5));
         valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
         panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));

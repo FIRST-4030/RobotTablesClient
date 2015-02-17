@@ -25,13 +25,14 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.LogInterface;
 import net.daboross.outputtablesclient.gui.NetConsoleInterface;
 import net.daboross.outputtablesclient.gui.OutputInterface;
 import net.daboross.outputtablesclient.gui.RootInterface;
+import net.daboross.outputtablesclient.gui.StaleInterface;
+import net.daboross.outputtablesclient.gui.SwingClientForward;
 import net.daboross.outputtablesclient.gui.SwingInputForward;
 import net.daboross.outputtablesclient.gui.SwingOutputForward;
 import net.daboross.outputtablesclient.listener.InputListener;
@@ -50,15 +51,13 @@ public class Application {
     private InputTablesMain inputMain;
     private OutputInterface outputInterface;
     private InputInterface inputInterface;
-    private InputListener inputInterfaceListener;
-    private OutputListener outputInterfaceListener;
+    private StaleInterface staleInterface;
     private PersistStorage persistStorage;
-//    private CustomInterface customInterface;
 
     public void run() throws InvocationTargetException, InterruptedException, IOException {
         Output.oLog("Initiating root interface");
         SwingUtilities.invokeAndWait(() -> {
-            root = new RootInterface(Application.this);
+            root = new RootInterface();
             root.show();
         });
         Output.setLogger(new LogInterface(root));
@@ -79,21 +78,12 @@ public class Application {
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
-//        customInterface = new CustomInterface(this);
         startOutput();
         startInput();
+        startStale();
         Output.oLog("Starting RobotTables");
         tablesStart.run();
         Output.oLog("Finished startup sequence");
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JLabel label = root.getStatusLabel();
-                if (label != null && label.getText().equals("Client Initializing")) {
-                    label.setText("Not connected");
-                }
-            }
-        });
     }
 
     private InetAddress findValidBroadcastAddress() throws SocketException {
@@ -122,10 +112,10 @@ public class Application {
         outputMain.addListener(outputLoggerListener);
         SwingUtilities.invokeAndWait(() -> {
             Output.oLog("Initiating output-tables interface");
-            outputInterface = new OutputInterface(Application.this);
-            outputInterfaceListener = new SwingOutputForward(outputInterface);
-            outputMain.addListener(outputInterfaceListener);
+            outputInterface = new OutputInterface(this);
         });
+        OutputListener outputInterfaceListener = new SwingOutputForward(outputInterface);
+        outputMain.addListener(outputInterfaceListener);
         Output.oLog("Subscribing to output-tables");
         outputMain.subscribe();
     }
@@ -134,12 +124,20 @@ public class Application {
         inputMain = new InputTablesMain(this);
         SwingUtilities.invokeAndWait(() -> {
             Output.iLog("Initiating input-tables interface");
-            inputInterface = new InputInterface(Application.this);
-            inputInterfaceListener = new SwingInputForward(inputInterface);
-            inputMain.addListener(inputInterfaceListener);
+            inputInterface = new InputInterface(this);
         });
+        InputListener inputInterfaceListener = new SwingInputForward(inputInterface);
+        inputMain.addListener(inputInterfaceListener);
         Output.iLog("Subscribing to input-tables");
         inputMain.subscribe();
+    }
+
+    public void startStale() throws InvocationTargetException, InterruptedException {
+        SwingUtilities.invokeAndWait(() -> {
+            Output.oLog("Initiating stale interface");
+            staleInterface = new StaleInterface(this);
+        });
+        tables.addClientListener(new SwingClientForward(staleInterface), true);
     }
 
     public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {
@@ -161,10 +159,6 @@ public class Application {
     public PersistStorage getPersist() {
         return persistStorage;
     }
-
-//    public CustomInterface getCustomInterface() {
-//        return customInterface;
-//    }
 
     public RobotTablesClient getTables() {
         return tables;

@@ -63,7 +63,7 @@ public class NetConsoleInterface {
             try {
                 for (boolean started = false; !started; Thread.sleep(2000)) {
                     try {
-                        NetConsoleInterface.this.receiving = new DatagramSocket(RECEIVING_PORT);
+                        receiving = new DatagramSocket(RECEIVING_PORT);
                         started = true;
                     } catch (SocketException e) {
                         // e.printStackTrace();

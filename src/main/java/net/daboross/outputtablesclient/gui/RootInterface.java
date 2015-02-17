@@ -19,7 +19,7 @@ package net.daboross.outputtablesclient.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileDescriptor;
@@ -28,33 +28,27 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultCaret;
 import net.daboross.outputtablesclient.main.Application;
 
 public class RootInterface {
 
-    private final Application application;
     private final JFrame rootFrame;
     private final JTabbedPane tabbedPane;
     private final JTextArea loggingTextArea;
     private final JPanel mainPanel;
-    private JPanel inputOutputPanel;
-    private JLabel statusLabel;
+    private JPanel inputOutputAndStalePanel;
 
-    public RootInterface(final Application application) {
-        this.application = application;
+    public RootInterface() {
         // rootFrame
         rootFrame = new JFrame();
         rootFrame.setMinimumSize(new Dimension(640, 480));
-        rootFrame.setSize(new Dimension((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), 480));
+        rootFrame.setSize(new Dimension((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 200));
         rootFrame.setLayout(new BorderLayout());
         rootFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         rootFrame.setTitle(String.format("RobotTablesClient %s", OutputInterface.class.getPackage().getImplementationVersion()));
@@ -75,6 +69,11 @@ public class RootInterface {
         tabbedPane.add(mainPanel, "Main");
         tabbedPane.setSelectedComponent(mainPanel);
 
+        // Other stuff
+        VideoCameraInput cameraPane = new VideoCameraInput();
+        tabbedPane.add(cameraPane, "Camera");
+        cameraPane.init();
+
 
         // statusLabel
 //        statusLabel = new JLabel();
@@ -85,8 +84,8 @@ public class RootInterface {
 //        mainPanel.add(statusLabel, BorderLayout.NORTH);
 
         // inputOutputPanel
-        inputOutputPanel = new JPanel(new GridLayout(1, 2));
-        mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
+        inputOutputAndStalePanel = new JPanel(new GridBagLayout());
+        mainPanel.add(inputOutputAndStalePanel, BorderLayout.CENTER);
     }
 
     public void registerRestart() {
@@ -142,6 +141,7 @@ public class RootInterface {
 
     public void show() {
         rootFrame.setVisible(true);
+
     }
 
     public JFrame getRootFrame() {
@@ -156,12 +156,8 @@ public class RootInterface {
         return loggingTextArea;
     }
 
-    public JPanel getInputOutputPanel() {
-        return inputOutputPanel;
-    }
-
-    public JLabel getStatusLabel() {
-        return statusLabel;
+    public JPanel getInputOutputAndStalePanel() {
+        return inputOutputAndStalePanel;
     }
 
     public JPanel getMainPanel() {
