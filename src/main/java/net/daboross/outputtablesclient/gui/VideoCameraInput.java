@@ -94,6 +94,7 @@ public class VideoCameraInput extends JPanel {
             final ByteArrayOutputStream imageBuffer = new ByteArrayOutputStream();
             while (!this.destroyed) {
                 System.out.println("Connecting...");
+                out_of_try:
                 try {
                     ipChanged = false;
                     final URL url = new URL("http://" + ipString + "/mjpg/video.mjpg");
@@ -103,7 +104,7 @@ public class VideoCameraInput extends JPanel {
                         stream = connection.getInputStream();
                     } catch (IOException ex) {
                         System.err.printf("Failed to connect to `%s`: %s%n", url, ex);
-                        continue;
+                        break out_of_try;
                     }
                     while (!this.destroyed && !ipChanged) {
                         while (System.currentTimeMillis() - this.lastRepaint < 10L) {
@@ -153,7 +154,7 @@ public class VideoCameraInput extends JPanel {
                 }
                 if (!ipChanged) {
                     try {
-                        Thread.sleep(500L);
+                        Thread.sleep(5000L);
                     } catch (InterruptedException ex) {
                     }
                 }
