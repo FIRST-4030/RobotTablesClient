@@ -12,11 +12,13 @@ import javax.swing.border.TitledBorder;
 import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.util.GBC;
 import org.ingrahamrobotics.robottables.api.RobotTable;
+import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.listeners.ClientUpdateListener;
 
 public class StaleInterface implements ClientUpdateListener {
 
+    private final RobotTablesClient tablesClient;
     private final AtomicInteger nextStaleY = new AtomicInteger();
     private final AtomicInteger nextSubscriberStaleY = new AtomicInteger();
     private final Map<String, JLabel> subscriberStaleTableLabels = new HashMap<>();
@@ -24,14 +26,15 @@ public class StaleInterface implements ClientUpdateListener {
     private final Map<String, JLabel> staleStateLabels = new HashMap<>();
     private final Map<String, JLabel> subscriberStaleStateLabels = new HashMap<>();
     private final JPanel stalePanel;
+    private final JLabel mainStatusLabel;
     private final JPanel subscriberStalePanel;
 
     public StaleInterface(final Application application) {
+        this.tablesClient = application.getTables();
         // mainTabPanel
         JPanel mainTabPanel = new JPanel(new GridBagLayout());
         mainTabPanel.setBorder(new TitledBorder("status"));
-        application.getRoot().getInputOutputAndStalePanel().add(mainTabPanel,
-                new GBC().weightx(1).fill(GridBagConstraints.VERTICAL).gridx(1).gridy(1).anchor(GridBagConstraints.EAST));
+        application.getRoot().getTabbedPane().add(mainTabPanel, "Status", 3);
 
         stalePanel = new JPanel(new GridBagLayout());
         mainTabPanel.add(stalePanel, new GBC().weightx(1).fill(GridBagConstraints.BOTH).gridy(0).anchor(GridBagConstraints.EAST));
@@ -40,7 +43,13 @@ public class StaleInterface implements ClientUpdateListener {
         subscriberStalePanel = new JPanel(new GridBagLayout());
         mainTabPanel.add(subscriberStalePanel, new GBC().weightx(1).fill(GridBagConstraints.BOTH).gridy(1).anchor(GridBagConstraints.EAST));
 
-        // tableRootPanel refresh
+        mainStatusLabel = new JLabel("DISCONNECTED - NO INITIAL CONNECTION RECEIVED");
+        mainStatusLabel.setFont(mainStatusLabel.getFont().deriveFont(20f));
+        mainStatusLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        application.getRoot().getMainPanel().add(mainStatusLabel,
+                new GBC().weightx(1).gridx(0).gridy(0).anchor(GridBagConstraints.NORTH).gridwidth(2));
+
+        // stalePanel refresh
         stalePanel.revalidate();
     }
 
@@ -67,18 +76,21 @@ public class StaleInterface implements ClientUpdateListener {
         panel.remove(tableLabel);
         panel.remove(stateLabel);
         panel.revalidate();
+        updateMainStatusLabel();
     }
 
     @Override
     public void onTableStaleChange(final RobotTable table, final boolean nowStale) {
         staleStateLabels.get(table.getName()).setText(nowStale ? "stale" : "fresh");
         stalePanel.revalidate();
+        updateMainStatusLabel();
     }
 
     @Override
     public void onAllSubscribersStaleChange(final RobotTable table, final boolean nowStale) {
         subscriberStaleStateLabels.get(table.getName()).setText(nowStale ? "robot stale" : "robot fresh");
         subscriberStalePanel.revalidate();
+        updateMainStatusLabel();
     }
 
     @Override
@@ -91,6 +103,7 @@ public class StaleInterface implements ClientUpdateListener {
                 addRemoteTable(table.getName());
                 break;
         }
+        updateMainStatusLabel();
     }
 
     private void addLocalTable(String tableName) {
@@ -123,5 +136,34 @@ public class StaleInterface implements ClientUpdateListener {
         stalePanel.add(stateLabel, new GBC().gridx(1).gridy(gridY).anchor(GridBagConstraints.EAST));
 
         stalePanel.revalidate();
+    }
+
+    private void updateMainStatusLabel() {
+        boolean localStale = false;
+        boolean remoteStale = false;
+        for (RobotTable table : tablesClient.getTableSet()) {
+            if (table.getType() == TableType.LOCAL) {
+                if (table.isSubcriberStale()) {
+                    localStale = true;
+                }
+            } else {
+                if (table.isStale()) {
+                    remoteStale = true;
+                }
+            }
+        }
+        if (localStale) {
+            if (remoteStale) {
+                mainStatusLabel.setText("DISCONNECTED - NOT ALL ROBOT SETTINGS ARE ACTIVE, NOT ALL DATA IS UP TO DATE");
+            } else {
+                mainStatusLabel.setText("DISCONNECTED - NOT ALL ROBOT SETTINGS ARE ACTIVE");
+            }
+        } else {
+            if (remoteStale) {
+                mainStatusLabel.setText("DISCONNECTED - NOT ALL DATA IS UP TO DATE");
+            } else {
+                mainStatusLabel.setText("CONNECTED - ALL UP TO DATE");
+            }
+        }
     }
 }

@@ -42,7 +42,6 @@ public class RootInterface {
     private final JTabbedPane tabbedPane;
     private final JTextArea loggingTextArea;
     private final JPanel mainPanel;
-    private JPanel inputOutputAndStalePanel;
 
     public RootInterface() {
         // rootFrame
@@ -65,27 +64,14 @@ public class RootInterface {
         tabbedPane.addTab("Log", loggingPane);
 
         // mainPanel
-        mainPanel = new JPanel(new BorderLayout());
+        mainPanel = new JPanel(new GridBagLayout());
         tabbedPane.add(mainPanel, "Main");
         tabbedPane.setSelectedComponent(mainPanel);
 
-        // Other stuff
+        // Video input
         VideoCameraInput cameraPane = new VideoCameraInput();
         tabbedPane.add(cameraPane, "Camera");
         cameraPane.init();
-
-
-        // statusLabel
-//        statusLabel = new JLabel();
-//        statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-//        statusLabel.setText("Client Initializing");
-//        statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
-//        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-//        mainPanel.add(statusLabel, BorderLayout.NORTH);
-
-        // inputOutputPanel
-        inputOutputAndStalePanel = new JPanel(new GridBagLayout());
-        mainPanel.add(inputOutputAndStalePanel, BorderLayout.CENTER);
     }
 
     public void registerRestart() {
@@ -94,37 +80,6 @@ public class RootInterface {
         tabbedPane.addChangeListener(evt -> {
             if (tabbedPane.getSelectedComponent() == emptyPanel) {
                 tabbedPane.setSelectedComponent(mainPanel);
-//                    SwingUtilities.invokeLater(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mainPanel.removeAll();
-//
-//                            // statusLabel
-//                            statusLabel = new JLabel();
-//                            statusLabel.setFont(statusLabel.getFont().deriveFont(25f).deriveFont(Font.BOLD));
-//                            statusLabel.setText("Not connected");
-//                            statusLabel.setBorder(new EmptyBorder(30, 5, 30, 5));
-//                            statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-//                            mainPanel.add(statusLabel, BorderLayout.NORTH);
-//
-//                            // inputOutputPanel
-//                            inputOutputPanel = new JPanel(new GridLayout(1, 2));
-//                            mainPanel.add(inputOutputPanel, BorderLayout.CENTER);
-//
-//                            new Thread() {
-//                                @Override
-//                                public void run() {
-//                                    try {
-//                                        // restart input & output
-//                                        application.startInput();
-//                                        application.startOutput();
-//                                    } catch (InvocationTargetException | InterruptedException ex) {
-//                                        ex.printStackTrace();
-//                                    }
-//                                }
-//                            }.start();
-//                        }
-//                    });
                 new Thread(() -> {
                     try {
                         String path = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getAbsolutePath();
@@ -141,7 +96,6 @@ public class RootInterface {
 
     public void show() {
         rootFrame.setVisible(true);
-
     }
 
     public JFrame getRootFrame() {
@@ -154,10 +108,6 @@ public class RootInterface {
 
     public JTextArea getLoggingTextArea() {
         return loggingTextArea;
-    }
-
-    public JPanel getInputOutputAndStalePanel() {
-        return inputOutputAndStalePanel;
     }
 
     public JPanel getMainPanel() {

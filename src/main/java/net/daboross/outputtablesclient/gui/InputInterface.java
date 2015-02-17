@@ -50,7 +50,7 @@ public class InputInterface implements InputListener {
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
         tableRootPanel.setMinimumSize(new Dimension(600, 40));
-        application.getRoot().getInputOutputAndStalePanel().add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(1).gridy(0));
+        application.getRoot().getMainPanel().add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(1).gridy(1));
 
         // tableRootPanel refresh
         tableRootPanel.revalidate();

@@ -74,13 +74,13 @@ public class OutputInterface implements OutputListener {
 
         // constraints
         toggleButtonConstraints = new GBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
-        tablePanelConstraints = new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST);
+        tablePanelConstraints = new GBC().gridx(0).gridy(-1).weightx(1).weighty(0).anchor(GridBagConstraints.EAST).fill(GridBagConstraints.HORIZONTAL);
 
 
         // mainTabPanel
         mainTabPanel = new JPanel();
         mainTabPanel.setLayout(new GridBagLayout());
-        application.getRoot().getInputOutputAndStalePanel().add(mainTabPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(0).gridy(0).gridheight(2));
+        application.getRoot().getMainPanel().add(mainTabPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(0).gridy(1));
 
 
         // toggleButtonPanel
