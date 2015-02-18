@@ -154,7 +154,7 @@ public class VideoCameraInput extends JPanel {
                 }
                 if (!ipChanged) {
                     try {
-                        Thread.sleep(5000L);
+                        Thread.sleep(1000L);
                     } catch (InterruptedException ex) {
                     }
                 }

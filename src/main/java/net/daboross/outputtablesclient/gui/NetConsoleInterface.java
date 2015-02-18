@@ -22,6 +22,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -100,7 +102,7 @@ public class NetConsoleInterface {
         }
 
         private void processLine(final String line) {
-            SwingUtilities.invokeLater(() -> textArea.append(line + "\n"));
+            SwingUtilities.invokeLater(() -> textArea.append(new SimpleDateFormat("[HH:mm:ss] ").format(new Date()) + line + "\n"));
         }
     }
 }
