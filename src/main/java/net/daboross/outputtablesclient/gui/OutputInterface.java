@@ -64,7 +64,7 @@ public class OutputInterface implements OutputListener {
         this.application = application;
 
         // persistEnabled
-        JSONObject parentObj = application.getPersist().obj();
+        JSONObject parentObj = application.getPersist().getStorageObject();
         JSONObject tempPersistEnabled = parentObj.optJSONObject("last-shown-panels");
         if (tempPersistEnabled == null) {
             tempPersistEnabled = new JSONObject();

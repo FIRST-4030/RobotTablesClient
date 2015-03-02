@@ -17,7 +17,9 @@
 package net.daboross.outputtablesclient.main;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import net.daboross.outputtablesclient.listener.InputListener;
 import net.daboross.outputtablesclient.listener.InputListenerForward;
 import net.daboross.outputtablesclient.output.Output;
@@ -27,42 +29,62 @@ import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 import org.ingrahamrobotics.robottables.api.listeners.ClientUpdateListener;
 import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
-import org.json.JSONObject;
+import org.ingrahamrobotics.robottables.util.UpdateableDelayedRunnable;
 
 public class InputTablesMain implements TableUpdateListener, ClientUpdateListener {
 
     private static final String DEFAULT_TABLE = "robot-input-default";
     private static final String SETTING_TABLE = "robot-input";
+    private final UpdateableDelayedRunnable valueSaveRunnable;
     private final InputListenerForward l = new InputListenerForward();
     private final Map<String, String> values = new HashMap<>();
+    private final Set<String> valuesNotDefault = new HashSet<>();
     private RobotTable defaultSettingsTable;
     private final RobotTable settingsTable;
-    private boolean stale = true;
-    private long currentFeedback;
     private final PersistStorage storage;
-    private final JSONObject storageObj;
 
     public InputTablesMain(Application application) {
         defaultSettingsTable = application.getTables().subscribeToTable(DEFAULT_TABLE);
         settingsTable = application.getTables().publishTable(SETTING_TABLE);
         storage = application.getPersist();
-        JSONObject tempObject = storage.obj().optJSONObject("input-save");
-        if (tempObject == null) {
-            tempObject = new JSONObject();
-            storage.obj().put("input-save", tempObject);
+        Object storedValues = storage.getStorageObject().get("input-save");
+        if (storedValues instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) storedValues).entrySet()) {
+                values.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
+            }
         }
-        storageObj = tempObject;
+        storage.getStorageObject().put("input-save", values);
+        Object storedNotDefault = storage.getStorageObject().get("input-not-default");
+        if (storedNotDefault instanceof Iterable) {
+            for (Object o : (Iterable) storedNotDefault) {
+                valuesNotDefault.add(String.valueOf(o));
+            }
+        }
+        storage.getStorageObject().put("input-not-default", valuesNotDefault);
+
+        valueSaveRunnable = new UpdateableDelayedRunnable(storage::save);
+    }
+
+    public void updateDefault(String key, String value) {
+        if (valuesNotDefault.contains(key)) {
+            return;
+        }
+        values.put(key, value);
+        valueSaveRunnable.delayUntil(System.currentTimeMillis() + 1000);
+    }
+
+    public void updateKey(String key, String value) {
+        settingsTable.set(key, value);
+        valuesNotDefault.add(key);
+        valueSaveRunnable.delayUntil(System.currentTimeMillis() + 1000);
     }
 
     public void subscribe() {
-        for (String key : storageObj.keySet()) {
-            String value = storageObj.getString(key);
-            settingsTable.set(key, value);
-            values.put(key, value);
-            l.onCreateDefaultKey(key, value);
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            settingsTable.set(entry.getKey(), entry.getValue());
+            l.onCreateDefaultKey(entry.getKey(), entry.getValue());
         }
         defaultSettingsTable.addUpdateListener(this, true);
-//        settingsTable.setInterval(1000);
     }
 
     public void addListener(InputListener listener) {
@@ -71,12 +93,6 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
 
     public void removeListener(InputListener listener) {
         l.removeListener(listener);
-    }
-
-    public void updateKey(String key, String newValue) {
-        settingsTable.set(key, newValue);
-        storageObj.put(key, newValue);
-        storage.save();
     }
 
     public PersistStorage getStorage() {
@@ -94,20 +110,20 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
             values.remove(key);
             l.onDeleteKey(key);
         } else if (action == UpdateAction.NEW) {
+            updateDefault(key, value);
             if (!values.containsKey(key)) {
-                values.put(key, value);
                 l.onCreateDefaultKey(key, value);
             } else {
                 l.onUpdateDefaultKey(key, value);
             }
         } else if (action == UpdateAction.UPDATE) {
+            updateDefault(key, value);
             l.onUpdateDefaultKey(key, value);
         }
     }
 
     @Override
     public void onUpdateAdmin(final RobotTable table, final String key, final String value, final UpdateAction action) {
-
     }
 
     @Override

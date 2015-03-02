@@ -16,21 +16,26 @@
  */
 package net.daboross.outputtablesclient.persist;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import net.daboross.jsonserialization.JsonException;
+import net.daboross.jsonserialization.JsonParser;
+import net.daboross.jsonserialization.JsonSerialization;
 import net.daboross.outputtablesclient.output.Output;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 public class PersistStorage {
 
@@ -38,7 +43,7 @@ public class PersistStorage {
     private final SaveRunnable saveRunnable = new SaveRunnable();
     private final Path saveFileBuffer;
     private final Path saveFile;
-    private final JSONObject mainObj;
+    private final Map<String, Object> mainObject;
 
     public PersistStorage() {
         String home = System.getProperty("user.home");
@@ -46,38 +51,40 @@ public class PersistStorage {
         Path homePath = Paths.get(home);
         this.saveFile = homePath.resolve(".java-output-client-persist.json");
         this.saveFileBuffer = homePath.resolve(".java-output-client-persist.json~");
-        JSONObject tempObj;
+        Map<String, Object> tempObject;
         try {
-            tempObj = load();
+            tempObject = load();
         } catch (IOException ex) {
             ex.printStackTrace();
-            tempObj = new JSONObject();
+            tempObject = new LinkedHashMap<>();
         }
-        this.mainObj = tempObj;
+        this.mainObject = tempObject;
     }
 
-    private JSONObject load() throws IOException {
+    private Map<String, Object> load() throws IOException {
         if (!Files.exists(saveFile)) {
             Files.createFile(saveFile);
-            return new JSONObject();
+            return new LinkedHashMap<>();
         }
         if (!Files.isRegularFile(saveFile)) {
             throw new IOException("File '" + saveFile.toAbsolutePath() + "' is not a file (perhaps a directory?).");
         }
 
-        try (FileInputStream fis = new FileInputStream(saveFile.toFile())) {
-            return new JSONObject(new JSONTokener(fis));
-        } catch (JSONException ex) {
+        try (FileInputStream fis = new FileInputStream(saveFile.toFile());
+             InputStreamReader isr = new InputStreamReader(fis);
+             BufferedReader br = new BufferedReader(isr)) {
+            return new JsonParser(br).parseJsonObject();
+        } catch (JsonException ex) {
             try (FileInputStream fis = new FileInputStream(saveFile.toFile())) {
                 byte[] buffer = new byte[10];
                 int read = fis.read(buffer);
-                if (read <= 0) return new JSONObject();
+                if (read <= 0) return new LinkedHashMap<>();
                 String str = new String(buffer, 0, read, Charset.forName("UTF-8"));
                 if (str.trim().length() == 0) {
-                    return new JSONObject();
+                    return new LinkedHashMap<>();
                 }
             }
-            throw new IOException("JSONException loading " + saveFile.toAbsolutePath(), ex);
+            throw new IOException("JsonException loading " + saveFile.toAbsolutePath(), ex);
         }
     }
 
@@ -85,8 +92,8 @@ public class PersistStorage {
         saveService.execute(saveRunnable);
     }
 
-    public JSONObject obj() {
-        return mainObj;
+    public Map<String, Object> getStorageObject() {
+        return mainObject;
     }
 
     private class SaveRunnable implements Runnable {
@@ -103,10 +110,11 @@ public class PersistStorage {
                 }
             }
             try (FileOutputStream fos = new FileOutputStream(saveFileBuffer.toFile())) {
-                try (OutputStreamWriter writer = new OutputStreamWriter(fos, Charset.forName("UTF-8"))) {
-                    mainObj.write(writer);
+                try (OutputStreamWriter writer = new OutputStreamWriter(fos, Charset.forName("UTF-8"));
+                     BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                    JsonSerialization.writeJsonObject(bufferedWriter, mainObject, 0, 0);
                 }
-            } catch (IOException | JSONException ex) {
+            } catch (IOException | JsonException ex) {
                 ex.printStackTrace();
                 Output.logError("Couldn't write to %s", saveFileBuffer.toAbsolutePath());
                 return;
