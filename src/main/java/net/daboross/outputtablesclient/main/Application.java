@@ -23,8 +23,10 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.LogInterface;
@@ -69,12 +71,12 @@ public class Application {
             Output.oLog("NetConsole initiated");
         });
         SwingUtilities.invokeLater(root::registerRestart);
-        InetAddress address = findValidBroadcastAddress();
-        if (address == null) {
+        List<InetAddress> addresses = findValidBroadcastAddresses();
+        if (addresses.isEmpty()) {
             throw new IOException("Failed to find valid broadcast address!");
         }
-        System.out.printf("Found broadcast address: %s%n", address);
-        RobotTables tablesStart = new RobotTables(address);
+        System.out.printf("Found broadcast addresses: %s%n", addresses);
+        RobotTables tablesStart = new RobotTables(addresses);
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
@@ -86,7 +88,8 @@ public class Application {
         Output.oLog("Finished startup sequence");
     }
 
-    private InetAddress findValidBroadcastAddress() throws SocketException {
+    private List<InetAddress> findValidBroadcastAddresses() throws SocketException {
+        List<InetAddress> result = new ArrayList<>();
         Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
         for (NetworkInterface iface : Collections.list(ifaces)) {
             for (InterfaceAddress interfaceAddress : iface.getInterfaceAddresses()) {
@@ -97,11 +100,11 @@ public class Application {
                 InetAddress broadcastAddress = interfaceAddress.getBroadcast();
                 // this might be null (only for IPv6 addresses?)
                 if (broadcastAddress != null) {
-                    return interfaceAddress.getBroadcast();
+                    result.add(interfaceAddress.getBroadcast());
                 }
             }
         }
-        return null;
+        return result;
     }
 
     public void startOutput() throws InvocationTargetException, InterruptedException {
