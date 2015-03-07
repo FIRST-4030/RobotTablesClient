@@ -19,6 +19,7 @@ package net.daboross.outputtablesclient.output;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 public class Output {
@@ -39,7 +40,15 @@ public class Output {
 
     public static void logError(String message, Object... args) {
         if (logger != null) {
-            logger.log(String.format("[error] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
+            if (args.length > 0) {
+                try {
+                    logger.log(String.format("[error] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), String.format(message, args)));
+                } catch (RuntimeException e) {
+                    logger.log(String.format("[error] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), message + " " + Arrays.toString(args)));
+                }
+            } else {
+                logger.log(String.format("[error] [%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), message));
+            }
         }
     }
 
