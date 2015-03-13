@@ -112,7 +112,7 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
     public class RecheckNetworkRunnable implements Runnable {
 
         private final Object updateLock = new Object();
-        private long timeoutTime;
+        private long timeoutTime = System.currentTimeMillis() + CHECK_NETWORK_EVERY;
 
         public RecheckNetworkRunnable() {
             new Thread(this).start();
