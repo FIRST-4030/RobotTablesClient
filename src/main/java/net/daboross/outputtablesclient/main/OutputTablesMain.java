@@ -27,7 +27,7 @@ import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
 
 public class OutputTablesMain implements ClientUpdateListener, TableUpdateListener {
 
-    private final long CHECK_NETWORK_EVERY = 5 * 60 * 1000;
+    private final long CHECK_NETWORK_EVERY = 60 * 1000;
     private final OutputListenerForward l = new OutputListenerForward();
     private final RobotTablesClient client;
     private final RobotTable nameTable;
