@@ -42,7 +42,6 @@ import net.daboross.outputtablesclient.util.GBC;
 import net.daboross.outputtablesclient.util.WrapLayout;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
-import org.json.JSONObject;
 
 public class OutputInterface implements OutputListener {
 
@@ -58,19 +57,19 @@ public class OutputInterface implements OutputListener {
     final Map<String, Map<String, JPanel>> tableKeyAndKeyToValuePanel;
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
     final Map<String, TitledBorder> tableKeyToTableTitledBoarder;
-    final JSONObject persistEnabled;
+    final Map<String, Boolean> persistEnabled;
 
     public OutputInterface(final Application application) {
         this.application = application;
 
         // persistEnabled
-        JSONObject parentObj = application.getPersist().getStorageObject();
-        JSONObject tempPersistEnabled = parentObj.optJSONObject("last-shown-panels");
-        if (tempPersistEnabled == null) {
-            tempPersistEnabled = new JSONObject();
-            parentObj.put("last-shown-panels", tempPersistEnabled);
+        Object tempPersistEnabledObj = application.getPersist().getStorageObject().get("last-shown-panels");
+        if (tempPersistEnabledObj != null && tempPersistEnabledObj instanceof Map) {
+            persistEnabled = (Map) tempPersistEnabledObj;
+        } else {
+            persistEnabled = new HashMap<>();
+            application.getPersist().getStorageObject().put("last-shown-panels", persistEnabled);
         }
-        persistEnabled = tempPersistEnabled;
 
         // constraints
         toggleButtonConstraints = new GBC().ipadx(2).ipady(2).gridx(0).gridy(-1).fill(GridBagConstraints.HORIZONTAL);
@@ -245,7 +244,7 @@ public class OutputInterface implements OutputListener {
         }
 
         private void initialAdd() {
-            boolean enabled = persistEnabled.optBoolean(tableKey, true);
+            boolean enabled = persistEnabled.getOrDefault(tableKey, true);
             tableKeyToTableEnabled.put(tableKey, enabled);
             JPanel panel = tableKeyToTablePanel.get(tableKey);
             tableRootPanel.add(panel, tablePanelConstraints);
