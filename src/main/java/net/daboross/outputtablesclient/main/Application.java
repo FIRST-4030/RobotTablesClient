@@ -19,12 +19,6 @@ package net.daboross.outputtablesclient.main;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Collections;
-import java.util.Enumeration;
 import javax.swing.SwingUtilities;
 import net.daboross.outputtablesclient.gui.InputInterface;
 import net.daboross.outputtablesclient.gui.LogInterface;
@@ -69,12 +63,7 @@ public class Application {
             Output.oLog("NetConsole initiated");
         });
         SwingUtilities.invokeLater(root::registerRestart);
-        InetAddress address = findValidBroadcastAddress();
-        if (address == null) {
-            throw new IOException("Failed to find valid broadcast address!");
-        }
-        System.out.printf("Found broadcast address: %s%n", address);
-        RobotTables tablesStart = new RobotTables(address);
+        RobotTables tablesStart = new RobotTables();
         tables = tablesStart.getClientInterface();
         Output.oLog("Loading persist");
         persistStorage = new PersistStorage();
@@ -84,24 +73,6 @@ public class Application {
         Output.oLog("Starting RobotTables");
         tablesStart.run();
         Output.oLog("Finished startup sequence");
-    }
-
-    private InetAddress findValidBroadcastAddress() throws SocketException {
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-        for (NetworkInterface iface : Collections.list(ifaces)) {
-            for (InterfaceAddress interfaceAddress : iface.getInterfaceAddresses()) {
-                InetAddress inetAddress = interfaceAddress.getAddress();
-                if (inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress()) {
-                    continue;
-                }
-                InetAddress broadcastAddress = interfaceAddress.getBroadcast();
-                // this might be null (only for IPv6 addresses?)
-                if (broadcastAddress != null) {
-                    return interfaceAddress.getBroadcast();
-                }
-            }
-        }
-        return null;
     }
 
     public void startOutput() throws InvocationTargetException, InterruptedException {

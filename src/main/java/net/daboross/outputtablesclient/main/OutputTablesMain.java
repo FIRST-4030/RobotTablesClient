@@ -27,18 +27,22 @@ import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
 
 public class OutputTablesMain implements ClientUpdateListener, TableUpdateListener {
 
+    private final long CHECK_NETWORK_EVERY = 60 * 1000;
     private final OutputListenerForward l = new OutputListenerForward();
     private final RobotTablesClient client;
     private final RobotTable nameTable;
+    private final RecheckNetworkRunnable recheckNetworkInterfacesRunnable;
 
     public OutputTablesMain(Application application) {
         client = application.getTables();
         nameTable = client.subscribeToTable("__output_display_names");
+        recheckNetworkInterfacesRunnable = new RecheckNetworkRunnable();
     }
 
     public void subscribe() {
         client.addClientListener(this, true);
         nameTable.addUpdateListener(this, true);
+        recheckNetworkInterfacesRunnable.delay();
     }
 
     public void addListener(OutputListener listener) {
@@ -56,6 +60,9 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     @Override
     public void onTableStaleChange(final RobotTable table, final boolean nowStale) {
+        if (!nowStale) {
+            recheckNetworkInterfacesRunnable.delay();
+        }
         l.onTableStaleChange(table.getName(), nowStale);
     }
 
@@ -100,5 +107,55 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
 
     public RobotTable getNameTable() {
         return nameTable;
+    }
+
+    public class RecheckNetworkRunnable implements Runnable {
+
+        private final Object updateLock = new Object();
+        private long timeoutTime = System.currentTimeMillis() + CHECK_NETWORK_EVERY;
+
+        public RecheckNetworkRunnable() {
+            new Thread(this).start();
+        }
+
+        public void delay() {
+            synchronized (updateLock) {
+                this.timeoutTime = System.currentTimeMillis() + CHECK_NETWORK_EVERY;
+            }
+        }
+
+        public void run() {
+            while (true) {
+                long currentUpdateTime;
+                synchronized (updateLock) {
+                    currentUpdateTime = timeoutTime;
+                }
+                while (true) {
+                    long waitTime = currentUpdateTime - System.currentTimeMillis();
+                    if (waitTime > 0) {
+                        try {
+                            Thread.sleep(waitTime);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    synchronized (updateLock) {
+                        if (timeoutTime > currentUpdateTime) {
+                            // If the updateTime has changed since we started, we should sleep again.
+                            currentUpdateTime = timeoutTime;
+                        } else {
+                            // Otherwise, let's run it!
+                            break;
+                        }
+                    }
+                }
+                if (System.currentTimeMillis() > nameTable.getLastUpdateTime() + Double.parseDouble(nameTable.getAdmin("UPDATE_INTERVAL")) * 4) {
+                    client.recheckNetworkInterfaces(true);
+                } else if (nameTable.isStale()) {
+                    client.recheckNetworkInterfaces(false);
+                }
+                this.timeoutTime = System.currentTimeMillis() + CHECK_NETWORK_EVERY;
+            }
+        }
     }
 }
