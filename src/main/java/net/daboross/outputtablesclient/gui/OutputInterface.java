@@ -164,14 +164,6 @@ public class OutputInterface implements OutputListener {
             return;
         }
         if (action == UpdateAction.NEW) {
-//            if (key.equalsIgnoreCase(":RangeGUI")) {
-//                Output.oLog("Range: %s", value);
-//                try {
-//                    application.getCustomInterface().setTo(Double.parseDouble(value));
-//                } catch (NumberFormatException ex) {
-//                    Output.oLog("Invalid range '%s'", value);
-//                }
-//            }
             ensureTableExists(table.getName());
             JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(new LineBorder(Color.BLACK));
@@ -194,14 +186,6 @@ public class OutputInterface implements OutputListener {
             parentPanel.add(panel);
             parentPanel.revalidate();
         } else if (action == UpdateAction.UPDATE) {
-//            if (key.equalsIgnoreCase(":RangeGUI")) {
-//                Output.oLog("Range: %s", value);
-//                try {
-//                    application.getCustomInterface().setTo(Double.parseDouble(value));
-//                } catch (NumberFormatException ex) {
-//                    Output.oLog("Invalid range '%s'", value);
-//                }
-//            }
             ensureTableExists(table.getName());
             JLabel valueLabel = tableKeyAndKeyToValueLabel.get(table.getName()).get(key);
             valueLabel.setText(value);
