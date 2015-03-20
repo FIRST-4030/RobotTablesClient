@@ -75,6 +75,7 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
 
     public void updateKey(String key, String value) {
         settingsTable.set(key, value);
+        values.put(key, value);
         valuesNotDefault.add(key);
         valueSaveRunnable.delayUntil(System.currentTimeMillis() + 1000);
     }
