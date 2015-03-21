@@ -21,8 +21,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -43,6 +43,7 @@ public class InputInterface implements InputListener {
     private final InputTablesMain main;
     private final JPanel tableRootPanel;
     private final Map<String, JPanel> keyToValuePanel;
+    private final GridBagConstraints panelConstraints = new GBC().gridx(0).insets(new Insets(5, 0, 5, 0)).anchor(GBC.EAST);
 
     public InputInterface(final Application application) {
         this.main = application.getInput();
@@ -56,7 +57,7 @@ public class InputInterface implements InputListener {
         tableRootPanel.revalidate();
 
         // maps
-        keyToValuePanel = new HashMap<>();
+        keyToValuePanel = new TreeMap<>();
     }
 
     @Override
@@ -88,7 +89,10 @@ public class InputInterface implements InputListener {
         valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
         panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
-        tableRootPanel.add(panel, new GBC().gridx(0).insets(new Insets(5, 0, 5, 0)).anchor(GBC.EAST));
+        tableRootPanel.removeAll();
+        for (JPanel createdPanel : keyToValuePanel.values()){
+            tableRootPanel.add(createdPanel, panelConstraints);
+        }
         tableRootPanel.revalidate();
     }
 
