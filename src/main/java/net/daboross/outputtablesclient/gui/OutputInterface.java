@@ -70,6 +70,7 @@ public class OutputInterface implements OutputListener {
     final JPanel toggleButtonPanel;
     final JPanel tableRootPanel;
     final JTextArea searchArea;
+    private String lastSearchString;
     final Map<String, JToggleButton> tableKeyToTableButton;
     final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
@@ -200,6 +201,9 @@ public class OutputInterface implements OutputListener {
             panel.setBorder(new LineBorder(Color.BLACK));
             tableKeyAndKeyToValuePanel.get(table.getName()).put(key, panel);
             allKeyAndValuePanels.add(new PanelWithKey(panel, key));
+            if (!key.toLowerCase().contains(lastSearchString)) {
+                panel.setVisible(false);
+            }
 
             JLabel keyLabel = new JLabel(key);
             keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
