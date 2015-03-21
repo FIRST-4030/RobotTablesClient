@@ -111,12 +111,12 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
             values.remove(key);
             l.onDeleteKey(key);
         } else if (action == UpdateAction.NEW) {
-            updateDefault(key, value);
             if (!values.containsKey(key)) {
                 l.onCreateDefaultKey(key, value);
             } else {
                 l.onUpdateDefaultKey(key, value);
             }
+            updateDefault(key, value);
         } else if (action == UpdateAction.UPDATE) {
             updateDefault(key, value);
             l.onUpdateDefaultKey(key, value);
