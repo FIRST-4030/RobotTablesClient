@@ -70,7 +70,7 @@ public class OutputInterface implements OutputListener {
     final JPanel toggleButtonPanel;
     final JPanel tableRootPanel;
     final JTextArea searchArea;
-    private String lastSearchString;
+    private String lastSearchString = "";
     final Map<String, JToggleButton> tableKeyToTableButton;
     final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
@@ -381,6 +381,7 @@ public class OutputInterface implements OutputListener {
                 SwingUtilities.invokeLater(() -> {
                     String text = searchArea.getText();
                     Output.iLog("Setting search text to: '%s'", text);
+                    lastSearchString = text;
                     setSearchContents(text);
                 });
             }
