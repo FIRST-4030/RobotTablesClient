@@ -109,10 +109,11 @@ public class PersistStorage {
                     return;
                 }
             }
+            System.out.println("Saving storage to " + saveFile);
             try (FileOutputStream fos = new FileOutputStream(saveFileBuffer.toFile())) {
                 try (OutputStreamWriter writer = new OutputStreamWriter(fos, Charset.forName("UTF-8"));
                      BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
-                    JsonSerialization.writeJsonObject(bufferedWriter, mainObject, 0, 0);
+                    JsonSerialization.writeJsonObject(bufferedWriter, mainObject, 4, 0);
                 }
             } catch (IOException | JsonException ex) {
                 ex.printStackTrace();

@@ -90,7 +90,7 @@ public class InputInterface implements InputListener {
         panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
         tableRootPanel.removeAll();
-        for (JPanel createdPanel : keyToValuePanel.values()){
+        for (JPanel createdPanel : keyToValuePanel.values()) {
             tableRootPanel.add(createdPanel, panelConstraints);
         }
         tableRootPanel.revalidate();
