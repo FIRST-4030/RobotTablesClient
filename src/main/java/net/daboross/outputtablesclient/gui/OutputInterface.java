@@ -23,18 +23,25 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import net.daboross.outputtablesclient.listener.OutputListener;
 import net.daboross.outputtablesclient.main.Application;
 import net.daboross.outputtablesclient.output.Output;
@@ -45,12 +52,24 @@ import org.ingrahamrobotics.robottables.api.UpdateAction;
 
 public class OutputInterface implements OutputListener {
 
+    private static final class PanelWithKey {
+
+        private final JPanel panel;
+        private final String key;
+
+        private PanelWithKey(final JPanel panel, final String key) {
+            this.panel = panel;
+            this.key = key.toLowerCase();
+        }
+    }
+
     private final Application application;
     final GridBagConstraints toggleButtonConstraints;
     final GridBagConstraints tablePanelConstraints;
     final JPanel mainTabPanel;
     final JPanel toggleButtonPanel;
     final JPanel tableRootPanel;
+    final JTextArea searchArea;
     final Map<String, JToggleButton> tableKeyToTableButton;
     final Map<String, Boolean> tableKeyToTableEnabled;
     final Map<String, JPanel> tableKeyToTablePanel;
@@ -58,6 +77,7 @@ public class OutputInterface implements OutputListener {
     final Map<String, Map<String, JLabel>> tableKeyAndKeyToValueLabel;
     final Map<String, TitledBorder> tableKeyToTableTitledBoarder;
     final Map<String, Boolean> persistEnabled;
+    final List<PanelWithKey> allKeyAndValuePanels;
 
     public OutputInterface(final Application application) {
         this.application = application;
@@ -81,17 +101,27 @@ public class OutputInterface implements OutputListener {
         mainTabPanel.setLayout(new GridBagLayout());
         application.getRoot().getMainPanel().add(mainTabPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(0).gridy(1));
 
+        // leftSidePanel
+        JPanel leftSidePanel = new JPanel();
+        leftSidePanel.setLayout(new GridBagLayout());
+        mainTabPanel.add(leftSidePanel, new GBC().weightx(0).weighty(0).gridx(0).gridy(0).anchor(GridBagConstraints.NORTHWEST));
 
         // toggleButtonPanel
         toggleButtonPanel = new JPanel();
         toggleButtonPanel.setLayout(new GridBagLayout());
-        mainTabPanel.add(toggleButtonPanel, new GBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
+        leftSidePanel.add(toggleButtonPanel, new GBC().weightx(0).weighty(0).gridx(0).gridy(0).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
 
 
         // tableRootPanel
         tableRootPanel = new JPanel(new GridBagLayout());
         mainTabPanel.add(tableRootPanel, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(2).gridy(0).anchor(GridBagConstraints.EAST));
 
+        // searchArea
+        searchArea = new JTextArea();
+        searchArea.setMinimumSize(new Dimension(100, 23));
+        searchArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        searchArea.getDocument().addDocumentListener(new SearchAreaActionListener());
+        leftSidePanel.add(searchArea, new GBC().weightx(0).weighty(0).gridx(0).gridy(1).insets(new Insets(0, 0, 10, 10)).anchor(GridBagConstraints.NORTHWEST));
 
         // maps
         tableKeyToTableButton = new TreeMap<>();
@@ -100,6 +130,7 @@ public class OutputInterface implements OutputListener {
         tableKeyAndKeyToValuePanel = new HashMap<>();
         tableKeyAndKeyToValueLabel = new HashMap<>();
         tableKeyToTableTitledBoarder = new HashMap<>();
+        allKeyAndValuePanels = new ArrayList<>();
     }
 
     private void ensureTableExists(String tableKey) {
@@ -168,6 +199,7 @@ public class OutputInterface implements OutputListener {
             JPanel panel = new JPanel(new GridBagLayout());
             panel.setBorder(new LineBorder(Color.BLACK));
             tableKeyAndKeyToValuePanel.get(table.getName()).put(key, panel);
+            allKeyAndValuePanels.add(new PanelWithKey(panel, key));
 
             JLabel keyLabel = new JLabel(key);
             keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -178,6 +210,8 @@ public class OutputInterface implements OutputListener {
             panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
             JLabel valueLabel = new JLabel(value);
+            valueLabel.setMinimumSize(new Dimension(50, 20));
+            valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
             valueLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
             panel.add(valueLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
             tableKeyAndKeyToValueLabel.get(table.getName()).put(key, valueLabel);
@@ -255,6 +289,97 @@ public class OutputInterface implements OutputListener {
             }
             tableRootPanel.revalidate();
             tableRootPanel.repaint();
+        }
+    }
+
+    public void setSearchContents(String searchContents) {
+        searchContents = searchContents.toLowerCase();
+        for (PanelWithKey panelWithKey : allKeyAndValuePanels) {
+            panelWithKey.panel.setVisible(panelWithKey.key.contains(searchContents));
+        }
+    }
+
+    public class SearchAreaActionListener implements DocumentListener {
+
+        /**
+         * This is the time that we should actually update the key. This is pushed to the current time + 1000 every time
+         * the field is updated, so we do automatically send, but not with the user's every keystroke.
+         */
+        private final UpdateRunnable updateRunnable;
+        private final Object updateLock;
+        private long updateTime;
+        private boolean updaterRunning;
+
+        public SearchAreaActionListener() {
+            updateRunnable = new UpdateRunnable();
+            updateLock = new Object();
+        }
+
+        private void startUpdate() {
+            synchronized (updateLock) {
+                updateTime = System.currentTimeMillis() + 100;
+                if (!updaterRunning) {
+                    new Thread(updateRunnable).start();
+                }
+            }
+        }
+
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
+            startUpdate();
+        }
+
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
+            startUpdate();
+        }
+
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
+            startUpdate();
+        }
+
+        private class UpdateRunnable implements Runnable {
+
+            @Override
+            public void run() {
+                long currentUpdateTime;
+                synchronized (updateLock) {
+                    if (updaterRunning) {
+                        return;
+                    }
+                    updaterRunning = true;
+                    currentUpdateTime = updateTime;
+                }
+                while (true) {
+                    long waitTime = currentUpdateTime - System.currentTimeMillis();
+                    try {
+                        Thread.sleep(waitTime);
+                    } catch (InterruptedException e) {
+                        Output.logError("Warning! SearchAreaUpdateRunnable interrupted! Search area will no longer be updated!");
+                        e.printStackTrace();
+                        synchronized (updateLock) {
+                            updaterRunning = false;
+                        }
+                        return;
+                    }
+                    synchronized (updateLock) {
+                        if (updateTime > currentUpdateTime) {
+                            // If the updateTime has changed since we started, we should sleep again.
+                            currentUpdateTime = updateTime;
+                        } else {
+                            // Otherwise, let's update it!
+                            updaterRunning = false;
+                            break;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    String text = searchArea.getText();
+                    Output.iLog("Setting search text to: '%s'", text);
+                    setSearchContents(text);
+                });
+            }
         }
     }
 }
