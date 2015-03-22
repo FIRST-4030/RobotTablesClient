@@ -27,7 +27,7 @@ import org.ingrahamrobotics.robottables.api.listeners.TableUpdateListener;
 
 public class OutputTablesMain implements ClientUpdateListener, TableUpdateListener {
 
-    private final long CHECK_NETWORK_EVERY = 60 * 1000;
+    private final long CHECK_NETWORK_EVERY = 5 * 1000;
     private final OutputListenerForward l = new OutputListenerForward();
     private final RobotTablesClient client;
     private final RobotTable nameTable;
@@ -149,7 +149,7 @@ public class OutputTablesMain implements ClientUpdateListener, TableUpdateListen
                         }
                     }
                 }
-                if (System.currentTimeMillis() > nameTable.getLastUpdateTime() + Double.parseDouble(nameTable.getAdmin("UPDATE_INTERVAL")) * 4) {
+                if (System.currentTimeMillis() > nameTable.getLastUpdateTime() + Double.parseDouble(nameTable.getAdmin("UPDATE_INTERVAL")) * 3) {
                     client.recheckNetworkInterfaces(true);
                 } else if (nameTable.isStale()) {
                     client.recheckNetworkInterfaces(false);
