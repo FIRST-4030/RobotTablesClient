@@ -40,99 +40,101 @@ import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 
 public class Application {
 
-    private RobotTablesClient tables;
-    private RootInterface root;
-    private OutputTablesMain outputMain;
-    private InputTablesMain inputMain;
-    private OutputInterface outputInterface;
-    private InputInterface inputInterface;
-    private StaleInterface staleInterface;
-    private PersistStorage persistStorage;
+	private RobotTablesClient tables;
+	private RootInterface root;
+	private OutputTablesMain outputMain;
+	private InputTablesMain inputMain;
+	private OutputInterface outputInterface;
+	private InputInterface inputInterface;
+	private StaleInterface staleInterface;
+	private PersistStorage persistStorage;
 
-    public void run() throws InvocationTargetException, InterruptedException, IOException {
-        Output.oLog("Initiating root interface");
-        SwingUtilities.invokeAndWait(() -> {
-            root = new RootInterface();
-            root.show();
-        });
-        Output.setLogger(new LogInterface(root));
-        System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
-        System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
-        SwingUtilities.invokeLater(() -> {
-            Output.oLog("Initiating NetConsole");
-            new NetConsoleInterface().addTo(root);
-            Output.oLog("NetConsole initiated");
-        });
-        SwingUtilities.invokeLater(root::registerRestart);
-        RobotTables tablesStart = new RobotTables();
-        tables = tablesStart.getClientInterface();
-        Output.oLog("Loading persist");
-        persistStorage = new PersistStorage();
-        startOutput();
-        startInput();
-        startStale();
-        Output.oLog("Starting RobotTables");
-        tablesStart.run();
-        Output.oLog("Finished startup sequence");
-    }
+	public void run() throws InvocationTargetException, InterruptedException, IOException {
+		Output.oLog("Initiating root interface");
+		SwingUtilities.invokeAndWait(() -> {
+			root = new RootInterface();
+			root.show();
+		});
+		Output.setLogger(new LogInterface(root));
+		System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
+		System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
+		if (false) {
+			SwingUtilities.invokeLater(() -> {
+				Output.oLog("Initiating NetConsole");
+				new NetConsoleInterface().addTo(root);
+				Output.oLog("NetConsole initiated");
+			});
+		}
+		SwingUtilities.invokeLater(root::registerRestart);
+		RobotTables tablesStart = new RobotTables();
+		tables = tablesStart.getClientInterface();
+		Output.oLog("Loading persist");
+		persistStorage = new PersistStorage();
+		startOutput();
+		startInput();
+		startStale();
+		Output.oLog("Starting RobotTables");
+		tablesStart.run();
+		Output.oLog("Finished startup sequence");
+	}
 
-    public void startOutput() throws InvocationTargetException, InterruptedException {
-        Output.oLog("Initiating output-tables");
-        outputMain = new OutputTablesMain(this);
-        Output.oLog("Initiating output-tables logger");
-        OutputLoggerListener outputLoggerListener = new OutputLoggerListener();
-        outputMain.addListener(outputLoggerListener);
-        SwingUtilities.invokeAndWait(() -> {
-            Output.oLog("Initiating output-tables interface");
-            outputInterface = new OutputInterface(this);
-        });
-        OutputListener outputInterfaceListener = new SwingOutputForward(outputInterface);
-        outputMain.addListener(outputInterfaceListener);
-        Output.oLog("Subscribing to output-tables");
-        outputMain.subscribe();
-    }
+	public void startOutput() throws InvocationTargetException, InterruptedException {
+		Output.oLog("Initiating output-tables");
+		outputMain = new OutputTablesMain(this);
+		Output.oLog("Initiating output-tables logger");
+		OutputLoggerListener outputLoggerListener = new OutputLoggerListener();
+		outputMain.addListener(outputLoggerListener);
+		SwingUtilities.invokeAndWait(() -> {
+			Output.oLog("Initiating output-tables interface");
+			outputInterface = new OutputInterface(this);
+		});
+		OutputListener outputInterfaceListener = new SwingOutputForward(outputInterface);
+		outputMain.addListener(outputInterfaceListener);
+		Output.oLog("Subscribing to output-tables");
+		outputMain.subscribe();
+	}
 
-    public void startInput() throws InvocationTargetException, InterruptedException {
-        inputMain = new InputTablesMain(this);
-        SwingUtilities.invokeAndWait(() -> {
-            Output.iLog("Initiating input-tables interface");
-            inputInterface = new InputInterface(this);
-        });
-        InputListener inputInterfaceListener = new SwingInputForward(inputInterface);
-        inputMain.addListener(inputInterfaceListener);
-        Output.iLog("Subscribing to input-tables");
-        inputMain.subscribe();
-    }
+	public void startInput() throws InvocationTargetException, InterruptedException {
+		inputMain = new InputTablesMain(this);
+		SwingUtilities.invokeAndWait(() -> {
+			Output.iLog("Initiating input-tables interface");
+			inputInterface = new InputInterface(this);
+		});
+		InputListener inputInterfaceListener = new SwingInputForward(inputInterface);
+		inputMain.addListener(inputInterfaceListener);
+		Output.iLog("Subscribing to input-tables");
+		inputMain.subscribe();
+	}
 
-    public void startStale() throws InvocationTargetException, InterruptedException {
-        SwingUtilities.invokeAndWait(() -> {
-            Output.oLog("Initiating stale interface");
-            staleInterface = new StaleInterface(this);
-        });
-        tables.addClientListener(new SwingClientForward(staleInterface), true);
-    }
+	public void startStale() throws InvocationTargetException, InterruptedException {
+		SwingUtilities.invokeAndWait(() -> {
+			Output.oLog("Initiating stale interface");
+			staleInterface = new StaleInterface(this);
+		});
+		tables.addClientListener(new SwingClientForward(staleInterface), true);
+	}
 
-    public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {
-        new Application().run();
-    }
+	public static void main(String[] args) throws IOException, InvocationTargetException, InterruptedException {
+		new Application().run();
+	}
 
-    public RootInterface getRoot() {
-        return root;
-    }
+	public RootInterface getRoot() {
+		return root;
+	}
 
-    public OutputTablesMain getOutput() {
-        return outputMain;
-    }
+	public OutputTablesMain getOutput() {
+		return outputMain;
+	}
 
-    public InputTablesMain getInput() {
-        return inputMain;
-    }
+	public InputTablesMain getInput() {
+		return inputMain;
+	}
 
-    public PersistStorage getPersist() {
-        return persistStorage;
-    }
+	public PersistStorage getPersist() {
+		return persistStorage;
+	}
 
-    public RobotTablesClient getTables() {
-        return tables;
-    }
+	public RobotTablesClient getTables() {
+		return tables;
+	}
 }
