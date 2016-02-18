@@ -58,13 +58,11 @@ public class Application {
 		Output.setLogger(new LogInterface(root));
 		System.setOut(new PrintStream(new Output.StaticOutputStream(), true));
 		System.setErr(new PrintStream(new Output.StaticOutputStream(), true));
-		if (false) {
-			SwingUtilities.invokeLater(() -> {
-				Output.oLog("Initiating NetConsole");
-				new NetConsoleInterface().addTo(root);
-				Output.oLog("NetConsole initiated");
-			});
-		}
+		SwingUtilities.invokeLater(() -> {
+			Output.oLog("Initiating NetConsole");
+			new NetConsoleInterface().addTo(root);
+			Output.oLog("NetConsole initiated");
+		});
 		SwingUtilities.invokeLater(root::registerRestart);
 		RobotTables tablesStart = new RobotTables();
 		tables = tablesStart.getClientInterface();
