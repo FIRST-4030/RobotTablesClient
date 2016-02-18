@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.output;
+package org.ingrahamrobotics.dashboard.output;
 
-import net.daboross.outputtablesclient.listener.OutputListener;
+import org.ingrahamrobotics.dashboard.listener.OutputListener;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 

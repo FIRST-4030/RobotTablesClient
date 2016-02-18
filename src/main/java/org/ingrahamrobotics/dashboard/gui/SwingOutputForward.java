@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.listener.OutputListener;
+
+import org.ingrahamrobotics.dashboard.listener.OutputListener;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 

@@ -14,26 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.main;
+package org.ingrahamrobotics.dashboard.main;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.gui.InputInterface;
-import net.daboross.outputtablesclient.gui.LogInterface;
-import net.daboross.outputtablesclient.gui.NetConsoleInterface;
-import net.daboross.outputtablesclient.gui.OutputInterface;
-import net.daboross.outputtablesclient.gui.RootInterface;
-import net.daboross.outputtablesclient.gui.StaleInterface;
-import net.daboross.outputtablesclient.gui.SwingClientForward;
-import net.daboross.outputtablesclient.gui.SwingInputForward;
-import net.daboross.outputtablesclient.gui.SwingOutputForward;
-import net.daboross.outputtablesclient.listener.InputListener;
-import net.daboross.outputtablesclient.listener.OutputListener;
-import net.daboross.outputtablesclient.output.Output;
-import net.daboross.outputtablesclient.output.OutputLoggerListener;
-import net.daboross.outputtablesclient.persist.PersistStorage;
+
+import org.ingrahamrobotics.dashboard.gui.InputInterface;
+import org.ingrahamrobotics.dashboard.gui.LogInterface;
+import org.ingrahamrobotics.dashboard.gui.NetConsoleInterface;
+import org.ingrahamrobotics.dashboard.gui.OutputInterface;
+import org.ingrahamrobotics.dashboard.gui.RootInterface;
+import org.ingrahamrobotics.dashboard.gui.StaleInterface;
+import org.ingrahamrobotics.dashboard.gui.SwingClientForward;
+import org.ingrahamrobotics.dashboard.gui.SwingInputForward;
+import org.ingrahamrobotics.dashboard.gui.SwingOutputForward;
+import org.ingrahamrobotics.dashboard.listener.InputListener;
+import org.ingrahamrobotics.dashboard.listener.OutputListener;
+import org.ingrahamrobotics.dashboard.output.Output;
+import org.ingrahamrobotics.dashboard.output.OutputLoggerListener;
+import org.ingrahamrobotics.dashboard.persist.PersistStorage;
 import org.ingrahamrobotics.robottables.RobotTables;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 

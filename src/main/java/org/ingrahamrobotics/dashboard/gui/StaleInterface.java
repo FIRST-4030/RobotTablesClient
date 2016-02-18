@@ -1,4 +1,4 @@
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,8 +9,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import net.daboross.outputtablesclient.main.Application;
-import net.daboross.outputtablesclient.util.GBC;
+
+import org.ingrahamrobotics.dashboard.main.Application;
+import org.ingrahamrobotics.dashboard.util.GBC;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.api.TableType;

@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.main;
+package org.ingrahamrobotics.dashboard.main;
 
-import net.daboross.outputtablesclient.listener.OutputListener;
-import net.daboross.outputtablesclient.listener.OutputListenerForward;
+import org.ingrahamrobotics.dashboard.listener.OutputListener;
+import org.ingrahamrobotics.dashboard.listener.OutputListenerForward;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.RobotTablesClient;
 import org.ingrahamrobotics.robottables.api.TableType;

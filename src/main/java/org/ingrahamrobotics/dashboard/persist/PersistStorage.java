@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.persist;
+package org.ingrahamrobotics.dashboard.persist;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,10 +32,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.ingrahamrobotics.dashboard.output.Output;
+
 import net.daboross.jsonserialization.JsonException;
 import net.daboross.jsonserialization.JsonParser;
 import net.daboross.jsonserialization.JsonSerialization;
-import net.daboross.outputtablesclient.output.Output;
 
 public class PersistStorage {
 

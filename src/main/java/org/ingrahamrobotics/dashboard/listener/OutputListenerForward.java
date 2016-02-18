@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.listener;
+package org.ingrahamrobotics.dashboard.listener;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.daboross.outputtablesclient.output.Output;
+
+import org.ingrahamrobotics.dashboard.output.Output;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
 

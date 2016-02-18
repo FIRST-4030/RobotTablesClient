@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,11 +32,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.daboross.outputtablesclient.listener.InputListener;
-import net.daboross.outputtablesclient.main.Application;
-import net.daboross.outputtablesclient.main.InputTablesMain;
-import net.daboross.outputtablesclient.output.Output;
-import net.daboross.outputtablesclient.util.GBC;
+
+import org.ingrahamrobotics.dashboard.listener.InputListener;
+import org.ingrahamrobotics.dashboard.main.Application;
+import org.ingrahamrobotics.dashboard.main.InputTablesMain;
+import org.ingrahamrobotics.dashboard.output.Output;
+import org.ingrahamrobotics.dashboard.util.GBC;
 
 public class InputInterface implements InputListener {
 

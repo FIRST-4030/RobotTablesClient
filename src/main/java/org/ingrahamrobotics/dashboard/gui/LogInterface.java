@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +27,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.output.Output;
+
+import org.ingrahamrobotics.dashboard.output.Output;
 
 public class LogInterface implements Output.StaticLogger {
 

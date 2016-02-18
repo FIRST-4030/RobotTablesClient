@@ -1,4 +1,4 @@
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;

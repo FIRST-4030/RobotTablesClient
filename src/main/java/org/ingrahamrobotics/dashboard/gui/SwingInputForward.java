@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import javax.swing.SwingUtilities;
-import net.daboross.outputtablesclient.listener.InputListener;
+
+import org.ingrahamrobotics.dashboard.listener.InputListener;
 
 public class SwingInputForward implements InputListener {
 

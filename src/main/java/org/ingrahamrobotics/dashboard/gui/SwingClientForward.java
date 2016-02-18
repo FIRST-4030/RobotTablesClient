@@ -1,4 +1,4 @@
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import javax.swing.SwingUtilities;
 import org.ingrahamrobotics.robottables.api.RobotTable;

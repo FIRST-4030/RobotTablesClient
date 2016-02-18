@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.gui;
+package org.ingrahamrobotics.dashboard.gui;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
@@ -29,7 +29,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
-import net.daboross.outputtablesclient.output.Output;
+
+import org.ingrahamrobotics.dashboard.output.Output;
 
 public class NetConsoleInterface {
 

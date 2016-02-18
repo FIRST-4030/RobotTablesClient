@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.daboross.outputtablesclient.main;
+package org.ingrahamrobotics.dashboard.main;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import net.daboross.outputtablesclient.listener.InputListener;
-import net.daboross.outputtablesclient.listener.InputListenerForward;
-import net.daboross.outputtablesclient.output.Output;
-import net.daboross.outputtablesclient.persist.PersistStorage;
+
+import org.ingrahamrobotics.dashboard.listener.InputListener;
+import org.ingrahamrobotics.dashboard.listener.InputListenerForward;
+import org.ingrahamrobotics.dashboard.output.Output;
+import org.ingrahamrobotics.dashboard.persist.PersistStorage;
 import org.ingrahamrobotics.robottables.api.RobotTable;
 import org.ingrahamrobotics.robottables.api.TableType;
 import org.ingrahamrobotics.robottables.api.UpdateAction;
