@@ -51,8 +51,8 @@ public class PersistStorage {
         String home = System.getProperty("user.home");
         System.out.println("User.home = " + home);
         Path homePath = Paths.get(home);
-        this.saveFile = homePath.resolve(".java-output-client-persist.json");
-        this.saveFileBuffer = homePath.resolve(".java-output-client-persist.json~");
+        this.saveFile = homePath.resolve(".RobotTablesClient.json");
+        this.saveFileBuffer = homePath.resolve(".RobotTablesClient.json~");
         Map<String, Object> tempObject;
         try {
             tempObject = load();
