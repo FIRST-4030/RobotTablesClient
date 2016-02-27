@@ -18,7 +18,7 @@ public class VideoCameraInput extends JPanel {
     private static final int[] START_BYTES = new int[]{255, 216};
     private static final int[] END_BYTES = new int[]{255, 217};
     private boolean ipChanged;
-    private String ipString;
+    private String mjpegURL;
     private long lastFPSCheck;
     private int lastFPS;
     private int fpsCounter;
@@ -28,12 +28,11 @@ public class VideoCameraInput extends JPanel {
     public VideoCameraInput() {
         super();
         this.ipChanged = true;
-        this.ipString = null;
         this.lastFPSCheck = 0L;
         this.lastFPS = 0;
         this.fpsCounter = 0;
         this.bgThread = new BGThread();
-        this.ipString = "axis1.local";
+        this.mjpegURL = "http://roborio-4030-frc.local/?action=video";
     }
 
     public void init() {
@@ -97,7 +96,7 @@ public class VideoCameraInput extends JPanel {
                 out_of_try:
                 try {
                     ipChanged = false;
-                    final URL url = new URL("http://" + ipString + "/mjpg/video.mjpg");
+                    final URL url = new URL(mjpegURL);
                     connection = url.openConnection();
                     connection.setReadTimeout(250);
                     try {
