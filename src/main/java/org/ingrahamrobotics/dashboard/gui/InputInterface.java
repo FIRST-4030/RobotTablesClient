@@ -23,8 +23,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
