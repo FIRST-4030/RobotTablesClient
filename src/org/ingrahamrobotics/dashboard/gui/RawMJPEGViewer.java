@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class RawMJPEGViewer extends JPanel implements Runnable {
 
 	private static final long serialVersionUID = 3484505648344571976L;
-	
+
 	private final static int PORT = 1180;
 	private final static byte[] MAGIC_NUMBERS = { 0x01, 0x00, 0x00, 0x00 };
 	private final static int SIZE_640x480 = 0;
@@ -25,11 +25,10 @@ public class RawMJPEGViewer extends JPanel implements Runnable {
 	private final static int SIZE_160x120 = 2;
 	private final static int HW_COMPRESSION = -1;
 	private final static int FPS_INTERVAL = 1000;
-	private final static int SOCKET_TIMEOUT = 500;
+	private final static int SOCKET_TIMEOUT = 1000;
 
 	private BufferedImage frame = null;
 	private final Object frameMutex = new Object();
-	private String errorMessage = null;
 	private boolean done = false;
 	private int fps = 0;
 
@@ -103,6 +102,10 @@ public class RawMJPEGViewer extends JPanel implements Runnable {
 			/* Clear and repaint whenever we get here to catch disconnects */
 			this.frame = null;
 			this.repaint();
+			try {
+				Thread.sleep(SOCKET_TIMEOUT);
+			} catch (InterruptedException e1) {
+			}
 
 			try {
 				/* Connect the raw camera socket */
@@ -164,6 +167,15 @@ public class RawMJPEGViewer extends JPanel implements Runnable {
 						size += huffman_table.length;
 					}
 
+					/* FPS calculation */
+					long now = System.currentTimeMillis();
+					frames++;
+					if (now - fpsTS > FPS_INTERVAL) {
+						fpsTS = now;
+						fps = frames * (1000 / FPS_INTERVAL);
+						frames = 0;
+					}
+
 					/*
 					 * Decode the data and re-paint the component with the new
 					 * frame
@@ -174,45 +186,15 @@ public class RawMJPEGViewer extends JPanel implements Runnable {
 						}
 
 						this.frame = ImageIO.read(new ByteArrayInputStream(data));
-						this.errorMessage = null;
-
-						// FPS calculation
-						long now = System.currentTimeMillis();
-						frames++;
-						if (now - fpsTS > FPS_INTERVAL) {
-							fpsTS = now;
-							fps = frames * (1000 / FPS_INTERVAL);
-							frames = 0;
-						}
-
 						this.repaint();
 					}
 				}
-			} catch (ConnectException e) {
-				if (this.errorMessage == null) {
-					this.errorMessage = e.getMessage();
-				}
-			} catch (EOFException e) {
-				if (this.errorMessage == null) {
-					this.errorMessage = "Robot stopped returning images";
-				}
-			} catch (IOException e) {
-				if (this.errorMessage == null) {
-					this.errorMessage = e.getMessage();
-				}
-			} finally {
+			} catch (Exception e) {
 				if (this.socket != null) {
 					try {
 						this.socket.close();
-					} catch (IOException e) {
+					} catch (IOException f) {
 					}
-				}
-
-				this.repaint();
-
-				try {
-					Thread.sleep(SOCKET_TIMEOUT);
-				} catch (InterruptedException e1) {
 				}
 			}
 		}
