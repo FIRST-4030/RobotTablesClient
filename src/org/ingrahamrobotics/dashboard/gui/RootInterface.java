@@ -72,7 +72,7 @@ public class RootInterface {
 		tabbedPane.setSelectedComponent(mainPanel);
 
 		// Video input
-		VideoCameraInput cameraPane = new VideoCameraInput();
+		RawMJPEGViewer cameraPane = new RawMJPEGViewer();
 		tabbedPane.add(cameraPane, "Camera");
 		cameraPane.init();
 	}
