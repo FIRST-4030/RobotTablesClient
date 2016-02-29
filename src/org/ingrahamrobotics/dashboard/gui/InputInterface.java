@@ -22,8 +22,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -121,8 +124,13 @@ public class InputInterface implements InputListener {
 		panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
 		tableRootPanel.removeAll();
-		for (JPanel createdPanel : keyToValuePanel.values()) {
-			tableRootPanel.add(createdPanel, panelConstraints);
+		List<String> list = new ArrayList<String>();
+		for (String key : keyToValuePanel.keySet()) {
+			list.add(key);
+		}
+		Collections.sort(list);
+		for (Iterator<String> i = list.iterator(); i.hasNext();) {
+			tableRootPanel.add(keyToValuePanel.get(i.next()), panelConstraints);
 		}
 		tableRootPanel.revalidate();
 	}
