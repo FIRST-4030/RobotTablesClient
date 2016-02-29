@@ -65,6 +65,13 @@ public class InputTablesMain implements TableUpdateListener, ClientUpdateListene
 
         valueSaveRunnable = new UpdateableDelayedRunnable(storage::save);
     }
+    
+    public Set<String> defaultKeys() {
+    	if (defaultSettingsTable == null) {
+    		return null;
+    	}
+    	return defaultSettingsTable.getKeySet();    		
+    }
 
     public void updateDefault(String key, String value) {
         if (valuesNotDefault.contains(key)) {

@@ -21,6 +21,9 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,160 +46,185 @@ import org.ingrahamrobotics.dashboard.util.GBC;
 
 public class InputInterface implements InputListener {
 
-    private final InputTablesMain main;
-    private final JPanel tableRootPanel;
-    private final Map<String, JPanel> keyToValuePanel;
-    private final GridBagConstraints panelConstraints = new GBC().gridx(0).insets(new Insets(5, 0, 5, 0)).anchor(GBC.EAST);
+	private final InputTablesMain main;
+	private final JPanel tableRootPanel;
+	private final Map<String, JPanel> keyToValuePanel;
+	private final GridBagConstraints panelConstraints = new GBC().gridx(0).insets(new Insets(5, 0, 5, 0))
+			.anchor(GBC.EAST);
 
-    public InputInterface(final Application application) {
-        this.main = application.getInput();
+	public InputInterface(final Application application) {
+		this.main = application.getInput();
 
-        // tableRootPanel
-        tableRootPanel = new JPanel(new GridBagLayout());
-        tableRootPanel.setMinimumSize(new Dimension(600, 40));
-        JScrollPane scrollFrame = new JScrollPane(tableRootPanel);
-        //scrollFrame.setPreferredSize(new Dimension(600, 40));
-        application.getRoot().getMainPanel().add(scrollFrame, new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(1).gridy(1));
+		// tableRootPanel
+		tableRootPanel = new JPanel(new GridBagLayout());
+		tableRootPanel.setMinimumSize(new Dimension(600, 40));
+		JScrollPane scrollFrame = new JScrollPane(tableRootPanel);
+		// scrollFrame.setPreferredSize(new Dimension(600, 40));
+		application.getRoot().getMainPanel().add(scrollFrame,
+				new GBC().weightx(1).weighty(1).fill(GridBagConstraints.BOTH).gridx(1).gridy(1));
 
-        // tableRootPanel refresh
-        tableRootPanel.revalidate();
+		// tableRootPanel refresh
+		tableRootPanel.revalidate();
 
-        // maps
-        keyToValuePanel = new TreeMap<>();
-    }
+		// maps
+		keyToValuePanel = new TreeMap<>();
+	}
 
-    @Override
-    public void onNotStale() {
-        // TODO: At this point, we should trim all keys which don't exist in the defaultSettingsTable
-    }
+	@Override
+	public void onNotStale() {
+		// TODO: Trim all keys which don't exist in defaultSettingsTables
+		if (true) {
+			return;
+		}
 
-    @Override
-    public void onStale() {
-    }
+		// The code past here is plausible but untested
 
-    @Override
-    public void onCreateDefaultKey(final String keyName, final String keyValue) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(new LineBorder(Color.BLACK));
-        keyToValuePanel.put(keyName, panel);
+		// Get the local list
+		HashSet<String> localKeys = new HashSet<String>();
+		for (String key : keyToValuePanel.keySet()) {
+			localKeys.add(key);
+		}
 
-        JLabel keyLabel = new JLabel(keyName);
-        keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        panel.add(keyLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+		// Trim known elements from defaultSettingsTable
+		for (String key : main.defaultKeys()) {
+			localKeys.remove(key);
+		}
 
-        JSeparator separator = new JSeparator(JSeparator.VERTICAL);
-        separator.setPreferredSize(new Dimension(2, 20));
-        panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+		// Remove anything still in the list
+		for (String key : (Iterable<String>) localKeys) {
+			this.onDeleteKey(key);
+		}
+	}
 
-        JTextField valueField = new JTextField(keyValue, 20);
-        valueField.setMinimumSize(new Dimension(100, 10));
-        valueField.setBorder(new EmptyBorder(5, 5, 5, 5));
-        valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
-        panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
+	@Override
+	public void onStale() {
+	}
 
-        tableRootPanel.removeAll();
-        for (JPanel createdPanel : keyToValuePanel.values()) {
-            tableRootPanel.add(createdPanel, panelConstraints);
-        }
-        tableRootPanel.revalidate();
-    }
+	@Override
+	public void onCreateDefaultKey(final String keyName, final String keyValue) {
+		JPanel panel = new JPanel(new GridBagLayout());
+		panel.setBorder(new LineBorder(Color.BLACK));
+		keyToValuePanel.put(keyName, panel);
 
-    @Override
-    public void onUpdateDefaultKey(final String keyName, final String keyValue) {
-    }
+		JLabel keyLabel = new JLabel(keyName);
+		keyLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		panel.add(keyLabel, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
-    @Override
-    public void onDeleteKey(final String keyName) {
-        JPanel valuePanel = keyToValuePanel.get(keyName);
-        tableRootPanel.remove(valuePanel);
-        tableRootPanel.revalidate();
-    }
+		JSeparator separator = new JSeparator(JSeparator.VERTICAL);
+		separator.setPreferredSize(new Dimension(2, 20));
+		panel.add(separator, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
-    public class JFieldActionListener implements DocumentListener {
+		JTextField valueField = new JTextField(keyValue, 20);
+		valueField.setMinimumSize(new Dimension(100, 10));
+		valueField.setBorder(new EmptyBorder(5, 5, 5, 5));
+		valueField.getDocument().addDocumentListener(new JFieldActionListener(keyName, valueField));
+		panel.add(valueField, new GBC().fill(GridBagConstraints.VERTICAL).gridy(0));
 
-        /**
-         * This is the time that we should actually update the key. This is pushed to the current time + 1000 every time
-         * the field is updated, so we do automatically send, but not with the user's every keystroke.
-         */
-        private final UpdateRunnable updateRunnable;
-        private final Object updateLock;
-        private final String key;
-        private final JTextField field;
-        private long updateTime;
-        private boolean updaterRunning;
+		tableRootPanel.removeAll();
+		for (JPanel createdPanel : keyToValuePanel.values()) {
+			tableRootPanel.add(createdPanel, panelConstraints);
+		}
+		tableRootPanel.revalidate();
+	}
 
-        public JFieldActionListener(final String key, final JTextField field) {
-            this.key = key;
-            this.field = field;
-            updateRunnable = new UpdateRunnable();
-            updateLock = new Object();
-        }
+	@Override
+	public void onUpdateDefaultKey(final String keyName, final String keyValue) {
+	}
 
-        private void startUpdate() {
-            synchronized (updateLock) {
-                updateTime = System.currentTimeMillis() + 1000;
-                if (!updaterRunning) {
-                    new Thread(updateRunnable).start();
-                }
-            }
-        }
+	@Override
+	public void onDeleteKey(final String keyName) {
+		JPanel valuePanel = keyToValuePanel.get(keyName);
+		tableRootPanel.remove(valuePanel);
+		tableRootPanel.revalidate();
+	}
 
-        @Override
-        public void insertUpdate(final DocumentEvent e) {
-            startUpdate();
-        }
+	public class JFieldActionListener implements DocumentListener {
 
-        @Override
-        public void removeUpdate(final DocumentEvent e) {
-            startUpdate();
-        }
+		/**
+		 * This is the time that we should actually update the key. This is
+		 * pushed to the current time + 1000 every time the field is updated, so
+		 * we do automatically send, but not with the user's every keystroke.
+		 */
+		private final UpdateRunnable updateRunnable;
+		private final Object updateLock;
+		private final String key;
+		private final JTextField field;
+		private long updateTime;
+		private boolean updaterRunning;
 
-        @Override
-        public void changedUpdate(final DocumentEvent e) {
-            startUpdate();
-        }
+		public JFieldActionListener(final String key, final JTextField field) {
+			this.key = key;
+			this.field = field;
+			updateRunnable = new UpdateRunnable();
+			updateLock = new Object();
+		}
 
-        private class UpdateRunnable implements Runnable {
+		private void startUpdate() {
+			synchronized (updateLock) {
+				updateTime = System.currentTimeMillis() + 1000;
+				if (!updaterRunning) {
+					new Thread(updateRunnable).start();
+				}
+			}
+		}
 
-            @Override
-            public void run() {
-                long currentUpdateTime;
-                synchronized (updateLock) {
-                    if (updaterRunning) {
-                        return;
-                    }
-                    updaterRunning = true;
-                    currentUpdateTime = updateTime;
-                }
-                while (true) {
-                    long waitTime = currentUpdateTime - System.currentTimeMillis();
-                    try {
-                        Thread.sleep(waitTime);
-                    } catch (InterruptedException e) {
-                        Output.logError("Warning! UpdateRunnable interrupted! Key %s will no longer be updated!", key);
-                        e.printStackTrace();
-                        synchronized (updateLock) {
-                            updaterRunning = false;
-                        }
-                        return;
-                    }
-                    synchronized (updateLock) {
-                        if (updateTime > currentUpdateTime) {
-                            // If the updateTime has changed since we started, we should sleep again.
-                            currentUpdateTime = updateTime;
-                        } else {
-                            // Otherwise, let's update it!
-                            updaterRunning = false;
-                            break;
-                        }
-                    }
-                }
-                SwingUtilities.invokeLater(() -> {
-                    String text = field.getText();
-                    Output.iLog("Updated key '%s': '%s'", key, text);
-                    main.updateKey(key, field.getText());
-                });
-            }
-        }
-    }
+		@Override
+		public void insertUpdate(final DocumentEvent e) {
+			startUpdate();
+		}
+
+		@Override
+		public void removeUpdate(final DocumentEvent e) {
+			startUpdate();
+		}
+
+		@Override
+		public void changedUpdate(final DocumentEvent e) {
+			startUpdate();
+		}
+
+		private class UpdateRunnable implements Runnable {
+
+			@Override
+			public void run() {
+				long currentUpdateTime;
+				synchronized (updateLock) {
+					if (updaterRunning) {
+						return;
+					}
+					updaterRunning = true;
+					currentUpdateTime = updateTime;
+				}
+				while (true) {
+					long waitTime = currentUpdateTime - System.currentTimeMillis();
+					try {
+						Thread.sleep(waitTime);
+					} catch (InterruptedException e) {
+						Output.logError("Warning! UpdateRunnable interrupted! Key %s will no longer be updated!", key);
+						e.printStackTrace();
+						synchronized (updateLock) {
+							updaterRunning = false;
+						}
+						return;
+					}
+					synchronized (updateLock) {
+						if (updateTime > currentUpdateTime) {
+							// If the updateTime has changed since we started,
+							// we should sleep again.
+							currentUpdateTime = updateTime;
+						} else {
+							// Otherwise, let's update it!
+							updaterRunning = false;
+							break;
+						}
+					}
+				}
+				SwingUtilities.invokeLater(() -> {
+					String text = field.getText();
+					Output.iLog("Updated key '%s': '%s'", key, text);
+					main.updateKey(key, field.getText());
+				});
+			}
+		}
+	}
 }
